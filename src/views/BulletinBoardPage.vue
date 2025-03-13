@@ -2,10 +2,10 @@
   <div>
     <section class="bg-dark text-white py-12">
       <div class="container mx-auto px-4">
-        <h1 class="text-4xl md:text-5xl font-extrabold mb-4 leading-tight">Pinnwand</h1>
+        <h1 class="text-4xl md:text-5xl font-extrabold mb-4 leading-tight">Kurzeinsätze & Vertretungen</h1>
         <p class="text-xl max-w-3xl">
-          Hier können Ärzte und Einrichtungen direkt kommunizieren. Teilen Sie kurzfristige Angebote, 
-          Gesuche oder andere relevante Informationen mit der MedMatch-Community.
+          Hier finden Ärzte und Einrichtungen kurzfristige Einsätze (1 Woche bis 3 Monate). 
+          Ärzte profitieren von übertariflichen Vergütungen, Kliniken lösen Personalengpässe schnell und unkompliziert.
         </p>
       </div>
     </section>
@@ -317,8 +317,8 @@ const demoMessages = [
     email: 'personal@klinikum-muenchen.de',
     userType: 'Klinik',
     messageType: 'Angebot',
-    title: 'Vertretung für Notfallmedizin (1 Woche)',
-    content: 'Suchen dringend Vertretung für unsere Notfallstation vom 15.-22.06.2025. Erfahrung in Notfallmedizin erforderlich. Attraktive Vergütung nach Vereinbarung.',
+    title: 'Vertretung Notfallmedizin (2 Wochen) - +30% Vergütung',
+    content: 'Suchen dringend Vertretung für unsere Notfallstation vom 15.-29.06.2025. Erfahrung in Notfallmedizin erforderlich. +30% über regulärem Tarif, Unterkunft wird gestellt.',
     timestamp: new Date('2025-05-15T10:30:00'),
     privacyPolicyAccepted: true
   },
@@ -328,8 +328,8 @@ const demoMessages = [
     email: 'j.weber@arztpraxis.de',
     userType: 'Arzt',
     messageType: 'Gesuch',
-    title: 'Anästhesist sucht Teilzeitstelle',
-    content: 'Facharzt für Anästhesie mit 8 Jahren Erfahrung sucht Teilzeitstelle (50-60%) im Raum Köln ab sofort.',
+    title: 'Anästhesist verfügbar für Kurzeinsätze bis 4 Wochen',
+    content: 'Facharzt für Anästhesie mit 8 Jahren Erfahrung sucht Kurzeinsätze (1-4 Wochen) im Raum Köln ab sofort. Flexibel und kurzfristig verfügbar, auch Wochenenddienste möglich.',
     timestamp: new Date('2025-05-12T15:45:00'),
     privacyPolicyAccepted: true
   },
@@ -339,8 +339,8 @@ const demoMessages = [
     email: 'karriere@uk-hamburg.de',
     userType: 'Klinik',
     messageType: 'Angebot',
-    title: 'Oberarztstelle Kardiologie',
-    content: 'Suchen zum nächstmöglichen Zeitpunkt engagierten Oberarzt (m/w/d) für unsere kardiologische Abteilung. Vollzeit, unbefristet.',
+    title: 'Kardiologie - 3-Monats-Vertretung (übertariflich)',
+    content: 'Suchen für den Zeitraum 01.07.-30.09.2025 Facharzt (m/w/d) für unsere kardiologische Abteilung. Vergütung 40% über TV-Ärzte, Dienstwohnung möglich, flexible Dienstplangestaltung.',
     timestamp: new Date('2025-05-10T09:15:00'),
     privacyPolicyAccepted: true
   },
@@ -350,8 +350,8 @@ const demoMessages = [
     email: 't.schmidt@mail.de',
     userType: 'Arzt',
     messageType: 'Information',
-    title: 'Fachärztliche Weiterbildung Radiologie',
-    content: 'Biete Mentoring und Unterstützung bei der Weiterbildung zum Facharzt für Radiologie. Bei Interesse gerne kontaktieren.',
+    title: 'Fachärztliche Vertretungs-Pool Radiologie',
+    content: 'Organisiere Vertretungs-Pool für kurzfristige Radiologie-Einsätze (max. 3 Monate). Über 20 Kolleginnen und Kollegen bereits dabei. Interessierte Radiologen und Kliniken können mich kontaktieren.',
     timestamp: new Date('2025-05-08T11:20:00'),
     privacyPolicyAccepted: true
   },
@@ -361,8 +361,8 @@ const demoMessages = [
     email: 'personal@rehaklinik-schwarzwald.de',
     userType: 'Klinik',
     messageType: 'Angebot',
-    title: 'Honorarärzte für Wochenenddienste',
-    content: 'Suchen regelmäßig Honorarärzte für Wochenenddienste. Flexible Einteilung nach Absprache. Attraktive Konditionen. Fachrichtung: Innere Medizin, Allgemeinmedizin.',
+    title: 'Honorarärzte für Wochenenddienste (bis zu 2.500€/WE)',
+    content: 'Suchen regelmäßig Honorarärzte für Wochenenddienste (Fr-So). Attraktives Honorar von bis zu 2.500€ pro Wochenende, Unterkunft inklusive. Fachrichtung: Innere Medizin, Allgemeinmedizin.',
     timestamp: new Date('2025-05-05T14:10:00'),
     privacyPolicyAccepted: true
   },
@@ -372,8 +372,8 @@ const demoMessages = [
     email: 's.mueller@gmail.com',
     userType: 'Arzt',
     messageType: 'Gesuch',
-    title: 'Kinderärztin sucht neue Herausforderung',
-    content: 'Fachärztin für Pädiatrie mit 12 Jahren Berufserfahrung sucht neue Stelle im Raum Berlin. Klinik oder größere Praxis bevorzugt.',
+    title: 'Kinderärztin für 3-Monats-Einsätze verfügbar',
+    content: 'Fachärztin für Pädiatrie mit 12 Jahren Berufserfahrung sucht Vertretungsstellen oder Projekteinsätze für 1-3 Monate im Raum Berlin/Brandenburg. Flexible Zeiteinteilung, auch kurzfristig verfügbar.',
     timestamp: new Date('2025-05-03T16:30:00'),
     privacyPolicyAccepted: true
   }

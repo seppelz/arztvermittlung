@@ -9,11 +9,10 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
           <div>
             <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white leading-tight mb-6">
-              Direkte Vermittlung für Ärzte und Kliniken
+              Kurzfristige Arztvermittlung mit Top-Honoraren
             </h1>
             <p class="text-xl text-white/90 mb-8 max-w-lg">
-              Verbinden Sie sich direkt mit Ärzten oder Kliniken ohne Umwege. Schnell, einfach und 
-              kosteneffizient.
+              Verbinden Sie sich direkt mit Ärzten oder Kliniken für Einsätze bis zu 3 Monaten. Ärzte profitieren von übertariflichen Honoraren, Kliniken von schneller Engpassüberbrückung.
             </p>
             <div class="flex flex-wrap gap-4">
               <router-link :to="{ name: 'ForDoctors' }" class="btn-primary text-lg px-6 py-3">
@@ -42,7 +41,7 @@
         <div class="text-center mb-16">
           <h2 class="text-3xl md:text-4xl font-bold text-heading mb-6">Warum MedMatch?</h2>
           <p class="text-xl text-neutral-600 max-w-3xl mx-auto">
-            Unsere Plattform verbindet medizinische Fachkräfte und Einrichtungen direkt, ohne teure Vermittlungsgebühren.
+            Unsere Plattform verbindet Ärzte und medizinische Einrichtungen direkt für kurzfristige Einsätze von einer Woche bis zu drei Monaten – ohne teure Vermittlungsgebühren.
           </p>
         </div>
 
@@ -53,9 +52,9 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
-            <h3 class="text-xl font-bold text-heading mb-3">Kein Vermittlungshonorar</h3>
+            <h3 class="text-xl font-bold text-heading mb-3">Übertarifliche Vergütung</h3>
             <p class="text-neutral-600">
-              Direkte Vermittlung ohne zusätzliche Kosten. Sie zahlen keine hohen Vermittlungsgebühren wie bei traditionellen Agenturen.
+              Ärzte erhalten für kurzfristige Einsätze 30-50% über der regulären Vergütung. Kliniken sparen trotzdem im Vergleich zu klassischen Personaldienstleistern.
             </p>
           </div>
 
@@ -65,9 +64,9 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
             </div>
-            <h3 class="text-xl font-bold text-heading mb-3">Schnelle Vermittlung</h3>
+            <h3 class="text-xl font-bold text-heading mb-3">Schnelle Vertretungslösungen</h3>
             <p class="text-neutral-600">
-              Direkter Kontakt zwischen Ärzten und Kliniken beschleunigt den Vermittlungsprozess erheblich.
+              Kurzfristige Engpässe im Klinikbetrieb überbrücken oder als Arzt flexible Kurzeinsätze finden – meist innerhalb weniger Tage vermittelt.
             </p>
           </div>
 
@@ -77,9 +76,9 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
               </svg>
             </div>
-            <h3 class="text-xl font-bold text-heading mb-3">Sichere Plattform</h3>
+            <h3 class="text-xl font-bold text-heading mb-3">Maximale Flexibilität</h3>
             <p class="text-neutral-600">
-              Daten werden sicher verarbeitet und der Kontakt erfolgt nur zwischen verifizierten Partnern.
+              Nur kurzfristige Einsätze zwischen 1 Woche und 3 Monaten. Keine langen Vertragsbindungen, hohe Planbarkeit für beide Seiten.
             </p>
           </div>
         </div>
@@ -92,7 +91,7 @@
         <div class="text-center mb-16">
           <h2 class="text-3xl md:text-4xl font-bold text-heading mb-6">So funktioniert's</h2>
           <p class="text-xl text-neutral-600 max-w-3xl mx-auto">
-            Einfacher Prozess für Ärzte und Kliniken, um schnell zusammenzufinden.
+            Einfacher Prozess für Ärzte und Kliniken, um schnell kurzfristige Einsätze zu vereinbaren.
           </p>
         </div>
 
@@ -110,18 +109,18 @@
             <ol class="relative border-l-2 border-primary-200 pl-8 space-y-8">
               <li class="process-step">
                 <div class="process-number">1</div>
-                <h4 class="text-lg font-bold text-heading mb-2">Profil erstellen</h4>
-                <p class="text-neutral-600">Geben Sie Ihre Qualifikationen, Erfahrungen und Präferenzen an.</p>
+                <h4 class="text-lg font-bold text-heading mb-2">Verfügbarkeit angeben</h4>
+                <p class="text-neutral-600">Teilen Sie mit, für welche Zeiträume (1 Woche bis 3 Monate) und Regionen Sie verfügbar sind.</p>
               </li>
               <li class="process-step">
                 <div class="process-number">2</div>
-                <h4 class="text-lg font-bold text-heading mb-2">Stellenangebote finden</h4>
-                <p class="text-neutral-600">Durchsuchen Sie passende Stellenangebote von Kliniken und Krankenhäusern.</p>
+                <h4 class="text-lg font-bold text-heading mb-2">Passende Kurzeinsätze finden</h4>
+                <p class="text-neutral-600">Durchsuchen Sie attraktiv vergütete Vertretungsstellen und kurzfristige Einsätze in Kliniken.</p>
               </li>
               <li class="process-step">
                 <div class="process-number">3</div>
-                <h4 class="text-lg font-bold text-heading mb-2">Direkter Kontakt</h4>
-                <p class="text-neutral-600">Nehmen Sie ohne Umwege direkten Kontakt mit den Einrichtungen auf.</p>
+                <h4 class="text-lg font-bold text-heading mb-2">Schnelle Vereinbarung</h4>
+                <p class="text-neutral-600">Verhandeln Sie direkt mit den Kliniken über Honorar, Unterkunft und Konditionen für Ihren Kurzeinsatz.</p>
               </li>
             </ol>
             <div class="mt-8">
@@ -144,18 +143,18 @@
             <ol class="relative border-l-2 border-secondary-200 pl-8 space-y-8">
               <li class="process-step">
                 <div class="process-number secondary">1</div>
-                <h4 class="text-lg font-bold text-heading mb-2">Stellenangebote erstellen</h4>
-                <p class="text-neutral-600">Beschreiben Sie Ihre offenen Stellen und benötigten Qualifikationen.</p>
+                <h4 class="text-lg font-bold text-heading mb-2">Bedarf veröffentlichen</h4>
+                <p class="text-neutral-600">Beschreiben Sie Ihren kurzfristigen Personalbedarf, Zeitraum (1 Woche bis 3 Monate) und angebotene Vergütung.</p>
               </li>
               <li class="process-step">
                 <div class="process-number secondary">2</div>
-                <h4 class="text-lg font-bold text-heading mb-2">Nach Ärzten suchen</h4>
-                <p class="text-neutral-600">Finden Sie qualifizierte Ärzte, die Ihren Anforderungen entsprechen.</p>
+                <h4 class="text-lg font-bold text-heading mb-2">Sofort verfügbare Ärzte finden</h4>
+                <p class="text-neutral-600">Durchsuchen Sie Profile von Ärzten, die aktuell für Kurzeinsätze verfügbar sind und Ihren Anforderungen entsprechen.</p>
               </li>
               <li class="process-step">
                 <div class="process-number secondary">3</div>
-                <h4 class="text-lg font-bold text-heading mb-2">Direkte Kontaktaufnahme</h4>
-                <p class="text-neutral-600">Kontaktieren Sie interessante Kandidaten ohne Vermittlungsgebühren.</p>
+                <h4 class="text-lg font-bold text-heading mb-2">Direkte Vereinbarung</h4>
+                <p class="text-neutral-600">Handeln Sie Konditionen direkt mit dem Arzt aus – keine versteckten Gebühren, nur die vereinbarte Vergütung.</p>
               </li>
             </ol>
             <div class="mt-8">
@@ -186,7 +185,7 @@
               </svg>
             </div>
             <p class="text-white/90 mb-6">
-              "Über MedMatch habe ich innerhalb von zwei Wochen meine neue Stelle als Oberarzt gefunden. Der direkte Kontakt hat den Prozess sehr beschleunigt."
+              "Über MedMatch habe ich innerhalb von drei Tagen eine zweimonatige Vertretung als Notarzt gefunden. Übertarifliche Vergütung und die direkte Kommunikation haben mich sofort überzeugt."
             </p>
             <div class="flex items-center">
               <div class="h-12 w-12 rounded-full bg-primary-700 flex items-center justify-center text-white font-bold mr-4">
@@ -206,7 +205,7 @@
               </svg>
             </div>
             <p class="text-white/90 mb-6">
-              "Als kleine Fachklinik konnten wir uns teure Personalvermittler nicht leisten. MedMatch hat uns ermöglicht, trotzdem qualifizierte Fachärzte zu finden."
+              "Als kleine Fachklinik müssen wir regelmäßig Engpässe überbrücken. MedMatch ermöglicht uns, qualifizierte Ärzte für Kurzeinsätze zu finden – trotz höherer Honorare sparen wir im Vergleich zu Personalvermittlern."
             </p>
             <div class="flex items-center">
               <div class="h-12 w-12 rounded-full bg-secondary-700 flex items-center justify-center text-white font-bold mr-4">
@@ -226,7 +225,7 @@
               </svg>
             </div>
             <p class="text-white/90 mb-6">
-              "Nach meiner Facharztausbildung wollte ich in eine andere Region wechseln. Durch MedMatch fand ich Kliniken, die genau meinen Vorstellungen entsprachen."
+              "Zwischen zwei Festanstellungen konnte ich durch dreimonatige Kurzeinsätze nicht nur meine Finanzen aufbessern, sondern auch wertvolle Kontakte knüpfen. Dank der übertariflichen Vergütung konnte ich meinen geplanten Urlaub verlängern."
             </p>
             <div class="flex items-center">
               <div class="h-12 w-12 rounded-full bg-accent-700 flex items-center justify-center text-white font-bold mr-4">
@@ -248,10 +247,10 @@
         <div class="bg-gradient-secondary rounded-2xl shadow-xl p-8 md:p-12">
           <div class="max-w-3xl mx-auto text-center">
             <h2 class="text-3xl md:text-4xl font-bold text-white mb-6">
-              Bereit, den nächsten Schritt zu gehen?
+              Bereit für übertarifliche Kurzeinsätze?
             </h2>
             <p class="text-xl text-white/90 mb-8">
-              Ob als Arzt auf der Suche nach neuen Möglichkeiten oder als Klinik auf der Suche nach qualifizierten Fachkräften – MedMatch hilft Ihnen dabei, schnell und direkt die passenden Kontakte zu knüpfen.
+              Ärzte: Erhöhen Sie Ihr Einkommen durch flexible Kurzeinsätze (1 Woche bis 3 Monate) mit 30-50% Honorarzuschlag. Kliniken: Überbrücken Sie Personalengpässe schnell und unkompliziert mit qualifizierten Fachärzten.
             </p>
             <div class="flex flex-wrap justify-center gap-4">
               <router-link :to="{ name: 'ForDoctors' }" class="btn-white text-lg px-8 py-3 bg-white text-secondary-700 hover:bg-neutral-100">
@@ -270,9 +269,9 @@
     <section class="py-20 bg-neutral-50">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-16">
-          <h2 class="text-3xl md:text-4xl font-bold text-heading mb-6">Aktuelle Pinnwand-Einträge</h2>
+          <h2 class="text-3xl md:text-4xl font-bold text-heading mb-6">Aktuelle Kurzeinsätze & Vertretungen</h2>
           <p class="text-xl text-neutral-600 max-w-3xl mx-auto">
-            Die neuesten Angebote und Gesuche von Ärzten und Kliniken auf unserer Plattform.
+            Die neuesten Angebote für Vertretungen (1 Woche bis 3 Monate) mit übertariflicher Vergütung und kurzfristig verfügbare Ärzte auf unserer Plattform.
           </p>
         </div>
 
@@ -282,9 +281,9 @@
               Stellenangebot
             </div>
             <div class="p-6">
-              <h3 class="text-xl font-bold text-heading mb-3">Facharzt für Anästhesie (m/w/d)</h3>
+              <h3 class="text-xl font-bold text-heading mb-3">Facharzt Anästhesie – 8 Wochen (+50%)</h3>
               <p class="text-neutral-600 mb-4 line-clamp-3">
-                Klinikum Frankfurt sucht zum nächstmöglichen Zeitpunkt einen Facharzt für Anästhesie in Vollzeit. Wir bieten ein kollegiales Team und attraktive Arbeitsbedingungen.
+                Universitätsklinikum Frankfurt sucht für Juli-August 2025 einen Facharzt für Anästhesie. Vergütung 50% über Tarif, flexible Arbeitszeiten, Unterkunft kann gestellt werden.
               </p>
               <div class="flex justify-between items-center">
                 <span class="text-sm text-neutral-500">Vor 2 Tagen</span>
@@ -300,9 +299,9 @@
               Stellengesuch
             </div>
             <div class="p-6">
-              <h3 class="text-xl font-bold text-heading mb-3">Chirurg sucht neue Herausforderung</h3>
+              <h3 class="text-xl font-bold text-heading mb-3">Chirurg für Kurzeinsätze verfügbar</h3>
               <p class="text-neutral-600 mb-4 line-clamp-3">
-                Facharzt für Allgemeinchirurgie mit 8 Jahren Erfahrung sucht neue Position in München oder Umgebung. Spezialgebiete: Laparoskopische Chirurgie und Traumatologie.
+                Facharzt für Allgemeinchirurgie mit 8 Jahren Erfahrung bietet Vertretungen (1-12 Wochen) im Raum München/Bayern. Sofort verfügbar für Engpassüberbrückung, auch kurzfristig.
               </p>
               <div class="flex justify-between items-center">
                 <span class="text-sm text-neutral-500">Vor 3 Tagen</span>
@@ -318,9 +317,9 @@
               Vertretung
             </div>
             <div class="p-6">
-              <h3 class="text-xl font-bold text-heading mb-3">Kurzzeitige Vertretung für Gynäkologie</h3>
+              <h3 class="text-xl font-bold text-heading mb-3">Kurzzeitvertretung Gynäkologie (6 Wochen)</h3>
               <p class="text-neutral-600 mb-4 line-clamp-3">
-                Praxisklinik in Berlin sucht für den Zeitraum 15.08.-30.09. eine Vertretung für Gynäkologie. Flexible Arbeitszeiten möglich, attraktive Vergütung.
+                Praxisklinik in Berlin sucht für den Zeitraum 15.08.-30.09. eine Vertretung für Gynäkologie. Übertarifliche Vergütung (bis zu 15.000€/Monat), flexible Arbeitszeiten möglich.
               </p>
               <div class="flex justify-between items-center">
                 <span class="text-sm text-neutral-500">Vor 5 Tagen</span>
