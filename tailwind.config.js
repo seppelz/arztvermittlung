@@ -25,7 +25,7 @@ export default {
         dark: '#003B73',
         'dark-800': '#002A54',
         light: '#F8FAFC',
-        'heading': '#004E7C',
+        'heading': '#003B73',
         'text-dark': '#1F2937',
         'highlight': '#0090E1',
         'success': '#059669',

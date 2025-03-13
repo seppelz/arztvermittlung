@@ -27,6 +27,9 @@ All notable changes to the MedMatch project will be documented in this file.
 - Optimized Vite build configuration for production
 - Improved color palette with stronger heading colors
 - Enhanced typography with better font weights
+- Bulletin board page for direct communication between doctors and hospitals
+- Message filtering and sorting system for bulletin board
+- Contact system for bulletin board messages
 
 ### Fixed
 - CSS configuration for Tailwind CSS integration
@@ -42,3 +45,4 @@ All notable changes to the MedMatch project will be documented in this file.
 - Resolved asset loading issues in production environment
 - Improved contrast of headings for better readability
 - Enhanced visual hierarchy with stronger heading styles 
+- Strengthened h2 heading colors for better visibility and hierarchy 

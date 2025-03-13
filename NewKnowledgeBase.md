@@ -44,6 +44,32 @@ This document contains insights and learnings gained during the development of t
 - Creating dedicated heading colors in the theme enhances brand consistency across components
 - Border elements like border-b-2 with accent colors help create visual separation for sections
 - Using increased font weights (extrabold, bold) makes headings stand out more effectively
+- Heading colors should lean toward the darker end of the brand palette for optimal readability
+- Using the same color as your 'dark' theme color for headings creates strong visual anchors
+
+## Interactive Component Design
+- Card-based interfaces work well for displaying multiple similar items
+- Color-coded elements (like badges or indicators) help users quickly identify content types
+- Filtering interfaces should be visually distinct but not distract from main content
+- Modal dialogs should be clearly layered above the main interface with proper background overlay
+- Form validation should provide immediate feedback while being unobtrusive
+- Success messages benefit from subtle color-coding that aligns with the brand palette
+- Using v-if/v-else for toggling UI elements creates cleaner state management
+- Combining Tailwind's utility classes allows for responsive designs without custom CSS
+- Pagination components should clearly indicate current state and disabled actions
+- Filter buttons with active states improve usability for sorting and filtering interfaces
+
+## Bulletin Board Implementation
+- Computed properties in Vue.js are ideal for filtering and sorting dynamic lists
+- Using reactive refs for filter state management simplifies code maintenance
+- Message categorization (offers, requests, information) helps users navigate content
+- Time-based sorting options (newest/oldest) are essential for chronological content
+- Data pagination reduces load times and improves performance for long lists
+- Contact mechanisms should protect user privacy while enabling communication
+- Demo data helps visualize the final product during development
+- Modals for contact forms provide focused interaction without page navigation
+- Color-coding different message types improves scanning and information hierarchy
+- Dynamic badge styling with v-bind and conditional classes creates consistent visual language
 
 ## Visual Design Principles
 - Headings should have at least 4.5:1 contrast ratio with background for accessibility

@@ -11,6 +11,7 @@
         <router-link to="/" class="text-gray-700 hover:text-primary">Home</router-link>
         <router-link to="/for-doctors" class="text-gray-700 hover:text-primary">Für Ärzte</router-link>
         <router-link to="/for-hospitals" class="text-gray-700 hover:text-primary">Für Kliniken</router-link>
+        <router-link to="/bulletin-board" class="text-gray-700 hover:text-primary">Pinnwand</router-link>
         <router-link to="/about" class="text-gray-700 hover:text-primary">Über uns</router-link>
         <router-link to="/team" class="text-gray-700 hover:text-primary">Team</router-link>
         <router-link to="/contact" class="text-gray-700 hover:text-primary">Kontakt</router-link>
@@ -30,6 +31,7 @@
         <router-link to="/" class="text-gray-700 hover:text-primary" @click="isMenuOpen = false">Home</router-link>
         <router-link to="/for-doctors" class="text-gray-700 hover:text-primary" @click="isMenuOpen = false">Für Ärzte</router-link>
         <router-link to="/for-hospitals" class="text-gray-700 hover:text-primary" @click="isMenuOpen = false">Für Kliniken</router-link>
+        <router-link to="/bulletin-board" class="text-gray-700 hover:text-primary" @click="isMenuOpen = false">Pinnwand</router-link>
         <router-link to="/about" class="text-gray-700 hover:text-primary" @click="isMenuOpen = false">Über uns</router-link>
         <router-link to="/team" class="text-gray-700 hover:text-primary" @click="isMenuOpen = false">Team</router-link>
         <router-link to="/contact" class="text-gray-700 hover:text-primary" @click="isMenuOpen = false">Kontakt</router-link>

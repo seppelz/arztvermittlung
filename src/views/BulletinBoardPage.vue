@@ -1,0 +1,539 @@
+<template>
+  <div>
+    <section class="bg-secondary text-white py-12">
+      <div class="container mx-auto px-4">
+        <h1 class="text-4xl md:text-5xl font-extrabold mb-4 leading-tight">Pinnwand</h1>
+        <p class="text-xl max-w-3xl">
+          Hier können Ärzte und Einrichtungen direkt kommunizieren. Teilen Sie kurzfristige Angebote, 
+          Gesuche oder andere relevante Informationen mit der MedMatch-Community.
+        </p>
+      </div>
+    </section>
+
+    <section class="py-12 bg-light">
+      <div class="container mx-auto px-4">
+        <!-- Neue Nachricht erstellen -->
+        <div class="max-w-2xl mx-auto bg-white rounded-lg shadow-strong p-6 mb-12">
+          <h2 class="text-2xl md:text-3xl font-bold mb-6 text-center text-heading">Neue Nachricht</h2>
+          
+          <form @submit.prevent="submitMessage" class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label for="name" class="block text-text-dark font-medium mb-2">Name*</label>
+                <input 
+                  type="text" 
+                  id="name" 
+                  v-model="newMessage.name" 
+                  required 
+                  class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
+                  placeholder="Ihr Name oder Einrichtung"
+                />
+              </div>
+              
+              <div>
+                <label for="email" class="block text-text-dark font-medium mb-2">E-Mail*</label>
+                <input 
+                  type="email" 
+                  id="email" 
+                  v-model="newMessage.email" 
+                  required 
+                  class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
+                  placeholder="ihre-email@beispiel.de"
+                />
+              </div>
+            </div>
+            
+            <div>
+              <label for="userType" class="block text-text-dark font-medium mb-2">Sie sind*</label>
+              <select 
+                id="userType" 
+                v-model="newMessage.userType" 
+                required 
+                class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
+              >
+                <option value="">Bitte wählen</option>
+                <option value="Arzt">Arzt</option>
+                <option value="Klinik">Klinik/Einrichtung</option>
+              </select>
+            </div>
+            
+            <div>
+              <label for="messageType" class="block text-text-dark font-medium mb-2">Typ der Nachricht*</label>
+              <select 
+                id="messageType" 
+                v-model="newMessage.messageType" 
+                required 
+                class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
+              >
+                <option value="">Bitte wählen</option>
+                <option value="Angebot">Angebot</option>
+                <option value="Gesuch">Gesuch</option>
+                <option value="Information">Information</option>
+              </select>
+            </div>
+            
+            <div>
+              <label for="title" class="block text-text-dark font-medium mb-2">Titel*</label>
+              <input 
+                type="text" 
+                id="title" 
+                v-model="newMessage.title" 
+                required 
+                class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
+                placeholder="Titel Ihrer Nachricht"
+              />
+            </div>
+            
+            <div>
+              <label for="content" class="block text-text-dark font-medium mb-2">Nachricht*</label>
+              <textarea 
+                id="content" 
+                v-model="newMessage.content" 
+                required 
+                rows="4" 
+                class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
+                placeholder="Ihre Nachricht hier..."
+              ></textarea>
+            </div>
+            
+            <div class="flex items-start">
+              <input type="checkbox" id="privacyPolicy" v-model="newMessage.privacyPolicyAccepted" required class="mt-1 mr-2" />
+              <label for="privacyPolicy" class="text-sm text-gray-600">
+                Ich habe die <router-link to="/privacy" class="text-primary hover:underline">Datenschutzerklärung</router-link> gelesen und akzeptiere diese.*
+              </label>
+            </div>
+            
+            <div class="text-center">
+              <button 
+                type="submit" 
+                class="bg-primary hover:bg-primary-dark text-white font-bold py-3 px-10 rounded-lg shadow-strong transition-colors duration-300 text-lg"
+                :disabled="isSubmitting"
+              >
+                {{ isSubmitting ? 'Wird gesendet...' : 'Nachricht veröffentlichen' }}
+              </button>
+            </div>
+          </form>
+          
+          <div v-if="messageSent" class="mt-6 p-4 bg-success bg-opacity-10 text-success rounded-lg border border-success border-opacity-20">
+            <p class="font-semibold">Vielen Dank für Ihre Nachricht!</p>
+            <p>Ihre Nachricht wurde erfolgreich veröffentlicht.</p>
+          </div>
+        </div>
+        
+        <!-- Filter-Optionen -->
+        <div class="max-w-7xl mx-auto mb-8">
+          <div class="bg-white rounded-lg shadow-md p-4 flex flex-wrap gap-4 items-center">
+            <h3 class="text-lg font-bold text-heading mr-4">Filter:</h3>
+            
+            <div class="flex items-center space-x-2">
+              <button 
+                @click="filterMessages('all')" 
+                class="px-4 py-2 rounded-lg transition-colors"
+                :class="currentFilter === 'all' ? 'bg-primary text-white' : 'bg-gray-100 hover:bg-gray-200'"
+              >
+                Alle
+              </button>
+              <button 
+                @click="filterMessages('Angebot')" 
+                class="px-4 py-2 rounded-lg transition-colors"
+                :class="currentFilter === 'Angebot' ? 'bg-primary text-white' : 'bg-gray-100 hover:bg-gray-200'"
+              >
+                Angebote
+              </button>
+              <button 
+                @click="filterMessages('Gesuch')" 
+                class="px-4 py-2 rounded-lg transition-colors"
+                :class="currentFilter === 'Gesuch' ? 'bg-primary text-white' : 'bg-gray-100 hover:bg-gray-200'"
+              >
+                Gesuche
+              </button>
+              <button 
+                @click="filterMessages('Information')" 
+                class="px-4 py-2 rounded-lg transition-colors"
+                :class="currentFilter === 'Information' ? 'bg-primary text-white' : 'bg-gray-100 hover:bg-gray-200'"
+              >
+                Informationen
+              </button>
+            </div>
+            
+            <div class="ml-auto flex items-center">
+              <label for="sortOrder" class="mr-2 text-gray-700">Sortieren nach:</label>
+              <select 
+                id="sortOrder" 
+                v-model="sortOrder" 
+                class="px-4 py-2 border rounded-lg"
+                @change="sortMessages()"
+              >
+                <option value="newest">Neueste zuerst</option>
+                <option value="oldest">Älteste zuerst</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Nachrichten-Grid -->
+        <div class="max-w-7xl mx-auto">
+          <div v-if="filteredMessages.length === 0" class="text-center py-8">
+            <p class="text-gray-500 text-lg">Keine Nachrichten gefunden. Erstellen Sie die erste!</p>
+          </div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div 
+              v-for="message in filteredMessages" 
+              :key="message.id" 
+              class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-strong transition-shadow duration-300 flex flex-col"
+            >
+              <div 
+                class="h-2 w-full" 
+                :class="{
+                  'bg-success': message.messageType === 'Angebot',
+                  'bg-primary': message.messageType === 'Gesuch',
+                  'bg-warning': message.messageType === 'Information'
+                }"
+              ></div>
+              <div class="p-6 flex-grow">
+                <div class="flex justify-between items-start mb-3">
+                  <span 
+                    class="inline-block px-3 py-1 text-xs font-medium rounded-full" 
+                    :class="{
+                      'bg-success bg-opacity-10 text-success': message.messageType === 'Angebot',
+                      'bg-primary bg-opacity-10 text-primary': message.messageType === 'Gesuch',
+                      'bg-warning bg-opacity-10 text-warning': message.messageType === 'Information'
+                    }"
+                  >
+                    {{ message.messageType }}
+                  </span>
+                  <span class="text-sm text-gray-500">{{ formatDate(message.timestamp) }}</span>
+                </div>
+                <h3 class="text-xl font-bold mb-2 text-heading">{{ message.title }}</h3>
+                <p class="text-gray-700 mb-4">{{ message.content }}</p>
+                <div class="mt-auto pt-4 border-t border-gray-100">
+                  <div class="flex justify-between">
+                    <div>
+                      <p class="font-medium text-gray-700">{{ message.name }}</p>
+                      <p class="text-sm text-gray-500">{{ message.userType }}</p>
+                    </div>
+                    <button 
+                      @click="contactPoster(message)" 
+                      class="text-primary hover:text-primary-dark font-medium"
+                      title="Kontakt aufnehmen"
+                    >
+                      Kontakt
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Paginierung (bei vielen Nachrichten) -->
+          <div v-if="messages.length > itemsPerPage" class="mt-8 flex justify-center">
+            <nav class="inline-flex rounded-md shadow">
+              <button 
+                @click="prevPage" 
+                :disabled="currentPage === 1" 
+                class="px-4 py-2 rounded-l-md border border-gray-300"
+                :class="currentPage === 1 ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-white text-gray-700 hover:bg-gray-50'"
+              >
+                Zurück
+              </button>
+              <button 
+                v-for="page in totalPages" 
+                :key="page" 
+                @click="goToPage(page)" 
+                class="px-4 py-2 border-t border-b border-gray-300"
+                :class="currentPage === page ? 'bg-primary text-white' : 'bg-white text-gray-700 hover:bg-gray-50'"
+              >
+                {{ page }}
+              </button>
+              <button 
+                @click="nextPage" 
+                :disabled="currentPage === totalPages" 
+                class="px-4 py-2 rounded-r-md border border-gray-300"
+                :class="currentPage === totalPages ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-white text-gray-700 hover:bg-gray-50'"
+              >
+                Weiter
+              </button>
+            </nav>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Kontakt-Modal -->
+    <div v-if="showContactModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div class="bg-white rounded-lg shadow-xl p-8 max-w-lg w-full mx-4">
+        <h3 class="text-2xl font-bold mb-4 text-heading">Kontakt aufnehmen</h3>
+        <p class="mb-6">Sie möchten Kontakt mit <strong>{{ selectedMessage.name }}</strong> aufnehmen bezüglich der Nachricht: <strong>{{ selectedMessage.title }}</strong></p>
+        
+        <form @submit.prevent="sendContact" class="space-y-4">
+          <div>
+            <label for="contactName" class="block text-text-dark font-medium mb-2">Ihr Name*</label>
+            <input type="text" id="contactName" v-model="contactForm.name" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary" />
+          </div>
+          
+          <div>
+            <label for="contactEmail" class="block text-text-dark font-medium mb-2">Ihre E-Mail*</label>
+            <input type="email" id="contactEmail" v-model="contactForm.email" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary" />
+          </div>
+          
+          <div>
+            <label for="contactMessage" class="block text-text-dark font-medium mb-2">Ihre Nachricht*</label>
+            <textarea id="contactMessage" v-model="contactForm.message" required rows="4" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"></textarea>
+          </div>
+          
+          <div class="flex justify-end space-x-4 mt-6">
+            <button 
+              type="button" 
+              @click="closeContactModal" 
+              class="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+            >
+              Abbrechen
+            </button>
+            <button 
+              type="submit" 
+              class="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark"
+            >
+              Nachricht senden
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { ref, reactive, computed, onMounted } from 'vue'
+
+// Beispieldaten für die Demonstration
+const demoMessages = [
+  {
+    id: 1,
+    name: 'Klinikum München',
+    email: 'personal@klinikum-muenchen.de',
+    userType: 'Klinik',
+    messageType: 'Angebot',
+    title: 'Vertretung für Notfallmedizin (1 Woche)',
+    content: 'Suchen dringend Vertretung für unsere Notfallstation vom 15.-22.06.2025. Erfahrung in Notfallmedizin erforderlich. Attraktive Vergütung nach Vereinbarung.',
+    timestamp: new Date('2025-05-15T10:30:00'),
+    privacyPolicyAccepted: true
+  },
+  {
+    id: 2,
+    name: 'Dr. Julia Weber',
+    email: 'j.weber@arztpraxis.de',
+    userType: 'Arzt',
+    messageType: 'Gesuch',
+    title: 'Anästhesist sucht Teilzeitstelle',
+    content: 'Facharzt für Anästhesie mit 8 Jahren Erfahrung sucht Teilzeitstelle (50-60%) im Raum Köln ab sofort.',
+    timestamp: new Date('2025-05-12T15:45:00'),
+    privacyPolicyAccepted: true
+  },
+  {
+    id: 3,
+    name: 'Universitätsklinikum Hamburg',
+    email: 'karriere@uk-hamburg.de',
+    userType: 'Klinik',
+    messageType: 'Angebot',
+    title: 'Oberarztstelle Kardiologie',
+    content: 'Suchen zum nächstmöglichen Zeitpunkt engagierten Oberarzt (m/w/d) für unsere kardiologische Abteilung. Vollzeit, unbefristet.',
+    timestamp: new Date('2025-05-10T09:15:00'),
+    privacyPolicyAccepted: true
+  },
+  {
+    id: 4,
+    name: 'Dr. Thomas Schmidt',
+    email: 't.schmidt@mail.de',
+    userType: 'Arzt',
+    messageType: 'Information',
+    title: 'Fachärztliche Weiterbildung Radiologie',
+    content: 'Biete Mentoring und Unterstützung bei der Weiterbildung zum Facharzt für Radiologie. Bei Interesse gerne kontaktieren.',
+    timestamp: new Date('2025-05-08T11:20:00'),
+    privacyPolicyAccepted: true
+  },
+  {
+    id: 5,
+    name: 'Rehaklinik Schwarzwald',
+    email: 'personal@rehaklinik-schwarzwald.de',
+    userType: 'Klinik',
+    messageType: 'Angebot',
+    title: 'Honorarärzte für Wochenenddienste',
+    content: 'Suchen regelmäßig Honorarärzte für Wochenenddienste. Flexible Einteilung nach Absprache. Attraktive Konditionen. Fachrichtung: Innere Medizin, Allgemeinmedizin.',
+    timestamp: new Date('2025-05-05T14:10:00'),
+    privacyPolicyAccepted: true
+  },
+  {
+    id: 6,
+    name: 'Dr. Sarah Müller',
+    email: 's.mueller@gmail.com',
+    userType: 'Arzt',
+    messageType: 'Gesuch',
+    title: 'Kinderärztin sucht neue Herausforderung',
+    content: 'Fachärztin für Pädiatrie mit 12 Jahren Berufserfahrung sucht neue Stelle im Raum Berlin. Klinik oder größere Praxis bevorzugt.',
+    timestamp: new Date('2025-05-03T16:30:00'),
+    privacyPolicyAccepted: true
+  }
+];
+
+// Zustandsvariablen
+const messages = ref([...demoMessages]);
+const currentFilter = ref('all');
+const sortOrder = ref('newest');
+const currentPage = ref(1);
+const itemsPerPage = 6;
+const isSubmitting = ref(false);
+const messageSent = ref(false);
+const showContactModal = ref(false);
+const selectedMessage = ref({});
+
+// Formulare
+const newMessage = reactive({
+  name: '',
+  email: '',
+  userType: '',
+  messageType: '',
+  title: '',
+  content: '',
+  privacyPolicyAccepted: false
+});
+
+const contactForm = reactive({
+  name: '',
+  email: '',
+  message: ''
+});
+
+// Berechnete Eigenschaften
+const filteredMessages = computed(() => {
+  let result = [...messages.value];
+  
+  // Filtern nach Nachrichtentyp
+  if (currentFilter.value !== 'all') {
+    result = result.filter(msg => msg.messageType === currentFilter.value);
+  }
+  
+  // Sortieren
+  result.sort((a, b) => {
+    if (sortOrder.value === 'newest') {
+      return b.timestamp - a.timestamp;
+    } else {
+      return a.timestamp - b.timestamp;
+    }
+  });
+  
+  // Paginierung
+  const startIndex = (currentPage.value - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  return result.slice(startIndex, endIndex);
+});
+
+const totalPages = computed(() => {
+  let filteredTotal = messages.value;
+  if (currentFilter.value !== 'all') {
+    filteredTotal = filteredTotal.filter(msg => msg.messageType === currentFilter.value);
+  }
+  return Math.ceil(filteredTotal.length / itemsPerPage);
+});
+
+// Methoden
+function submitMessage() {
+  isSubmitting.value = true;
+  
+  // Simuliere API-Aufruf
+  setTimeout(() => {
+    const newId = messages.value.length > 0 ? Math.max(...messages.value.map(m => m.id)) + 1 : 1;
+    
+    const message = {
+      ...newMessage,
+      id: newId,
+      timestamp: new Date(),
+      privacyPolicyAccepted: true
+    };
+    
+    messages.value.unshift(message);
+    
+    // Formular zurücksetzen
+    Object.keys(newMessage).forEach(key => {
+      if (typeof newMessage[key] === 'boolean') {
+        newMessage[key] = false;
+      } else {
+        newMessage[key] = '';
+      }
+    });
+    
+    isSubmitting.value = false;
+    messageSent.value = true;
+    
+    // Erfolgsmeldung nach 3 Sekunden ausblenden
+    setTimeout(() => {
+      messageSent.value = false;
+    }, 3000);
+  }, 1000);
+}
+
+function filterMessages(filter) {
+  currentFilter.value = filter;
+  currentPage.value = 1; // Zurück zur ersten Seite
+}
+
+function sortMessages() {
+  // Sortierung wird in der computed property angewendet
+  currentPage.value = 1; // Zurück zur ersten Seite
+}
+
+function formatDate(date) {
+  return new Date(date).toLocaleDateString('de-DE', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  });
+}
+
+function prevPage() {
+  if (currentPage.value > 1) {
+    currentPage.value--;
+  }
+}
+
+function nextPage() {
+  if (currentPage.value < totalPages.value) {
+    currentPage.value++;
+  }
+}
+
+function goToPage(page) {
+  currentPage.value = page;
+}
+
+function contactPoster(message) {
+  selectedMessage.value = message;
+  showContactModal.value = true;
+}
+
+function closeContactModal() {
+  showContactModal.value = false;
+  // Formular zurücksetzen
+  contactForm.name = '';
+  contactForm.email = '';
+  contactForm.message = '';
+}
+
+function sendContact() {
+  // Hier würden wir normalerweise eine API-Anfrage senden
+  console.log('Kontaktanfrage gesendet:', {
+    to: selectedMessage.value.email,
+    from: contactForm
+  });
+  
+  // Schließe das Modal und zeige eine Erfolgsmeldung
+  alert('Ihre Nachricht wurde gesendet!');
+  closeContactModal();
+}
+
+// Initialisierung
+onMounted(() => {
+  // Hier könnten Nachrichten von einer API geladen werden
+  // Für die Demo verwenden wir die vordefinierten Daten
+});
+</script> 

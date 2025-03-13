@@ -27,6 +27,11 @@ const routes = [
     component: () => import('@/views/ContactPage.vue')
   },
   {
+    path: '/bulletin-board',
+    name: 'BulletinBoard',
+    component: () => import('@/views/BulletinBoardPage.vue')
+  },
+  {
     path: '/privacy',
     name: 'Privacy',
     component: () => import('@/views/PrivacyPage.vue')
