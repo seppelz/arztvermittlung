@@ -1,6 +1,6 @@
 <template>
   <div>
-    <section class="bg-secondary text-white py-12">
+    <section class="bg-dark text-white py-12">
       <div class="container mx-auto px-4">
         <h1 class="text-4xl md:text-5xl font-extrabold mb-4 leading-tight">Pinnwand</h1>
         <p class="text-xl max-w-3xl">
@@ -14,42 +14,42 @@
       <div class="container mx-auto px-4">
         <!-- Neue Nachricht erstellen -->
         <div class="max-w-2xl mx-auto bg-white rounded-lg shadow-strong p-6 mb-12">
-          <h2 class="text-2xl md:text-3xl font-bold mb-6 text-center text-heading">Neue Nachricht</h2>
+          <h2 class="text-2xl md:text-3xl font-bold mb-6 text-center text-heading border-b-2 border-primary pb-3">Neue Nachricht</h2>
           
           <form @submit.prevent="submitMessage" class="space-y-6">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label for="name" class="block text-text-dark font-medium mb-2">Name*</label>
+                <label for="name" class="block text-text-dark font-semibold mb-2">Name*</label>
                 <input 
                   type="text" 
                   id="name" 
                   v-model="newMessage.name" 
                   required 
-                  class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
+                  class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm"
                   placeholder="Ihr Name oder Einrichtung"
                 />
               </div>
               
               <div>
-                <label for="email" class="block text-text-dark font-medium mb-2">E-Mail*</label>
+                <label for="email" class="block text-text-dark font-semibold mb-2">E-Mail*</label>
                 <input 
                   type="email" 
                   id="email" 
                   v-model="newMessage.email" 
                   required 
-                  class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
+                  class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm"
                   placeholder="ihre-email@beispiel.de"
                 />
               </div>
             </div>
             
             <div>
-              <label for="userType" class="block text-text-dark font-medium mb-2">Sie sind*</label>
+              <label for="userType" class="block text-text-dark font-semibold mb-2">Sie sind*</label>
               <select 
                 id="userType" 
                 v-model="newMessage.userType" 
                 required 
-                class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
+                class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm appearance-none"
               >
                 <option value="">Bitte wählen</option>
                 <option value="Arzt">Arzt</option>
@@ -58,12 +58,12 @@
             </div>
             
             <div>
-              <label for="messageType" class="block text-text-dark font-medium mb-2">Typ der Nachricht*</label>
+              <label for="messageType" class="block text-text-dark font-semibold mb-2">Typ der Nachricht*</label>
               <select 
                 id="messageType" 
                 v-model="newMessage.messageType" 
                 required 
-                class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
+                class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm appearance-none"
               >
                 <option value="">Bitte wählen</option>
                 <option value="Angebot">Angebot</option>
@@ -73,40 +73,40 @@
             </div>
             
             <div>
-              <label for="title" class="block text-text-dark font-medium mb-2">Titel*</label>
+              <label for="title" class="block text-text-dark font-semibold mb-2">Titel*</label>
               <input 
                 type="text" 
                 id="title" 
                 v-model="newMessage.title" 
                 required 
-                class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
+                class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm"
                 placeholder="Titel Ihrer Nachricht"
               />
             </div>
             
             <div>
-              <label for="content" class="block text-text-dark font-medium mb-2">Nachricht*</label>
+              <label for="content" class="block text-text-dark font-semibold mb-2">Nachricht*</label>
               <textarea 
                 id="content" 
                 v-model="newMessage.content" 
                 required 
                 rows="4" 
-                class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
+                class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm"
                 placeholder="Ihre Nachricht hier..."
               ></textarea>
             </div>
             
             <div class="flex items-start">
-              <input type="checkbox" id="privacyPolicy" v-model="newMessage.privacyPolicyAccepted" required class="mt-1 mr-2" />
-              <label for="privacyPolicy" class="text-sm text-gray-600">
-                Ich habe die <router-link to="/privacy" class="text-primary hover:underline">Datenschutzerklärung</router-link> gelesen und akzeptiere diese.*
+              <input type="checkbox" id="privacyPolicy" v-model="newMessage.privacyPolicyAccepted" required class="mt-1 mr-2 w-5 h-5 text-primary border-2 border-gray-300 rounded focus:ring-primary" />
+              <label for="privacyPolicy" class="text-sm text-gray-700">
+                Ich habe die <router-link to="/privacy" class="text-primary hover:underline font-medium">Datenschutzerklärung</router-link> gelesen und akzeptiere diese.*
               </label>
             </div>
             
             <div class="text-center">
               <button 
                 type="submit" 
-                class="bg-primary hover:bg-primary-dark text-white font-bold py-3 px-10 rounded-lg shadow-strong transition-colors duration-300 text-lg"
+                class="bg-primary hover:bg-primary-dark text-white font-bold py-3 px-10 rounded-lg shadow-strong transition-colors duration-300 text-lg transform hover:scale-105"
                 :disabled="isSubmitting"
               >
                 {{ isSubmitting ? 'Wird gesendet...' : 'Nachricht veröffentlichen' }}
@@ -114,7 +114,7 @@
             </div>
           </form>
           
-          <div v-if="messageSent" class="mt-6 p-4 bg-success bg-opacity-10 text-success rounded-lg border border-success border-opacity-20">
+          <div v-if="messageSent" class="mt-6 p-4 bg-success bg-opacity-10 text-success rounded-lg border-2 border-success">
             <p class="font-semibold">Vielen Dank für Ihre Nachricht!</p>
             <p>Ihre Nachricht wurde erfolgreich veröffentlicht.</p>
           </div>
@@ -122,46 +122,46 @@
         
         <!-- Filter-Optionen -->
         <div class="max-w-7xl mx-auto mb-8">
-          <div class="bg-white rounded-lg shadow-md p-4 flex flex-wrap gap-4 items-center">
+          <div class="bg-white rounded-lg shadow-md p-4 flex flex-wrap gap-4 items-center border border-gray-200">
             <h3 class="text-lg font-bold text-heading mr-4">Filter:</h3>
             
             <div class="flex items-center space-x-2">
               <button 
                 @click="filterMessages('all')" 
-                class="px-4 py-2 rounded-lg transition-colors"
-                :class="currentFilter === 'all' ? 'bg-primary text-white' : 'bg-gray-100 hover:bg-gray-200'"
+                class="px-4 py-2 rounded-lg transition-colors shadow-sm"
+                :class="currentFilter === 'all' ? 'bg-primary text-white font-bold' : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-300'"
               >
                 Alle
               </button>
               <button 
                 @click="filterMessages('Angebot')" 
-                class="px-4 py-2 rounded-lg transition-colors"
-                :class="currentFilter === 'Angebot' ? 'bg-primary text-white' : 'bg-gray-100 hover:bg-gray-200'"
+                class="px-4 py-2 rounded-lg transition-colors shadow-sm"
+                :class="currentFilter === 'Angebot' ? 'bg-success text-white font-bold' : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-300'"
               >
                 Angebote
               </button>
               <button 
                 @click="filterMessages('Gesuch')" 
-                class="px-4 py-2 rounded-lg transition-colors"
-                :class="currentFilter === 'Gesuch' ? 'bg-primary text-white' : 'bg-gray-100 hover:bg-gray-200'"
+                class="px-4 py-2 rounded-lg transition-colors shadow-sm"
+                :class="currentFilter === 'Gesuch' ? 'bg-primary text-white font-bold' : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-300'"
               >
                 Gesuche
               </button>
               <button 
                 @click="filterMessages('Information')" 
-                class="px-4 py-2 rounded-lg transition-colors"
-                :class="currentFilter === 'Information' ? 'bg-primary text-white' : 'bg-gray-100 hover:bg-gray-200'"
+                class="px-4 py-2 rounded-lg transition-colors shadow-sm"
+                :class="currentFilter === 'Information' ? 'bg-warning text-white font-bold' : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-300'"
               >
                 Informationen
               </button>
             </div>
             
             <div class="ml-auto flex items-center">
-              <label for="sortOrder" class="mr-2 text-gray-700">Sortieren nach:</label>
+              <label for="sortOrder" class="mr-2 text-gray-700 font-medium">Sortieren nach:</label>
               <select 
                 id="sortOrder" 
                 v-model="sortOrder" 
-                class="px-4 py-2 border rounded-lg"
+                class="px-4 py-2 border-2 border-gray-300 rounded-lg text-text-dark bg-white shadow-sm appearance-none"
                 @change="sortMessages()"
               >
                 <option value="newest">Neueste zuerst</option>
@@ -181,7 +181,7 @@
             <div 
               v-for="message in filteredMessages" 
               :key="message.id" 
-              class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-strong transition-shadow duration-300 flex flex-col"
+              class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-strong transition-shadow duration-300 flex flex-col border border-gray-200"
             >
               <div 
                 class="h-2 w-full" 
@@ -194,11 +194,11 @@
               <div class="p-6 flex-grow">
                 <div class="flex justify-between items-start mb-3">
                   <span 
-                    class="inline-block px-3 py-1 text-xs font-medium rounded-full" 
+                    class="inline-block px-3 py-1 text-xs font-bold rounded-full" 
                     :class="{
-                      'bg-success bg-opacity-10 text-success': message.messageType === 'Angebot',
-                      'bg-primary bg-opacity-10 text-primary': message.messageType === 'Gesuch',
-                      'bg-warning bg-opacity-10 text-warning': message.messageType === 'Information'
+                      'bg-success bg-opacity-20 text-success border border-success': message.messageType === 'Angebot',
+                      'bg-primary bg-opacity-20 text-primary border border-primary': message.messageType === 'Gesuch',
+                      'bg-warning bg-opacity-20 text-warning border border-warning': message.messageType === 'Information'
                     }"
                   >
                     {{ message.messageType }}
@@ -207,7 +207,7 @@
                 </div>
                 <h3 class="text-xl font-bold mb-2 text-heading">{{ message.title }}</h3>
                 <p class="text-gray-700 mb-4">{{ message.content }}</p>
-                <div class="mt-auto pt-4 border-t border-gray-100">
+                <div class="mt-auto pt-4 border-t border-gray-200">
                   <div class="flex justify-between">
                     <div>
                       <p class="font-medium text-gray-700">{{ message.name }}</p>
@@ -215,7 +215,7 @@
                     </div>
                     <button 
                       @click="contactPoster(message)" 
-                      class="text-primary hover:text-primary-dark font-medium"
+                      class="text-white bg-primary hover:bg-primary-dark font-medium px-4 py-1 rounded-lg shadow-sm transform hover:scale-105 transition-all"
                       title="Kontakt aufnehmen"
                     >
                       Kontakt
@@ -232,7 +232,7 @@
               <button 
                 @click="prevPage" 
                 :disabled="currentPage === 1" 
-                class="px-4 py-2 rounded-l-md border border-gray-300"
+                class="px-4 py-2 rounded-l-md border-2 border-gray-300"
                 :class="currentPage === 1 ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-white text-gray-700 hover:bg-gray-50'"
               >
                 Zurück
@@ -241,15 +241,15 @@
                 v-for="page in totalPages" 
                 :key="page" 
                 @click="goToPage(page)" 
-                class="px-4 py-2 border-t border-b border-gray-300"
-                :class="currentPage === page ? 'bg-primary text-white' : 'bg-white text-gray-700 hover:bg-gray-50'"
+                class="px-4 py-2 border-t-2 border-b-2 border-gray-300"
+                :class="currentPage === page ? 'bg-primary text-white border-primary' : 'bg-white text-gray-700 hover:bg-gray-50'"
               >
                 {{ page }}
               </button>
               <button 
                 @click="nextPage" 
                 :disabled="currentPage === totalPages" 
-                class="px-4 py-2 rounded-r-md border border-gray-300"
+                class="px-4 py-2 rounded-r-md border-2 border-gray-300"
                 :class="currentPage === totalPages ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-white text-gray-700 hover:bg-gray-50'"
               >
                 Weiter
@@ -263,36 +263,36 @@
     <!-- Kontakt-Modal -->
     <div v-if="showContactModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div class="bg-white rounded-lg shadow-xl p-8 max-w-lg w-full mx-4">
-        <h3 class="text-2xl font-bold mb-4 text-heading">Kontakt aufnehmen</h3>
+        <h3 class="text-2xl font-bold mb-4 text-heading border-b-2 border-primary pb-3">Kontakt aufnehmen</h3>
         <p class="mb-6">Sie möchten Kontakt mit <strong>{{ selectedMessage.name }}</strong> aufnehmen bezüglich der Nachricht: <strong>{{ selectedMessage.title }}</strong></p>
         
         <form @submit.prevent="sendContact" class="space-y-4">
           <div>
-            <label for="contactName" class="block text-text-dark font-medium mb-2">Ihr Name*</label>
-            <input type="text" id="contactName" v-model="contactForm.name" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary" />
+            <label for="contactName" class="block text-text-dark font-semibold mb-2">Ihr Name*</label>
+            <input type="text" id="contactName" v-model="contactForm.name" required class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm" />
           </div>
           
           <div>
-            <label for="contactEmail" class="block text-text-dark font-medium mb-2">Ihre E-Mail*</label>
-            <input type="email" id="contactEmail" v-model="contactForm.email" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary" />
+            <label for="contactEmail" class="block text-text-dark font-semibold mb-2">Ihre E-Mail*</label>
+            <input type="email" id="contactEmail" v-model="contactForm.email" required class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm" />
           </div>
           
           <div>
-            <label for="contactMessage" class="block text-text-dark font-medium mb-2">Ihre Nachricht*</label>
-            <textarea id="contactMessage" v-model="contactForm.message" required rows="4" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"></textarea>
+            <label for="contactMessage" class="block text-text-dark font-semibold mb-2">Ihre Nachricht*</label>
+            <textarea id="contactMessage" v-model="contactForm.message" required rows="4" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm"></textarea>
           </div>
           
           <div class="flex justify-end space-x-4 mt-6">
             <button 
               type="button" 
               @click="closeContactModal" 
-              class="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+              class="px-6 py-2 border-2 border-gray-300 rounded-lg hover:bg-gray-50 text-gray-700 font-medium"
             >
               Abbrechen
             </button>
             <button 
               type="submit" 
-              class="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark"
+              class="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark font-bold shadow-md transform hover:scale-105 transition-all"
             >
               Nachricht senden
             </button>

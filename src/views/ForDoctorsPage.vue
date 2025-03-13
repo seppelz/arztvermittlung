@@ -21,8 +21,8 @@
               <h3 class="text-xl font-bold mb-6 pb-2 border-b-2 border-accent text-heading">Persönliche Informationen</h3>
               <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label for="title" class="block text-text-dark font-medium mb-2">Titel</label>
-                  <select id="title" v-model="form.title" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
+                  <label for="title" class="block text-text-dark font-semibold mb-2">Titel</label>
+                  <select id="title" v-model="form.title" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm appearance-none">
                     <option value="">Bitte wählen</option>
                     <option value="Dr.">Dr.</option>
                     <option value="Dr. med.">Dr. med.</option>
@@ -32,8 +32,8 @@
                 </div>
                 
                 <div>
-                  <label for="specialty" class="block text-text-dark font-medium mb-2">Fachrichtung*</label>
-                  <select id="specialty" v-model="form.specialty" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
+                  <label for="specialty" class="block text-text-dark font-semibold mb-2">Fachrichtung*</label>
+                  <select id="specialty" v-model="form.specialty" required class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm appearance-none">
                     <option value="">Bitte wählen</option>
                     <option value="Allgemeinmedizin">Allgemeinmedizin</option>
                     <option value="Anästhesiologie">Anästhesiologie</option>
@@ -51,23 +51,23 @@
                 </div>
                 
                 <div>
-                  <label for="firstName" class="block text-text-dark font-medium mb-2">Vorname*</label>
-                  <input type="text" id="firstName" v-model="form.firstName" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary" />
+                  <label for="firstName" class="block text-text-dark font-semibold mb-2">Vorname*</label>
+                  <input type="text" id="firstName" v-model="form.firstName" required class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm" />
                 </div>
                 
                 <div>
-                  <label for="lastName" class="block text-text-dark font-medium mb-2">Nachname*</label>
-                  <input type="text" id="lastName" v-model="form.lastName" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary" />
+                  <label for="lastName" class="block text-text-dark font-semibold mb-2">Nachname*</label>
+                  <input type="text" id="lastName" v-model="form.lastName" required class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm" />
                 </div>
                 
                 <div>
-                  <label for="email" class="block text-text-dark font-medium mb-2">E-Mail*</label>
-                  <input type="email" id="email" v-model="form.email" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary" />
+                  <label for="email" class="block text-text-dark font-semibold mb-2">E-Mail*</label>
+                  <input type="email" id="email" v-model="form.email" required class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm" />
                 </div>
                 
                 <div>
-                  <label for="phone" class="block text-text-dark font-medium mb-2">Telefon*</label>
-                  <input type="tel" id="phone" v-model="form.phone" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary" />
+                  <label for="phone" class="block text-text-dark font-semibold mb-2">Telefon*</label>
+                  <input type="tel" id="phone" v-model="form.phone" required class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm" />
                 </div>
               </div>
             </div>
@@ -77,19 +77,19 @@
               <h3 class="text-xl font-bold mb-6 pb-2 border-b-2 border-accent text-heading">Berufliche Informationen</h3>
               <div class="space-y-6">
                 <div>
-                  <label for="experience" class="block text-text-dark font-medium mb-2">Berufserfahrung in Jahren*</label>
-                  <input type="number" id="experience" v-model="form.experience" required min="0" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary" />
+                  <label for="experience" class="block text-text-dark font-semibold mb-2">Berufserfahrung in Jahren*</label>
+                  <input type="number" id="experience" v-model="form.experience" required min="0" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm" />
                 </div>
                 
                 <div>
-                  <label class="block text-text-dark font-medium mb-2">Qualifikationen und Zusatzbezeichnungen</label>
+                  <label class="block text-text-dark font-semibold mb-2">Qualifikationen und Zusatzbezeichnungen</label>
                   <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                     <div v-for="(qualification, index) in qualifications" :key="index" class="flex items-center">
-                      <input type="checkbox" :id="'qualification-' + index" v-model="form.qualifications" :value="qualification" class="mr-2" />
-                      <label :for="'qualification-' + index" class="cursor-pointer">{{ qualification }}</label>
+                      <input type="checkbox" :id="'qualification-' + index" v-model="form.qualifications" :value="qualification" class="mr-2 w-5 h-5 text-primary border-2 border-gray-300 rounded focus:ring-primary" />
+                      <label :for="'qualification-' + index" class="cursor-pointer text-text-dark">{{ qualification }}</label>
                     </div>
                   </div>
-                  <input type="text" placeholder="Weitere Qualifikationen" v-model="form.otherQualifications" class="w-full px-4 py-2 mt-4 border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary" />
+                  <input type="text" placeholder="Weitere Qualifikationen" v-model="form.otherQualifications" class="w-full px-4 py-3 mt-4 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm" />
                 </div>
               </div>
             </div>
