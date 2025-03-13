@@ -19,10 +19,28 @@ export default {
     extend: {
       colors: {
         primary: '#0074B7',
+        'primary-dark': '#005A8F',
         secondary: '#60A3D9',
         accent: '#BFD7ED',
         dark: '#003B73',
+        'dark-800': '#002A54',
         light: '#F8FAFC',
+        'heading': '#004E7C',
+        'text-dark': '#1F2937',
+        'highlight': '#0090E1',
+        'success': '#059669',
+        'warning': '#F59E0B',
+        'error': '#DC2626',
+      },
+      fontWeight: {
+        normal: '400',
+        medium: '500',
+        semibold: '600',
+        bold: '700',
+        extrabold: '800',
+      },
+      boxShadow: {
+        'strong': '0 10px 25px -5px rgba(0, 59, 115, 0.1), 0 8px 10px -6px rgba(0, 59, 115, 0.1)',
       },
     },
   },

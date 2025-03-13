@@ -2,7 +2,7 @@
   <div>
     <section class="bg-primary text-white py-12">
       <div class="container mx-auto px-4">
-        <h1 class="text-3xl md:text-4xl font-bold mb-4">Für Ärzte</h1>
+        <h1 class="text-4xl md:text-5xl font-extrabold mb-4 leading-tight">Für Ärzte</h1>
         <p class="text-xl max-w-2xl">
           Finden Sie Ihren nächsten Einsatz in einer Klinik ohne teure Vermittlungsgebühren. 
           Direkt, transparent und flexibel.
@@ -12,16 +12,16 @@
 
     <section class="py-12 bg-light">
       <div class="container mx-auto px-4">
-        <div class="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-8">
-          <h2 class="text-2xl font-bold mb-6 text-center">Arzt-Profil erstellen</h2>
+        <div class="max-w-4xl mx-auto bg-white rounded-lg shadow-strong p-8">
+          <h2 class="text-2xl md:text-3xl font-bold mb-8 text-center text-heading">Arzt-Profil erstellen</h2>
           
-          <form @submit.prevent="submitForm" class="space-y-6">
+          <form @submit.prevent="submitForm" class="space-y-8">
             <!-- Personal Information -->
             <div>
-              <h3 class="text-xl font-semibold mb-4 pb-2 border-b border-gray-200">Persönliche Informationen</h3>
+              <h3 class="text-xl font-bold mb-6 pb-2 border-b-2 border-accent text-heading">Persönliche Informationen</h3>
               <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label for="title" class="block text-gray-700 mb-2">Titel</label>
+                  <label for="title" class="block text-text-dark font-medium mb-2">Titel</label>
                   <select id="title" v-model="form.title" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
                     <option value="">Bitte wählen</option>
                     <option value="Dr.">Dr.</option>
@@ -32,7 +32,7 @@
                 </div>
                 
                 <div>
-                  <label for="specialty" class="block text-gray-700 mb-2">Fachrichtung*</label>
+                  <label for="specialty" class="block text-text-dark font-medium mb-2">Fachrichtung*</label>
                   <select id="specialty" v-model="form.specialty" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
                     <option value="">Bitte wählen</option>
                     <option value="Allgemeinmedizin">Allgemeinmedizin</option>
@@ -51,22 +51,22 @@
                 </div>
                 
                 <div>
-                  <label for="firstName" class="block text-gray-700 mb-2">Vorname*</label>
+                  <label for="firstName" class="block text-text-dark font-medium mb-2">Vorname*</label>
                   <input type="text" id="firstName" v-model="form.firstName" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary" />
                 </div>
                 
                 <div>
-                  <label for="lastName" class="block text-gray-700 mb-2">Nachname*</label>
+                  <label for="lastName" class="block text-text-dark font-medium mb-2">Nachname*</label>
                   <input type="text" id="lastName" v-model="form.lastName" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary" />
                 </div>
                 
                 <div>
-                  <label for="email" class="block text-gray-700 mb-2">E-Mail*</label>
+                  <label for="email" class="block text-text-dark font-medium mb-2">E-Mail*</label>
                   <input type="email" id="email" v-model="form.email" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary" />
                 </div>
                 
                 <div>
-                  <label for="phone" class="block text-gray-700 mb-2">Telefon*</label>
+                  <label for="phone" class="block text-text-dark font-medium mb-2">Telefon*</label>
                   <input type="tel" id="phone" v-model="form.phone" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary" />
                 </div>
               </div>
@@ -74,15 +74,15 @@
             
             <!-- Professional Information -->
             <div>
-              <h3 class="text-xl font-semibold mb-4 pb-2 border-b border-gray-200">Berufliche Informationen</h3>
+              <h3 class="text-xl font-bold mb-6 pb-2 border-b-2 border-accent text-heading">Berufliche Informationen</h3>
               <div class="space-y-6">
                 <div>
-                  <label for="experience" class="block text-gray-700 mb-2">Berufserfahrung in Jahren*</label>
+                  <label for="experience" class="block text-text-dark font-medium mb-2">Berufserfahrung in Jahren*</label>
                   <input type="number" id="experience" v-model="form.experience" required min="0" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary" />
                 </div>
                 
                 <div>
-                  <label class="block text-gray-700 mb-2">Qualifikationen und Zusatzbezeichnungen</label>
+                  <label class="block text-text-dark font-medium mb-2">Qualifikationen und Zusatzbezeichnungen</label>
                   <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                     <div v-for="(qualification, index) in qualifications" :key="index" class="flex items-center">
                       <input type="checkbox" :id="'qualification-' + index" v-model="form.qualifications" :value="qualification" class="mr-2" />
@@ -96,16 +96,16 @@
             
             <!-- Availability -->
             <div>
-              <h3 class="text-xl font-semibold mb-4 pb-2 border-b border-gray-200">Verfügbarkeit</h3>
+              <h3 class="text-xl font-bold mb-6 pb-2 border-b-2 border-accent text-heading">Verfügbarkeit</h3>
               <div class="space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label for="availableFrom" class="block text-gray-700 mb-2">Verfügbar ab*</label>
+                    <label for="availableFrom" class="block text-text-dark font-medium mb-2">Verfügbar ab*</label>
                     <input type="date" id="availableFrom" v-model="form.availableFrom" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary" />
                   </div>
                   
                   <div>
-                    <label for="employmentType" class="block text-gray-700 mb-2">Gewünschte Beschäftigungsart*</label>
+                    <label for="employmentType" class="block text-text-dark font-medium mb-2">Gewünschte Beschäftigungsart*</label>
                     <select id="employmentType" v-model="form.employmentType" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
                       <option value="">Bitte wählen</option>
                       <option value="Vollzeit">Vollzeit</option>
@@ -118,7 +118,7 @@
                 </div>
                 
                 <div>
-                  <label class="block text-gray-700 mb-2">Gewünschte Regionen</label>
+                  <label class="block text-text-dark font-medium mb-2">Gewünschte Regionen</label>
                   <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                     <div v-for="(region, index) in regions" :key="index" class="flex items-center">
                       <input type="checkbox" :id="'region-' + index" v-model="form.regions" :value="region" class="mr-2" />
@@ -128,7 +128,7 @@
                 </div>
                 
                 <div>
-                  <label for="additionalInfo" class="block text-gray-700 mb-2">Weitere Informationen</label>
+                  <label for="additionalInfo" class="block text-text-dark font-medium mb-2">Weitere Informationen</label>
                   <textarea id="additionalInfo" v-model="form.additionalInfo" rows="4" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"></textarea>
                 </div>
               </div>
@@ -152,7 +152,7 @@
             </div>
             
             <div class="text-center">
-              <button type="submit" class="bg-primary text-white font-semibold py-3 px-8 rounded-lg shadow-md hover:bg-dark transition-colors duration-300">
+              <button type="submit" class="bg-primary hover:bg-primary-dark text-white font-bold py-3 px-10 rounded-lg shadow-strong transition-colors duration-300 text-lg">
                 Profil erstellen
               </button>
             </div>
@@ -160,8 +160,8 @@
             <p class="text-sm text-gray-500 text-center">* Pflichtfelder</p>
           </form>
           
-          <div v-if="formSubmitted" class="mt-8 p-4 bg-green-100 text-green-800 rounded-lg">
-            <p class="font-semibold">Vielen Dank für Ihre Registrierung!</p>
+          <div v-if="formSubmitted" class="mt-8 p-6 bg-success bg-opacity-10 text-success rounded-lg border border-success border-opacity-20">
+            <p class="font-semibold text-lg">Vielen Dank für Ihre Registrierung!</p>
             <p>Wir haben Ihre Daten erhalten und werden uns in Kürze bei Ihnen melden.</p>
           </div>
         </div>

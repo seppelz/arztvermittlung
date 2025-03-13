@@ -40,6 +40,19 @@ This document contains insights and learnings gained during the development of t
 - Use flex-grow with w-full for expandable containers that take available space
 - Set explicit responsive image sizes with classes like max-w-full and h-auto to prevent distortion
 - CSS @import statements must come before Tailwind directives to avoid PostCSS warnings
+- Strong visual hierarchy requires distinct heading styles with sufficient color contrast
+- Creating dedicated heading colors in the theme enhances brand consistency across components
+- Border elements like border-b-2 with accent colors help create visual separation for sections
+- Using increased font weights (extrabold, bold) makes headings stand out more effectively
+
+## Visual Design Principles
+- Headings should have at least 4.5:1 contrast ratio with background for accessibility
+- Consistent visual hierarchy makes interfaces more intuitive and easier to navigate
+- Section headings are more effective with decorative elements like bottom borders
+- Font weight plays a crucial role in establishing importance of different text elements
+- Buttons should have hover states that provide clear visual feedback
+- Visual feedback for form submission improves user experience and confidence
+- Shadow styles can be customized to match the overall brand aesthetic
 
 ## Deployment and Version Control
 - Vercel simplifies deployment of Vue.js applications with zero configuration

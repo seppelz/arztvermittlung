@@ -25,6 +25,8 @@ All notable changes to the MedMatch project will be documented in this file.
 - Comprehensive documentation in README.md
 - Enhanced Vercel configuration for proper static asset handling
 - Optimized Vite build configuration for production
+- Improved color palette with stronger heading colors
+- Enhanced typography with better font weights
 
 ### Fixed
 - CSS configuration for Tailwind CSS integration
@@ -37,4 +39,6 @@ All notable changes to the MedMatch project will be documented in this file.
 - Fixed layout issues in App and HomePage components 
 - Resolved PostCSS import warning by moving base.css import before Tailwind directives
 - Fixed MIME type errors in Vercel deployment by improving routes configuration
-- Resolved asset loading issues in production environment 
+- Resolved asset loading issues in production environment
+- Improved contrast of headings for better readability
+- Enhanced visual hierarchy with stronger heading styles 

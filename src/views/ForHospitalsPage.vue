@@ -2,7 +2,7 @@
   <div>
     <section class="bg-dark text-white py-12">
       <div class="container mx-auto px-4">
-        <h1 class="text-3xl md:text-4xl font-bold mb-4">Für Kliniken</h1>
+        <h1 class="text-4xl md:text-5xl font-extrabold mb-4 leading-tight">Für Kliniken</h1>
         <p class="text-xl max-w-2xl">
           Finden Sie qualifizierte Ärzte ohne teure Vermittlungsagenturen. 
           Bei MedMatch zahlen Sie nur bei erfolgreicher Vermittlung eine faire Gebühr.
@@ -12,10 +12,10 @@
 
     <section class="py-12 bg-light">
       <div class="container mx-auto px-4">
-        <div class="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-8">
-          <h2 class="text-2xl font-bold mb-6 text-center">Klinik-Anfrage stellen</h2>
+        <div class="max-w-4xl mx-auto bg-white rounded-lg shadow-strong p-8">
+          <h2 class="text-2xl md:text-3xl font-bold mb-8 text-center text-heading">Klinik-Anfrage stellen</h2>
           
-          <form @submit.prevent="submitForm" class="space-y-6">
+          <form @submit.prevent="submitForm" class="space-y-8">
             <!-- Hospital Information -->
             <div>
               <h3 class="text-xl font-semibold mb-4 pb-2 border-b border-gray-200">Informationen zur Einrichtung</h3>
