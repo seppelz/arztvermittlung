@@ -1,0 +1,30 @@
+<svg width="400" height="400" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Hintergrund-Raster -->
+  <rect width="400" height="400" fill="transparent" />
+  
+  <!-- Medizinische Symbole, die sich wiederholen -->
+  <!-- Herzschlag -->
+  <path d="M20 80L40 80L50 50L60 120L70 80L90 80" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M120 80L140 80L150 50L160 120L170 80L190 80" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M220 80L240 80L250 50L260 120L270 80L290 80" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M320 80L340 80L350 50L360 120L370 80L390 80" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+  
+  <!-- Plus-Zeichen (medizinisches Kreuz) -->
+  <path d="M50 180H30V200H50V220H70V200H90V180H70V160H50V180Z" fill="currentColor" />
+  <path d="M150 180H130V200H150V220H170V200H190V180H170V160H150V180Z" fill="currentColor" />
+  <path d="M250 180H230V200H250V220H270V200H290V180H270V160H250V180Z" fill="currentColor" />
+  <path d="M350 180H330V200H350V220H370V200H390V180H370V160H350V180Z" fill="currentColor" />
+  
+  <!-- Stethoskop Symbol -->
+  <path d="M40 280C40 271.716 46.7157 265 55 265C63.2843 265 70 271.716 70 280V310C70 323.807 58.8071 335 45 335C31.1929 335 20 323.807 20 310V300" stroke="currentColor" stroke-width="4" />
+  <circle cx="20" cy="300" r="10" stroke="currentColor" stroke-width="4" />
+  
+  <path d="M140 280C140 271.716 146.716 265 155 265C163.284 265 170 271.716 170 280V310C170 323.807 158.807 335 145 335C131.193 335 120 323.807 120 310V300" stroke="currentColor" stroke-width="4" />
+  <circle cx="120" cy="300" r="10" stroke="currentColor" stroke-width="4" />
+  
+  <path d="M240 280C240 271.716 246.716 265 255 265C263.284 265 270 271.716 270 280V310C270 323.807 258.807 335 245 335C231.193 335 220 323.807 220 310V300" stroke="currentColor" stroke-width="4" />
+  <circle cx="220" cy="300" r="10" stroke="currentColor" stroke-width="4" />
+  
+  <path d="M340 280C340 271.716 346.716 265 355 265C363.284 265 370 271.716 370 280V310C370 323.807 358.807 335 345 335C331.193 335 320 323.807 320 310V300" stroke="currentColor" stroke-width="4" />
+  <circle cx="320" cy="300" r="10" stroke="currentColor" stroke-width="4" />
+</svg> 

@@ -12,114 +12,6 @@
 
     <section class="py-12 bg-light">
       <div class="container mx-auto px-4">
-        <!-- Neue Nachricht erstellen -->
-        <div class="max-w-2xl mx-auto bg-white rounded-lg shadow-strong p-6 mb-12">
-          <h2 class="text-2xl md:text-3xl font-bold mb-6 text-center text-heading border-b-2 border-primary pb-3">Neue Nachricht</h2>
-          
-          <form @submit.prevent="submitMessage" class="space-y-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label for="name" class="block text-text-dark font-semibold mb-2">Name*</label>
-                <input 
-                  type="text" 
-                  id="name" 
-                  v-model="newMessage.name" 
-                  required 
-                  class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm"
-                  placeholder="Ihr Name oder Einrichtung"
-                />
-              </div>
-              
-              <div>
-                <label for="email" class="block text-text-dark font-semibold mb-2">E-Mail*</label>
-                <input 
-                  type="email" 
-                  id="email" 
-                  v-model="newMessage.email" 
-                  required 
-                  class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm"
-                  placeholder="ihre-email@beispiel.de"
-                />
-              </div>
-            </div>
-            
-            <div>
-              <label for="userType" class="block text-text-dark font-semibold mb-2">Sie sind*</label>
-              <select 
-                id="userType" 
-                v-model="newMessage.userType" 
-                required 
-                class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm appearance-none"
-              >
-                <option value="">Bitte wählen</option>
-                <option value="Arzt">Arzt</option>
-                <option value="Klinik">Klinik/Einrichtung</option>
-              </select>
-            </div>
-            
-            <div>
-              <label for="messageType" class="block text-text-dark font-semibold mb-2">Typ der Nachricht*</label>
-              <select 
-                id="messageType" 
-                v-model="newMessage.messageType" 
-                required 
-                class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm appearance-none"
-              >
-                <option value="">Bitte wählen</option>
-                <option value="Angebot">Angebot</option>
-                <option value="Gesuch">Gesuch</option>
-                <option value="Information">Information</option>
-              </select>
-            </div>
-            
-            <div>
-              <label for="title" class="block text-text-dark font-semibold mb-2">Titel*</label>
-              <input 
-                type="text" 
-                id="title" 
-                v-model="newMessage.title" 
-                required 
-                class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm"
-                placeholder="Titel Ihrer Nachricht"
-              />
-            </div>
-            
-            <div>
-              <label for="content" class="block text-text-dark font-semibold mb-2">Nachricht*</label>
-              <textarea 
-                id="content" 
-                v-model="newMessage.content" 
-                required 
-                rows="4" 
-                class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm"
-                placeholder="Ihre Nachricht hier..."
-              ></textarea>
-            </div>
-            
-            <div class="flex items-start">
-              <input type="checkbox" id="privacyPolicy" v-model="newMessage.privacyPolicyAccepted" required class="mt-1 mr-2 w-5 h-5 text-primary border-2 border-gray-300 rounded focus:ring-primary" />
-              <label for="privacyPolicy" class="text-sm text-gray-700">
-                Ich habe die <router-link to="/privacy" class="text-primary hover:underline font-medium">Datenschutzerklärung</router-link> gelesen und akzeptiere diese.*
-              </label>
-            </div>
-            
-            <div class="text-center">
-              <button 
-                type="submit" 
-                class="bg-primary hover:bg-primary-dark text-white font-bold py-3 px-10 rounded-lg shadow-strong transition-colors duration-300 text-lg transform hover:scale-105"
-                :disabled="isSubmitting"
-              >
-                {{ isSubmitting ? 'Wird gesendet...' : 'Nachricht veröffentlichen' }}
-              </button>
-            </div>
-          </form>
-          
-          <div v-if="messageSent" class="mt-6 p-4 bg-success bg-opacity-10 text-success rounded-lg border-2 border-success">
-            <p class="font-semibold">Vielen Dank für Ihre Nachricht!</p>
-            <p>Ihre Nachricht wurde erfolgreich veröffentlicht.</p>
-          </div>
-        </div>
-        
         <!-- Filter-Optionen -->
         <div class="max-w-7xl mx-auto mb-8">
           <div class="bg-white rounded-lg shadow-md p-4 flex flex-wrap gap-4 items-center border border-gray-200">
@@ -172,7 +64,7 @@
         </div>
         
         <!-- Nachrichten-Grid -->
-        <div class="max-w-7xl mx-auto">
+        <div class="max-w-7xl mx-auto mb-16">
           <div v-if="filteredMessages.length === 0" class="text-center py-8">
             <p class="text-gray-500 text-lg">Keine Nachrichten gefunden. Erstellen Sie die erste!</p>
           </div>
@@ -255,6 +147,117 @@
                 Weiter
               </button>
             </nav>
+          </div>
+        </div>
+        
+        <!-- Neue Nachricht erstellen - Breiteres, kompakteres Formular -->
+        <div class="max-w-7xl mx-auto bg-white rounded-lg shadow-strong p-6 mb-8 border border-gray-200">
+          <h2 class="text-2xl md:text-3xl font-bold mb-6 text-center text-heading border-b-2 border-primary pb-3">Neue Nachricht erstellen</h2>
+          
+          <form @submit.prevent="submitMessage" class="space-y-5">
+            <!-- Zwei-Spalten-Layout für kompakteren Look -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+              <div>
+                <label for="name" class="block text-text-dark font-semibold mb-1">Name*</label>
+                <input 
+                  type="text" 
+                  id="name" 
+                  v-model="newMessage.name" 
+                  required 
+                  class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm"
+                  placeholder="Ihr Name oder Einrichtung"
+                />
+              </div>
+              
+              <div>
+                <label for="email" class="block text-text-dark font-semibold mb-1">E-Mail*</label>
+                <input 
+                  type="email" 
+                  id="email" 
+                  v-model="newMessage.email" 
+                  required 
+                  class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm"
+                  placeholder="ihre-email@beispiel.de"
+                />
+              </div>
+              
+              <div>
+                <label for="title" class="block text-text-dark font-semibold mb-1">Titel*</label>
+                <input 
+                  type="text" 
+                  id="title" 
+                  v-model="newMessage.title" 
+                  required 
+                  class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm"
+                  placeholder="Titel Ihrer Nachricht"
+                />
+              </div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div>
+                <label for="userType" class="block text-text-dark font-semibold mb-1">Sie sind*</label>
+                <select 
+                  id="userType" 
+                  v-model="newMessage.userType" 
+                  required 
+                  class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm appearance-none"
+                >
+                  <option value="">Bitte wählen</option>
+                  <option value="Arzt">Arzt</option>
+                  <option value="Klinik">Klinik/Einrichtung</option>
+                </select>
+              </div>
+              
+              <div>
+                <label for="messageType" class="block text-text-dark font-semibold mb-1">Typ der Nachricht*</label>
+                <select 
+                  id="messageType" 
+                  v-model="newMessage.messageType" 
+                  required 
+                  class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm appearance-none"
+                >
+                  <option value="">Bitte wählen</option>
+                  <option value="Angebot">Angebot</option>
+                  <option value="Gesuch">Gesuch</option>
+                  <option value="Information">Information</option>
+                </select>
+              </div>
+            </div>
+            
+            <div>
+              <label for="content" class="block text-text-dark font-semibold mb-1">Nachricht*</label>
+              <textarea 
+                id="content" 
+                v-model="newMessage.content" 
+                required 
+                rows="4" 
+                class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm"
+                placeholder="Ihre Nachricht hier..."
+              ></textarea>
+            </div>
+            
+            <div class="flex items-start">
+              <input type="checkbox" id="privacyPolicy" v-model="newMessage.privacyPolicyAccepted" required class="mt-1 mr-2 w-5 h-5 text-primary border-2 border-gray-300 rounded focus:ring-primary" />
+              <label for="privacyPolicy" class="text-sm text-gray-700">
+                Ich habe die <router-link to="/privacy" class="text-primary hover:underline font-medium">Datenschutzerklärung</router-link> gelesen und akzeptiere diese.*
+              </label>
+            </div>
+            
+            <div class="text-center">
+              <button 
+                type="submit" 
+                class="bg-primary hover:bg-primary-dark text-white font-bold py-2 px-8 rounded-lg shadow-strong transition-colors duration-300 text-lg transform hover:scale-105"
+                :disabled="isSubmitting"
+              >
+                {{ isSubmitting ? 'Wird gesendet...' : 'Nachricht veröffentlichen' }}
+              </button>
+            </div>
+          </form>
+          
+          <div v-if="messageSent" class="mt-6 p-4 bg-success bg-opacity-10 text-success rounded-lg border-2 border-success">
+            <p class="font-semibold">Vielen Dank für Ihre Nachricht!</p>
+            <p>Ihre Nachricht wurde erfolgreich veröffentlicht.</p>
           </div>
         </div>
       </div>

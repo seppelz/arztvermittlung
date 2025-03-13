@@ -1,13 +1,14 @@
 <script setup>
+import { RouterView } from 'vue-router'
 import AppHeader from '@/components/layout/AppHeader.vue'
 import AppFooter from '@/components/layout/AppFooter.vue'
 </script>
 
 <template>
-  <div class="min-h-screen bg-light flex flex-col w-full">
+  <div id="app" class="min-h-screen flex flex-col">
     <AppHeader />
-    <main class="flex-grow w-full">
-      <router-view />
+    <main class="flex-grow main-content">
+      <RouterView />
     </main>
     <AppFooter />
   </div>

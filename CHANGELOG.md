@@ -1,10 +1,54 @@
 # Changelog
 
-All notable changes to the MedMatch project will be documented in this file.
+Alle wichtigen Änderungen an diesem Projekt werden in dieser Datei dokumentiert.
+
+## [Unreleased]
 
 ## [0.1.0] - 2025-03-13
 
 ### Added
+- Pinnwand (Bulletin Board) zum direkten Austausch zwischen Ärzten und Kliniken
+- Nachrichtenfilter- und Sortiersystem für die Pinnwand
+- Kontaktsystem für Pinnwand-Nachrichten
+- Verbesserte Farbpalette mit medizinischen Themenfarben und besseren Kontrasten
+- Neue Typografie mit verbesserten Lesbarkeits- und Hierarchiestandards
+- Gradienten für visuelles Interesse und moderne Ästhetik
+- Umfangreiche Komponentenbibliothek mit konsistenten Stilen (Karten, Schaltflächen, Abzeichen, Warnungen)
+- Modulare Layout-Komponenten für konsistente Seitenstrukturen
+- Optimierte Formularkomponenten mit verbesserten visuellen Hinweisen
+- Mobile Optimierungen für alle Komponenten und Seiten
+
+### Changed
+- Vollständig überarbeitetes Farbschema mit besserer Zugänglichkeit und Hierarchie
+- Header- und Footer-Redesign für bessere Benutzerführung
+- Verbesserte visuelle Hierarchie von Überschriften und Textelementen
+- Optimierte Seitenstruktur mit verbesserten Abständen und Layout
+- Modernisiertes Design mit Schattierungs- und Tiefeneffekten
+- Verbesserte Form- und Interaktionsdesigns
+- Konsistente Anwendung von Design-Token im gesamten Projekt
+- Optimiertes Layout der Pinnwand-Seite mit Nachrichten vor dem Eingabeformular für verbesserte UX
+- Kompakteres, breiteres Formular-Design auf der Pinnwand-Seite für effizientere Platznutzung
+- Verbesserte Eingabefelder mit optimierten Abständen und responsivem Grid-Layout
+
+### Fixed
+- CSS-Konfigurationsprobleme bei der Tailwind-Integration
+- Inkonsistente Farben und Kontraste zwischen verschiedenen Seitenelementen
+- Probleme mit der Sichtbarkeit von Formularelementen
+- Symbolgrößenprobleme und Ausrichtung in der Benutzeroberfläche
+- Layout-Probleme auf mobilen Geräten
+- Designinkonsistenzen zwischen Komponenten
+- Unzugängliche Farbkontraste für Benutzer mit Sehbehinderungen
+
+## [0.0.1] - 2025-02-15
+
+### Added
+- Initialer Projektaufbau
+- Grundlegende Vue.js-App-Struktur mit Vue Router
+- Tailwind CSS Integration
+- Basisseiten (Home, ForDoctors, ForHospitals, About, Contact)
+- Grundlegende Komponenten (Header, Footer, Forms)
+
+### Changed
 - Initial project setup with Vue.js and Tailwind CSS
 - Responsive layout with header and footer components
 - Home page with hero section, features, and benefits
