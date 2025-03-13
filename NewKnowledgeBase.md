@@ -47,4 +47,10 @@ This document contains insights and learnings gained during the development of t
 - SPA routing requires configuration to handle client-side routes on deployment platforms
 - Proper .gitignore settings are crucial to avoid committing node_modules, dist directories, and environment files
 - Documentation (README.md, CHANGELOG.md) should be regularly updated before deployment for transparency
-- For Vue.js projects on Vercel, setting the framework to "vite" optimizes the build process 
+- For Vue.js projects on Vercel, setting the framework to "vite" optimizes the build process
+- When deploying SPAs to Vercel, static assets require specific route handling to prevent MIME type errors
+- Route configuration in vercel.json should differentiate between static assets (JS, CSS, SVG, etc.) and application routes
+- For Vite projects, explicitly setting base: '/' in vite.config.js ensures proper asset path resolution
+- Adding sourcemap generation in production can help debug deployment issues
+- Optimizing chunk strategy in vite.config.js can improve initial load performance in production
+- MIME type errors often indicate improper route handling where static assets are being served as HTML 
