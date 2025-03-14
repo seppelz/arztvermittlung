@@ -4,6 +4,61 @@ Alle wichtigen Änderungen an diesem Projekt werden in dieser Datei dokumentiert
 
 ## [Unreleased]
 
+### Hinzugefügt
+- Admin-Komponente für die Benutzerverwaltung mit Filter-, Such- und Paginierungsfunktionen
+- Admin-Komponente für die Verwaltung von Schwarzbrett-Einträgen mit CRUD-Funktionalität
+- Admin-Komponente für die Verwaltung von Kontaktanfragen mit Statusverwaltung
+- Admin-Komponente für Systemeinstellungen mit verschiedenen Konfigurationsbereichen
+- Admin-Bereich mit Konfiguration der Zugriffsberechtigungen
+- Admin-Dashboard mit Übersichtsstatistiken und Schnellzugriff
+- Backend-Setup mit MongoDB-Datenbank und Express.js
+- API-Endpunkte für Benutzer, Schwarzbrett-Einträge und Kontaktanfragen
+- JWT-basierte Authentifizierung für geschützte API-Routen
+- Registrierungs- und Login-Funktionalität für Administratoren
+- Frontend-Services für API-Zugriff (auth, user, bulletin, contact)
+- Verbindung zwischen Frontend und Backend für Admin-Komponenten
+- Benutzerregistrierung mit Formularvalidierung und Benutzertyp-Auswahl (Arzt/Klinik)
+- Login-Seite mit Formularvalidierung und Erinnerungsfunktion
+- Profilseite für Benutzer mit Anzeige der Kontoinformationen
+- Toast-Benachrichtigungssystem für Benutzer-Feedback
+- Pinia-Store für zentralisierte Zustandsverwaltung
+- Authentifizierungsservice mit JWT-Token-Management
+- Benutzerservice für Profilmanagement
+- Responsive navigation with mobile menu support
+- Navigation login/register buttons for better accessibility
+- Guest access option for demonstration purposes
+- Verbesserte Vercel-Deployment-Konfiguration für Frontend und Backend
+- Testskript für Deployment-Überprüfung vor Produktivschaltung
+- Umgebungsvariablen-Template für einfache Konfiguration
+- Seed-Skript für die Erstellung von Testbenutzern in der Produktionsdatenbank
+
+### Verbessert
+- Implementierung von responsiven Datenfiltern für alle Admin-Ansichten
+- Optimierte Tabellen-Layouts für bessere Datenübersicht
+- Modale Detailansichten für Kontaktanfragen
+- Intuitive Statusverwaltung mit farblicher Kennzeichnung
+- Lokale MongoDB-Installation für Entwicklungsumgebung
+- CORS-Konfiguration für sichere API-Zugriffe
+- Routing mit rollenbasierter Zugriffskontrolle
+- Authentifizierungs-Workflow mit JWT-Token-Management
+- Verbesserte Benutzeroberfläche mit Ladezuständen und Fehlerbehandlung
+- Optimierte Formularvalidierung mit Echtzeit-Feedback
+- Erweiterte Backend-Authentifizierung für verschiedene Benutzertypen
+- Login options updated to use guest access instead of admin credentials
+- Benutzertyp-Schema im Mongoose-Modell um 'Gast' für Demo-Zugang erweitert
+- Deployment-Prozess für einfachere Inbetriebnahme
+
+### Behoben
+- Fehlende Registrierungsfunktion im Backend hinzugefügt
+- Validierungsprobleme bei der Benutzerregistrierung behoben
+- MongoDB-Verbindungsprobleme durch lokale Installation gelöst
+- Fehler bei der Benutzeranmeldung für Nicht-Admin-Benutzer behoben
+- Probleme mit fehlenden Routen für Login und Registrierung behoben
+- Added proper error handling for API requests
+- Navigation menu accessibility on mobile devices
+- Security improvements for authentication system
+- Usertype validation error bei der Erstellung von Gast-Benutzern behoben
+
 ## [0.1.0] - 2025-03-13
 
 ### Added

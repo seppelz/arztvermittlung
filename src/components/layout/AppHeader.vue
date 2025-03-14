@@ -71,6 +71,39 @@
           >
             Kontakt
           </router-link>
+          
+          <!-- Auth Links for Desktop -->
+          <template v-if="!authStore.isAuthenticated">
+            <router-link
+              :to="{ name: 'Login' }"
+              class="nav-link login-btn ml-2"
+              active-class="nav-link-active"
+            >
+              Anmelden
+            </router-link>
+            <router-link
+              :to="{ name: 'Register' }"
+              class="nav-link register-btn"
+              active-class="nav-link-active"
+            >
+              Registrieren
+            </router-link>
+          </template>
+          <template v-else>
+            <router-link
+              :to="{ name: 'Profile' }"
+              class="nav-link"
+              active-class="nav-link-active"
+            >
+              Profil
+            </router-link>
+            <button
+              @click="logout"
+              class="nav-link logout-btn"
+            >
+              Abmelden
+            </button>
+          </template>
         </nav>
 
         <!-- Mobile Menu Button -->
@@ -183,6 +216,42 @@
           >
             Kontakt
           </router-link>
+          
+          <!-- Auth Links for Mobile -->
+          <template v-if="!authStore.isAuthenticated">
+            <router-link
+              :to="{ name: 'Login' }"
+              @click="mobileMenuOpen = false"
+              class="mobile-nav-link mt-4"
+              active-class="mobile-nav-link-active"
+            >
+              Anmelden
+            </router-link>
+            <router-link
+              :to="{ name: 'Register' }"
+              @click="mobileMenuOpen = false"
+              class="mobile-nav-link"
+              active-class="mobile-nav-link-active"
+            >
+              Registrieren
+            </router-link>
+          </template>
+          <template v-else>
+            <router-link
+              :to="{ name: 'Profile' }"
+              @click="mobileMenuOpen = false"
+              class="mobile-nav-link mt-4"
+              active-class="mobile-nav-link-active"
+            >
+              Profil
+            </router-link>
+            <button
+              @click="logoutMobile"
+              class="mobile-nav-link w-full text-left"
+            >
+              Abmelden
+            </button>
+          </template>
         </div>
       </div>
     </transition>
@@ -191,12 +260,26 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue';
+import { useAuthStore } from '@/stores/auth';
+import { useRouter } from 'vue-router';
 
+const router = useRouter();
+const authStore = useAuthStore();
 const mobileMenuOpen = ref(false);
 const isScrolled = ref(false);
 
 const handleScroll = () => {
   isScrolled.value = window.scrollY > 10;
+};
+
+const logout = () => {
+  authStore.clearAuth();
+  router.push('/');
+};
+
+const logoutMobile = () => {
+  mobileMenuOpen.value = false;
+  logout();
 };
 
 onMounted(() => {
@@ -230,5 +313,17 @@ onUnmounted(() => {
 .mobile-nav-link-active {
   @apply bg-white/15 shadow-inner;
   @apply border-l-4 border-secondary-400 pl-3;
+}
+
+.login-btn {
+  @apply bg-primary-600 hover:bg-primary-700;
+}
+
+.register-btn {
+  @apply bg-secondary-500 hover:bg-secondary-600;
+}
+
+.logout-btn {
+  @apply text-red-100 hover:bg-red-700/40;
 }
 </style> 
