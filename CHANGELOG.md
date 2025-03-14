@@ -31,6 +31,7 @@ Alle wichtigen Änderungen an diesem Projekt werden in dieser Datei dokumentiert
 - Testskript für Deployment-Überprüfung vor Produktivschaltung
 - Umgebungsvariablen-Template für einfache Konfiguration
 - Seed-Skript für die Erstellung von Testbenutzern in der Produktionsdatenbank
+- MongoDB Atlas Integration für Produktionsdatenbank
 
 ### Verbessert
 - Implementierung von responsiven Datenfiltern für alle Admin-Ansichten

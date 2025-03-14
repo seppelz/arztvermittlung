@@ -299,7 +299,11 @@ Dieses Dokument enthält wichtige Lernpunkte, die während der Entwicklung der M
 - **Fullstack Deployment**: Vercel ermöglicht das Deployment sowohl von Frontend (Vue.js SPA) als auch Backend (Express.js API) in einer Konfiguration.
 - **Serverless Functions**: Der Express.js Backend-Server wird als Serverless Function auf Vercel ausgeführt, wodurch ein separates Backend-Hosting entfällt.
 - **Route Handling**: Die Vercel-Konfiguration muss korrekt eingerichtet sein, um API-Anfragen an die Serverless Function weiterzuleiten und SPA-Routen korrekt zu behandeln.
-- **MongoDB Atlas**: Für Produktionsumgebungen sollte MongoDB Atlas als Cloud-Datenbank verwendet werden, anstatt einer lokalen MongoDB-Installation.
+- **MongoDB Atlas**: Für Produktionsumgebungen wird MongoDB Atlas als Cloud-Datenbank verwendet, anstatt einer lokalen MongoDB-Installation.
+  - **Verbindungssicherheit**: MongoDB Atlas bietet IP-Whitelist und Auth-Mechanismen für sichere Datenbankverbindungen.
+  - **Skalierbarkeit**: Serverlose Funktionen können dynamisch mit MongoDB Atlas skaliert werden.
+  - **Datenbank-Administration**: Atlas bietet ein Dashboard für Datenbanküberwachung, Backup und Wiederherstellung.
+  - **Verbindungsstring-Format**: `mongodb+srv://<username>:<password>@<cluster>.mongodb.net/<dbname>?retryWrites=true&w=majority`
 - **Seeding-Mechanismen**: Die Bereitstellung von Seed-Skripten vereinfacht das Einrichten der Produktionsdatenbank mit Testdaten.
 
 ### Umgebungsvariablen und Konfiguration
