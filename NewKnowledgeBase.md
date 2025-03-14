@@ -320,3 +320,25 @@ Dieses Dokument enthält wichtige Lernpunkte, die während der Entwicklung der M
 - **Rollbacks**: Bei Problemen kann einfach zu einer früheren Version zurückgewechselt werden.
 - **Deployment-Tests**: Testskripte vor dem Deployment helfen, häufige Probleme zu identifizieren und zu beheben, bevor sie in Produktion gehen.
 - **Kontinuierliche Integration**: Der Deployment-Prozess kann in CI/CD-Pipelines integriert werden, um Tests und Qualitätschecks vor dem Deployment auszuführen. 
+
+# New Knowledge Base
+
+This file documents new insights and knowledge gained while working on this project.
+
+## MongoDB Atlas Connection
+
+- MongoDB Atlas connections may require specific SSL/TLS settings to work properly
+- Disabling SSL validation (`sslValidate: false`) can help resolve connection issues in development environments
+- IP whitelisting in MongoDB Atlas is crucial for allowing connections from specific environments
+- Using the MongoDB native driver directly can provide more detailed error messages for troubleshooting
+- The connection string format is important and should match exactly what MongoDB Atlas provides 
+
+## CORS and API Configuration
+
+- When deploying a frontend to a different domain than the backend, CORS configuration is essential
+- The backend server must explicitly allow requests from the frontend domain in its CORS configuration
+- Environment variables should be used for API URLs instead of hardcoding them
+- Different environment files (`.env.development`, `.env.production`) can be used to configure different environments
+- Vite uses the `import.meta.env` syntax to access environment variables instead of `process.env`
+- CORS errors often manifest as network errors in the browser console
+- For Vercel deployments, both the frontend and backend need to be properly configured to work together 

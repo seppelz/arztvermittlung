@@ -22,9 +22,6 @@
                 Für Kliniken
               </router-link>
             </div>
-            <div class="mt-4 text-white/70 text-sm">
-              Jetzt mit MongoDB Atlas für höchste Skalierbarkeit und Zuverlässigkeit!
-            </div>
           </div>
           <div class="hidden md:block">
             <img 

@@ -1,8 +1,19 @@
 # Changelog
 
-Alle wichtigen Änderungen an diesem Projekt werden in dieser Datei dokumentiert.
+All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+
+### Fixed
+- Fixed MongoDB Atlas connection issues by disabling SSL validation
+- Added test users to MongoDB Atlas database for guest login functionality
+- Fixed CORS issues with Vercel deployment by updating API URL configuration
+- Updated CORS configuration to allow requests from Vercel domain
+
+### Added
+- Created test scripts for MongoDB Atlas connection testing
+- Added seed script for creating test users in MongoDB Atlas
+- Added production environment configuration for Vercel deployment
 
 ### Hinzugefügt
 - Admin-Komponente für die Benutzerverwaltung mit Filter-, Such- und Paginierungsfunktionen
