@@ -59,6 +59,7 @@ Alle wichtigen Änderungen an diesem Projekt werden in dieser Datei dokumentiert
 - Navigation menu accessibility on mobile devices
 - Security improvements for authentication system
 - Usertype validation error bei der Erstellung von Gast-Benutzern behoben
+- MIME-Typ-Fehler in Vercel-Deployment für statische Assets (CSS, JS, SVG) behoben
 
 ## [0.1.0] - 2025-03-13
 
