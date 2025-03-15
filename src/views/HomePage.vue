@@ -1,45 +1,99 @@
 <template>
   <div>
-    <!-- Hero Section with Gradient Background -->
-    <section class="bg-gradient-banner relative overflow-hidden">
-      <div class="absolute -bottom-24 right-0 w-1/2 h-full opacity-10">
-        <div class="w-full h-full bg-opacity-10 bg-pattern"></div>
+    <!-- Simplified Hero Section -->
+    <section class="bg-gradient-banner relative overflow-hidden min-h-[500px] flex items-center">
+      <div class="absolute inset-0 overflow-hidden">
+        <div class="absolute top-0 left-0 w-full h-full opacity-10">
+          <div class="w-full h-full bg-pattern"></div>
+        </div>
       </div>
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-28 lg:py-32 relative z-10">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-          <div>
-            <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white leading-tight mb-6">
-              Kurzfristige Arztvermittlung mit Top-Honoraren
-            </h1>
-            <p class="text-xl text-white/90 mb-8 max-w-lg">
-              Verbinden Sie sich direkt mit Ärzten oder Kliniken für Einsätze bis zu 3 Monaten. Ärzte profitieren von übertariflichen Honoraren, Kliniken von schneller Engpassüberbrückung.
+      
+      <div class="container mx-auto px-4 py-12 relative z-10">
+        <div class="grid md:grid-cols-2 gap-8 items-center">
+          <!-- Hero Content -->
+          <div class="text-white animate-fade-in-up">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4 text-white">Direkte Verbindung zwischen Ärzten und Kliniken</h1>
+            <p class="text-xl mb-6 text-white/90">
+              Unsere Pinnwand ermöglicht den einfachen Austausch zwischen medizinischen Fachkräften und Einrichtungen - mit minimaler Registrierung.
             </p>
             <div class="flex flex-wrap gap-4">
-              <router-link :to="{ name: 'ForDoctors' }" class="btn-primary text-lg px-6 py-3">
-                Für Ärzte
+              <router-link :to="{ name: 'BulletinBoard' }" class="btn-hero-primary px-6 py-3">
+                Pinnwand ansehen
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                </svg>
               </router-link>
-              <router-link :to="{ name: 'ForHospitals' }" class="btn-secondary text-lg px-6 py-3">
-                Für Kliniken
+              <router-link :to="{ name: 'Register' }" class="btn-hero-secondary px-6 py-3">
+                Jetzt registrieren
               </router-link>
             </div>
+            
+            <div class="mt-8 grid grid-cols-2 gap-6">
+              <div class="bg-white/10 backdrop-blur-sm p-4 rounded-lg">
+                <h3 class="font-semibold text-lg mb-2 text-white">Für Ärzte</h3>
+                <p class="text-white/90">Finden Sie passende Kliniken oder teilen Sie Ihre Verfügbarkeit mit nur wenigen Klicks.</p>
+              </div>
+              <div class="bg-white/10 backdrop-blur-sm p-4 rounded-lg">
+                <h3 class="font-semibold text-lg mb-2 text-white">Für Kliniken</h3>
+                <p class="text-white/90">Veröffentlichen Sie Stellenangebote und finden Sie qualifizierte Ärzte für Ihre Einrichtung.</p>
+              </div>
+            </div>
           </div>
+          
+          <!-- Hero Image -->
           <div class="hidden md:block">
-            <img 
-              src="@/assets/hero-image.svg" 
-              alt="Arztvermittlung" 
-              class="w-full h-auto rounded-xl shadow-2xl transform rotate-1 border-4 border-white/30"
-            />
+            <div class="relative bg-white/10 backdrop-blur-sm rounded-lg p-6 shadow-lg">
+              <h3 class="font-bold text-xl text-white mb-4">Aktuelle Pinnwand-Einträge</h3>
+              
+              <!-- Sample Bulletin Board Entries -->
+              <div class="space-y-3">
+                <div class="bg-white/20 backdrop-blur-sm p-3 rounded-lg">
+                  <div class="flex justify-between items-start">
+                    <span class="bg-blue-500 text-white text-xs px-2 py-1 rounded-full">Stellenangebot</span>
+                    <span class="text-white/80 text-sm">Vor 2 Tagen</span>
+                  </div>
+                  <h4 class="font-medium text-white mt-2">Facharzt für Innere Medizin gesucht</h4>
+                  <p class="text-white/90 text-sm mt-1">Universitätsklinikum sucht Verstärkung ab sofort...</p>
+                </div>
+                
+                <div class="bg-white/20 backdrop-blur-sm p-3 rounded-lg">
+                  <div class="flex justify-between items-start">
+                    <span class="bg-green-500 text-white text-xs px-2 py-1 rounded-full">Verfügbarkeit</span>
+                    <span class="text-white/80 text-sm">Vor 3 Tagen</span>
+                  </div>
+                  <h4 class="font-medium text-white mt-2">Anästhesist verfügbar für Teilzeit</h4>
+                  <p class="text-white/90 text-sm mt-1">Erfahrener Facharzt sucht neue Herausforderung...</p>
+                </div>
+                
+                <div class="bg-white/20 backdrop-blur-sm p-3 rounded-lg">
+                  <div class="flex justify-between items-start">
+                    <span class="bg-purple-500 text-white text-xs px-2 py-1 rounded-full">Information</span>
+                    <span class="text-white/80 text-sm">Vor 5 Tagen</span>
+                  </div>
+                  <h4 class="font-medium text-white mt-2">Fortbildung: Notfallmedizin</h4>
+                  <p class="text-white/90 text-sm mt-1">Zweitägiger Workshop für interessierte Kollegen...</p>
+                </div>
+              </div>
+              
+              <div class="mt-4 text-center">
+                <router-link :to="{ name: 'BulletinBoard' }" class="text-white hover:text-secondary-300 inline-flex items-center">
+                  Alle Einträge ansehen
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                  </svg>
+                </router-link>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-      <div class="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white to-transparent"></div>
     </section>
 
     <!-- Features Section -->
     <section class="py-20 bg-white">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-16">
-          <h2 class="text-3xl md:text-4xl font-bold text-heading mb-6">Warum MedMatch?</h2>
+          <h2 class="text-3xl md:text-4xl font-bold text-primary-800 mb-6">Warum MedMatch?</h2>
           <p class="text-xl text-neutral-600 max-w-3xl mx-auto">
             Unsere Plattform verbindet Ärzte und medizinische Einrichtungen direkt für kurzfristige Einsätze von einer Woche bis zu drei Monaten – ohne teure Vermittlungsgebühren.
           </p>
@@ -52,7 +106,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
-            <h3 class="text-xl font-bold text-heading mb-3">Übertarifliche Vergütung</h3>
+            <h3 class="text-xl font-bold text-primary-800 mb-3">Übertarifliche Vergütung</h3>
             <p class="text-neutral-600">
               Ärzte erhalten für kurzfristige Einsätze 30-50% über der regulären Vergütung. Kliniken sparen trotzdem im Vergleich zu klassischen Personaldienstleistern.
             </p>
@@ -64,7 +118,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
             </div>
-            <h3 class="text-xl font-bold text-heading mb-3">Schnelle Vertretungslösungen</h3>
+            <h3 class="text-xl font-bold text-primary-800 mb-3">Schnelle Vertretungslösungen</h3>
             <p class="text-neutral-600">
               Kurzfristige Engpässe im Klinikbetrieb überbrücken oder als Arzt flexible Kurzeinsätze finden – meist innerhalb weniger Tage vermittelt.
             </p>
@@ -76,7 +130,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
               </svg>
             </div>
-            <h3 class="text-xl font-bold text-heading mb-3">Maximale Flexibilität</h3>
+            <h3 class="text-xl font-bold text-primary-800 mb-3">Maximale Flexibilität</h3>
             <p class="text-neutral-600">
               Nur kurzfristige Einsätze zwischen 1 Woche und 3 Monaten. Keine langen Vertragsbindungen, hohe Planbarkeit für beide Seiten.
             </p>
@@ -89,7 +143,7 @@
     <section class="py-20 bg-neutral-50">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-16">
-          <h2 class="text-3xl md:text-4xl font-bold text-heading mb-6">So funktioniert's</h2>
+          <h2 class="text-3xl md:text-4xl font-bold text-primary-800 mb-6">So funktioniert's</h2>
           <p class="text-xl text-neutral-600 max-w-3xl mx-auto">
             Einfacher Prozess für Ärzte und Kliniken, um schnell kurzfristige Einsätze zu vereinbaren.
           </p>
@@ -104,22 +158,22 @@
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
               </div>
-              <h3 class="text-2xl font-bold text-heading">Für Ärzte</h3>
+              <h3 class="text-2xl font-bold text-primary-800">Für Ärzte</h3>
             </div>
             <ol class="relative border-l-2 border-primary-200 pl-8 space-y-8">
               <li class="process-step">
                 <div class="process-number">1</div>
-                <h4 class="text-lg font-bold text-heading mb-2">Verfügbarkeit angeben</h4>
+                <h4 class="text-lg font-bold text-primary-700 mb-2">Verfügbarkeit angeben</h4>
                 <p class="text-neutral-600">Teilen Sie mit, für welche Zeiträume (1 Woche bis 3 Monate) und Regionen Sie verfügbar sind.</p>
               </li>
               <li class="process-step">
                 <div class="process-number">2</div>
-                <h4 class="text-lg font-bold text-heading mb-2">Passende Kurzeinsätze finden</h4>
+                <h4 class="text-lg font-bold text-primary-700 mb-2">Passende Kurzeinsätze finden</h4>
                 <p class="text-neutral-600">Durchsuchen Sie attraktiv vergütete Vertretungsstellen und kurzfristige Einsätze in Kliniken.</p>
               </li>
               <li class="process-step">
                 <div class="process-number">3</div>
-                <h4 class="text-lg font-bold text-heading mb-2">Schnelle Vereinbarung</h4>
+                <h4 class="text-lg font-bold text-primary-700 mb-2">Schnelle Vereinbarung</h4>
                 <p class="text-neutral-600">Verhandeln Sie direkt mit den Kliniken über Honorar, Unterkunft und Konditionen für Ihren Kurzeinsatz.</p>
               </li>
             </ol>
@@ -138,22 +192,22 @@
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                 </svg>
               </div>
-              <h3 class="text-2xl font-bold text-heading">Für Kliniken</h3>
+              <h3 class="text-2xl font-bold text-primary-800">Für Kliniken</h3>
             </div>
             <ol class="relative border-l-2 border-secondary-200 pl-8 space-y-8">
               <li class="process-step">
                 <div class="process-number secondary">1</div>
-                <h4 class="text-lg font-bold text-heading mb-2">Bedarf veröffentlichen</h4>
+                <h4 class="text-lg font-bold text-primary-700 mb-2">Bedarf veröffentlichen</h4>
                 <p class="text-neutral-600">Beschreiben Sie Ihren kurzfristigen Personalbedarf, Zeitraum (1 Woche bis 3 Monate) und angebotene Vergütung.</p>
               </li>
               <li class="process-step">
                 <div class="process-number secondary">2</div>
-                <h4 class="text-lg font-bold text-heading mb-2">Sofort verfügbare Ärzte finden</h4>
+                <h4 class="text-lg font-bold text-primary-700 mb-2">Sofort verfügbare Ärzte finden</h4>
                 <p class="text-neutral-600">Durchsuchen Sie Profile von Ärzten, die aktuell für Kurzeinsätze verfügbar sind und Ihren Anforderungen entsprechen.</p>
               </li>
               <li class="process-step">
                 <div class="process-number secondary">3</div>
-                <h4 class="text-lg font-bold text-heading mb-2">Direkte Vereinbarung</h4>
+                <h4 class="text-lg font-bold text-primary-700 mb-2">Direkte Vereinbarung</h4>
                 <p class="text-neutral-600">Handeln Sie Konditionen direkt mit dem Arzt aus – keine versteckten Gebühren, nur die vereinbarte Vergütung.</p>
               </li>
             </ol>
@@ -171,7 +225,7 @@
     <section class="bg-gradient-banner py-20 text-white">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-16">
-          <h2 class="text-3xl md:text-4xl font-bold mb-6">Das sagen unsere Nutzer</h2>
+          <h2 class="text-3xl md:text-4xl font-bold mb-6 text-white">Das sagen unsere Nutzer</h2>
           <p class="text-xl text-white/80 max-w-3xl mx-auto">
             Erfahrungen von Ärzten und Kliniken, die unsere Plattform bereits erfolgreich genutzt haben.
           </p>
@@ -192,7 +246,7 @@
                 TM
               </div>
               <div>
-                <h4 class="font-bold">Dr. Thomas Müller</h4>
+                <h4 class="font-bold text-white">Dr. Thomas Müller</h4>
                 <p class="text-white/70 text-sm">Facharzt für Innere Medizin</p>
               </div>
             </div>
@@ -212,7 +266,7 @@
                 MS
               </div>
               <div>
-                <h4 class="font-bold">Maria Schmidt</h4>
+                <h4 class="font-bold text-white">Maria Schmidt</h4>
                 <p class="text-white/70 text-sm">Personalleiterin, Fachklinik Heidelberg</p>
               </div>
             </div>
@@ -232,7 +286,7 @@
                 SW
               </div>
               <div>
-                <h4 class="font-bold">Dr. Sarah Weber</h4>
+                <h4 class="font-bold text-white">Dr. Sarah Weber</h4>
                 <p class="text-white/70 text-sm">Fachärztin für Neurologie</p>
               </div>
             </div>
@@ -269,7 +323,7 @@
     <section class="py-20 bg-neutral-50">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-16">
-          <h2 class="text-3xl md:text-4xl font-bold text-heading mb-6">Aktuelle Kurzeinsätze & Vertretungen</h2>
+          <h2 class="text-3xl md:text-4xl font-bold text-primary-800 mb-6">Aktuelle Kurzeinsätze & Vertretungen</h2>
           <p class="text-xl text-neutral-600 max-w-3xl mx-auto">
             Die neuesten Angebote für Vertretungen (1 Woche bis 3 Monate) mit übertariflicher Vergütung und kurzfristig verfügbare Ärzte auf unserer Plattform.
           </p>
@@ -281,7 +335,7 @@
               Stellenangebot
             </div>
             <div class="p-6">
-              <h3 class="text-xl font-bold text-heading mb-3">Facharzt Anästhesie – 8 Wochen (+50%)</h3>
+              <h3 class="text-xl font-bold text-primary-800 mb-3">Facharzt Anästhesie – 8 Wochen (+50%)</h3>
               <p class="text-neutral-600 mb-4 line-clamp-3">
                 Universitätsklinikum Frankfurt sucht für Juli-August 2025 einen Facharzt für Anästhesie. Vergütung 50% über Tarif, flexible Arbeitszeiten, Unterkunft kann gestellt werden.
               </p>
@@ -299,7 +353,7 @@
               Stellengesuch
             </div>
             <div class="p-6">
-              <h3 class="text-xl font-bold text-heading mb-3">Chirurg für Kurzeinsätze verfügbar</h3>
+              <h3 class="text-xl font-bold text-primary-800 mb-3">Chirurg für Kurzeinsätze verfügbar</h3>
               <p class="text-neutral-600 mb-4 line-clamp-3">
                 Facharzt für Allgemeinchirurgie mit 8 Jahren Erfahrung bietet Vertretungen (1-12 Wochen) im Raum München/Bayern. Sofort verfügbar für Engpassüberbrückung, auch kurzfristig.
               </p>
@@ -317,7 +371,7 @@
               Vertretung
             </div>
             <div class="p-6">
-              <h3 class="text-xl font-bold text-heading mb-3">Kurzzeitvertretung Gynäkologie (6 Wochen)</h3>
+              <h3 class="text-xl font-bold text-primary-800 mb-3">Kurzzeitvertretung Gynäkologie (6 Wochen)</h3>
               <p class="text-neutral-600 mb-4 line-clamp-3">
                 Praxisklinik in Berlin sucht für den Zeitraum 15.08.-30.09. eine Vertretung für Gynäkologie. Übertarifliche Vergütung (bis zu 15.000€/Monat), flexible Arbeitszeiten möglich.
               </p>
@@ -345,7 +399,30 @@
 </template>
 
 <script setup>
-// No additional script needed
+import { onMounted } from 'vue';
+
+onMounted(() => {
+  // Animate the counters
+  const counters = document.querySelectorAll('.counter');
+  const speed = 200; // The lower the faster
+  
+  counters.forEach(counter => {
+    const target = +counter.getAttribute('data-target');
+    const increment = target / speed;
+    
+    const updateCount = () => {
+      const count = +counter.innerText;
+      if (count < target) {
+        counter.innerText = Math.ceil(count + increment);
+        setTimeout(updateCount, 1);
+      } else {
+        counter.innerText = target;
+      }
+    };
+    
+    updateCount();
+  });
+});
 </script>
 
 <style scoped>
@@ -378,5 +455,198 @@
 .bg-pattern {
   background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M10 0L10 20M0 10L20 10' stroke='white' opacity='0.3' stroke-width='1'/%3E%3C/svg%3E");
   background-size: 20px 20px;
+}
+
+/* Hero Section Animations */
+.animate-fade-in-up {
+  animation: fadeInUp 0.8s ease forwards;
+  opacity: 0;
+}
+
+.animation-delay-200 {
+  animation-delay: 0.2s;
+}
+
+.animation-delay-400 {
+  animation-delay: 0.4s;
+}
+
+.animation-delay-500 {
+  animation-delay: 0.5s;
+}
+
+.animation-delay-600 {
+  animation-delay: 0.6s;
+}
+
+.animation-delay-700 {
+  animation-delay: 0.7s;
+}
+
+.animation-delay-1000 {
+  animation-delay: 1s;
+}
+
+.animation-delay-1200 {
+  animation-delay: 1.2s;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(-5px);
+  }
+  50% {
+    transform: translateY(5px);
+  }
+  100% {
+    transform: translateY(-5px);
+  }
+}
+
+.animate-ping-slow {
+  animation: pingSlow 4s ease-in-out infinite;
+}
+
+@keyframes pingSlow {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.4;
+  }
+  100% {
+    transform: scale(0.8);
+    opacity: 0.8;
+  }
+}
+
+.particle {
+  animation: floatParticle linear infinite;
+}
+
+@keyframes floatParticle {
+  0% {
+    transform: translateY(0) translateX(0);
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(-100vh) translateX(100px);
+    opacity: 0;
+  }
+}
+
+.connection-line {
+  animation: drawLine 3s ease-in-out infinite alternate;
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000;
+}
+
+@keyframes drawLine {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.window-lit {
+  background-color: rgba(255, 253, 130, 0.8);
+  box-shadow: 0 0 15px rgba(255, 253, 130, 0.6);
+  animation: windowGlow 4s ease-in-out infinite alternate;
+}
+
+@keyframes windowGlow {
+  0% {
+    background-color: rgba(255, 253, 130, 0.8);
+    box-shadow: 0 0 5px rgba(255, 253, 130, 0.3);
+  }
+  100% {
+    background-color: rgba(255, 253, 130, 0.8);
+    box-shadow: 0 0 15px rgba(255, 253, 130, 0.6);
+  }
+}
+
+/* Enhanced Button Styles */
+.btn-hero-primary {
+  @apply bg-primary-600 text-white rounded-md font-semibold transition-all hover:bg-primary-700 hover:shadow-md;
+}
+
+.btn-hero-secondary {
+  @apply bg-white text-primary-700 rounded-md font-semibold transition-all hover:bg-gray-100 hover:shadow-md;
+}
+
+/* Stat Counter Styles */
+.stat-counter {
+  @apply flex flex-col items-center;
+}
+
+/* Animated Hero Image Container */
+.animated-hero-image {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 400px;
+}
+
+.hero-section {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #0f2b5b, #1e5799);
+}
+
+.hero-content {
+  position: relative;
+  z-index: 10;
+}
+
+.shadow-strong {
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.window {
+  transition: all 0.5s ease;
+}
+
+.network-highlight {
+  @apply flex flex-col items-center text-center;
+}
+
+.network-icon {
+  @apply flex items-center justify-center;
+}
+
+.network-line {
+  animation: dash 15s linear infinite;
+  stroke-dasharray: 5;
+}
+
+@keyframes dash {
+  to {
+    stroke-dashoffset: 100;
+  }
+}
+
+@media (max-width: 768px) {
+  .animated-hero-image {
+    min-height: 300px;
+  }
 }
 </style> 

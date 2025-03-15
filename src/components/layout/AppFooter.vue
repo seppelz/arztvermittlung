@@ -10,9 +10,9 @@
               alt="MedMatch Logo"
               class="h-10 w-auto"
             />
-            <span class="text-xl font-bold">MedMatch</span>
+            <span class="text-xl font-bold text-white">MedMatch</span>
           </div>
-          <p class="text-neutral-200 mb-6 max-w-md">
+          <p class="text-white mb-6 max-w-md">
             Die Plattform für ärztliche Fachkräfte und medizinische Einrichtungen.
             Wir verbinden qualifizierte Ärzte mit passenden Stellen in ganz Deutschland.
           </p>
@@ -42,7 +42,7 @@
 
         <!-- Quick Links -->
         <div>
-          <h3 class="text-lg font-bold mb-4 border-b border-white/30 pb-2">Schnellzugriff</h3>
+          <h3 class="text-xl font-bold mb-4 border-b border-white/50 pb-2 text-white">Schnellzugriff</h3>
           <ul class="space-y-2">
             <li>
               <router-link :to="{ name: 'Home' }" class="footer-link">
@@ -74,7 +74,7 @@
 
         <!-- Legal Links -->
         <div>
-          <h3 class="text-lg font-bold mb-4 border-b border-white/30 pb-2">Rechtliches</h3>
+          <h3 class="text-xl font-bold mb-4 border-b border-white/50 pb-2 text-white">Rechtliches</h3>
           <ul class="space-y-2">
             <li>
               <router-link :to="{ name: 'Privacy' }" class="footer-link">
@@ -100,8 +100,8 @@
         </div>
       </div>
 
-      <div class="mt-12 pt-6 border-t border-white/20">
-        <p class="text-center text-neutral-300 text-sm">
+      <div class="mt-12 pt-6 border-t border-white/30">
+        <p class="text-center text-white text-sm">
           &copy; {{ new Date().getFullYear() }} MedMatch GmbH. Alle Rechte vorbehalten.
         </p>
       </div>
@@ -115,14 +115,14 @@
 
 <style scoped>
 .footer-link {
-  @apply text-neutral-200 hover:text-white transition-colors duration-300 block;
+  @apply text-white hover:text-white/90 transition-colors duration-300 block;
   @apply no-underline hover:no-underline;
   @apply hover:translate-x-1 transition-transform;
 }
 
 .social-icon {
-  @apply flex items-center justify-center h-10 w-10 rounded-full bg-white/10;
-  @apply hover:bg-white/20 transition-colors duration-300 text-white;
+  @apply flex items-center justify-center h-10 w-10 rounded-full bg-white/20;
+  @apply hover:bg-white/30 transition-colors duration-300 text-white;
   @apply no-underline hover:no-underline;
 }
 </style> 

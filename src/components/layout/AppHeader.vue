@@ -21,7 +21,7 @@
         </div>
 
         <!-- Desktop Navigation -->
-        <nav class="hidden md:flex space-x-1">
+        <nav class="hidden md:flex space-x-4">
           <router-link
             :to="{ name: 'Home' }"
             class="nav-link"
@@ -76,14 +76,14 @@
           <template v-if="!authStore.isAuthenticated">
             <router-link
               :to="{ name: 'Login' }"
-              class="nav-link login-btn ml-2"
+              class="nav-link login-btn ml-4"
               active-class="nav-link-active"
             >
               Anmelden
             </router-link>
             <router-link
               :to="{ name: 'Register' }"
-              class="nav-link register-btn"
+              class="nav-link register-btn ml-2"
               active-class="nav-link-active"
             >
               Registrieren
@@ -92,14 +92,14 @@
           <template v-else>
             <router-link
               :to="{ name: 'Profile' }"
-              class="nav-link"
+              class="nav-link ml-4"
               active-class="nav-link-active"
             >
               Profil
             </router-link>
             <button
               @click="logout"
-              class="nav-link logout-btn"
+              class="nav-link logout-btn ml-2"
             >
               Abmelden
             </button>
@@ -294,7 +294,7 @@ onUnmounted(() => {
 
 <style scoped>
 .nav-link {
-  @apply block px-3 py-2 text-lg font-medium rounded-lg text-white no-underline;
+  @apply block px-4 py-2 text-base font-medium rounded-lg text-white no-underline;
   @apply transition-all duration-300 hover:bg-white/10 hover:shadow-inner;
   @apply hover:no-underline hover:text-white;
 }
@@ -316,11 +316,11 @@ onUnmounted(() => {
 }
 
 .login-btn {
-  @apply bg-primary-600 hover:bg-primary-700;
+  @apply bg-primary-600 hover:bg-primary-700 px-5;
 }
 
 .register-btn {
-  @apply bg-secondary-500 hover:bg-secondary-600;
+  @apply bg-secondary-500 hover:bg-secondary-600 px-5;
 }
 
 .logout-btn {
