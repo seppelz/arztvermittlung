@@ -1,7 +1,8 @@
 const { MongoClient } = require('mongodb');
+require('dotenv').config({ path: '../.env' });
 
-// Connection string from MongoDB Atlas dashboard
-const uri = "mongodb+srv://sebastiansoecker:TiaclOBGm6AEIX5E@medmatchproduction.72mfz.mongodb.net/?retryWrites=true&w=majority&appName=MedmatchProduction";
+// Connection string from environment variables
+const uri = process.env.MONGODB_URI;
 
 // Create a client with explicit options
 const client = new MongoClient(uri, {

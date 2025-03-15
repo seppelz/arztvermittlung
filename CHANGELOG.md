@@ -4,11 +4,18 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Security
+- Changed MongoDB Atlas password to improve database security
+- Removed hardcoded MongoDB credentials from test files and replaced with environment variables
+- Created .env.example template file to demonstrate proper credential management
+- Updated MongoDB connection test files to use environment variables for secure credential handling
+
 ### Fixed
 - Fixed MongoDB Atlas connection issues by disabling SSL validation
 - Added test users to MongoDB Atlas database for guest login functionality
 - Fixed CORS issues with Vercel deployment by updating API URL configuration
 - Updated CORS configuration to allow requests from Vercel domain
+- Fixed admin login issue by correctly checking the user role in the response structure
 
 ### Added
 - Created test scripts for MongoDB Atlas connection testing

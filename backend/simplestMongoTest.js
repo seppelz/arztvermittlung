@@ -1,7 +1,8 @@
 const { MongoClient } = require('mongodb');
+require('dotenv').config({ path: '../.env' });
 
-// Direct connection string without environment variables
-const uri = "mongodb+srv://sebastiansoecker:TiaclOBGm6AEIX5E@medmatchproduction.72mfz.mongodb.net/medmatch?retryWrites=true&w=majority";
+// Connection string from environment variables
+const uri = process.env.MONGODB_URI;
 
 // Create a new MongoClient with minimal options
 const client = new MongoClient(uri, {

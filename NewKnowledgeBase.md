@@ -191,6 +191,19 @@
 
 Dieses Dokument enthält wichtige Lernpunkte, die während der Entwicklung der MedMatch-Plattform gesammelt wurden.
 
+## Sicherheitspraktiken
+
+- Hardcodierte Datenbank-Credentials in Test- oder Entwicklungsdateien stellen ein erhebliches Sicherheitsrisiko dar, besonders wenn sie in öffentlichen Repositories gespeichert werden.
+- Die Verwendung von Umgebungsvariablen (.env-Dateien) für sensible Informationen wie Datenbank-Credentials ist eine Best Practice für die sichere Konfiguration.
+- .env-Dateien müssen immer in .gitignore aufgenommen werden, um zu verhindern, dass sensible Daten in das Repository hochgeladen werden.
+- Eine .env.example-Datei sollte als Template bereitgestellt werden, um die erforderlichen Umgebungsvariablen zu dokumentieren, ohne tatsächliche Credentials preiszugeben.
+- Testdateien für Datenbankverbindungen sollten Umgebungsvariablen verwenden, anstatt Credentials direkt im Code zu speichern.
+- MongoDB Atlas und andere Cloud-Dienste bieten Warnungen bei erkannten Sicherheitsrisiken, wie öffentlich zugänglichen Credentials.
+- Die Verwendung von dotenv in Node.js-Anwendungen ermöglicht das einfache Laden von Umgebungsvariablen aus .env-Dateien.
+- Bei Sicherheitsverletzungen oder Verdacht auf kompromittierte Credentials sollten Passwörter sofort geändert werden.
+- Regelmäßige Passwortänderungen für Datenbankzugänge sind eine wichtige Sicherheitsmaßnahme, besonders für Produktionssysteme.
+- MongoDB Atlas bietet zusätzliche Sicherheitsmaßnahmen wie IP-Whitelisting und Netzwerkzugriffsbeschränkungen, die genutzt werden sollten.
+
 ## Architektur und Projektstuktur
 
 - Die Trennung zwischen Admin- und Benutzer-Bereich über verschiedene Vue-Komponenten und Router-Konfigurationen bietet eine klare Struktur für das Projekt.
@@ -341,4 +354,13 @@ This file documents new insights and knowledge gained while working on this proj
 - Different environment files (`.env.development`, `.env.production`) can be used to configure different environments
 - Vite uses the `import.meta.env` syntax to access environment variables instead of `process.env`
 - CORS errors often manifest as network errors in the browser console
-- For Vercel deployments, both the frontend and backend need to be properly configured to work together 
+- For Vercel deployments, both the frontend and backend need to be properly configured to work together
+
+## Authentication and Response Handling
+
+- When working with API responses, it's important to understand the exact structure of the response data
+- In this project, the login response structure is `response.data.user` rather than `response.user`
+- Incorrect response structure handling can lead to authentication issues even when credentials are correct
+- Role-based access control requires careful checking of user roles in the response
+- The admin login component needs to check `userData.user.role === 'admin'` to properly verify admin access
+- Debugging authentication issues often requires examining the exact response structure from the API 

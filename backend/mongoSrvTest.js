@@ -1,7 +1,8 @@
 const { MongoClient } = require('mongodb');
+require('dotenv').config({ path: '../.env' });
 
-// Connection string with srv format
-const uri = "mongodb+srv://sebastiansoecker:TiaclOBGm6AEIX5E@medmatchproduction.72mfz.mongodb.net/medmatch";
+// Connection string from environment variables
+const uri = process.env.MONGODB_URI;
 
 // Set Node.js options for TLS
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'; // Only for testing - not recommended for production

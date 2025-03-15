@@ -1,7 +1,13 @@
 const { MongoClient } = require('mongodb');
+require('dotenv').config({ path: '../.env' });
 
-// Direct connection string using IP addresses
-const uri = "mongodb://sebastiansoecker:TiaclOBGm6AEIX5E@18.194.218.68:27017/medmatch?ssl=true&authSource=admin";
+// Extract credentials from environment variables
+const credentials = process.env.MONGODB_URI.match(/mongodb\+srv:\/\/(.*):(.*)@/);
+const username = credentials ? credentials[1] : '';
+const password = credentials ? credentials[2] : '';
+
+// Use direct connection string with IP address
+const uri = `mongodb://${username}:${password}@medmatchproduction-shard-00-00.72mfz.mongodb.net:27017,medmatchproduction-shard-00-01.72mfz.mongodb.net:27017,medmatchproduction-shard-00-02.72mfz.mongodb.net:27017/medmatch?ssl=true&authSource=admin`;
 
 async function run() {
   try {

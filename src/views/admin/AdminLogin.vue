@@ -117,7 +117,8 @@ const login = async () => {
     console.log('Login erfolgreich:', response);
     
     // Überprüfen, ob der Benutzer ein Admin ist
-    if (response.user && response.user.role === 'admin') {
+    const userData = response.data;
+    if (userData && userData.user && userData.user.role === 'admin') {
       // Weiterleitung zum Dashboard
       router.push({ name: 'AdminDashboard' });
     } else {
