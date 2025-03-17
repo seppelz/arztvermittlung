@@ -6,10 +6,10 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between items-center h-[var(--nav-height)]">
         <!-- Logo -->
-        <div class="flex">
+        <div class="flex mr-8">
           <router-link
             :to="{ name: 'Home' }"
-            class="flex items-center gap-2 font-bold text-2xl no-underline hover:no-underline"
+            class="flex items-center gap-2 font-bold text-2xl no-underline hover:no-underline pl-2"
           >
             <img
               src="/Med-MATCH.png"
@@ -21,7 +21,7 @@
         </div>
 
         <!-- Desktop Navigation -->
-        <nav class="hidden md:flex space-x-4">
+        <nav class="hidden md:flex space-x-5">
           <router-link
             :to="{ name: 'Home' }"
             class="nav-link"

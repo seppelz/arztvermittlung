@@ -14,7 +14,7 @@
           <div class="text-white animate-fade-in-up">
             <h1 class="text-4xl md:text-5xl font-bold mb-4 text-white">Direkte Verbindung zwischen Ärzten und Kliniken</h1>
             <p class="text-xl mb-6 text-white/90">
-              Unsere Pinnwand ermöglicht den einfachen Austausch zwischen medizinischen Fachkräften und Einrichtungen - mit minimaler Registrierung.
+              Unsere Plattform ermöglicht den einfachen Austausch zwischen medizinischen Fachkräften und Einrichtungen - mit minimaler Registrierung.
             </p>
             <div class="flex flex-wrap gap-4">
               <router-link :to="{ name: 'BulletinBoard' }" class="btn-hero-primary px-6 py-3">
@@ -23,8 +23,8 @@
                   <path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
                 </svg>
               </router-link>
-              <router-link :to="{ name: 'Register' }" class="btn-hero-secondary px-6 py-3">
-                Jetzt registrieren
+              <router-link :to="{ name: 'Arztboerse' }" class="btn-hero-secondary px-6 py-3">
+                Arztbörse entdecken
               </router-link>
             </div>
             
@@ -40,48 +40,71 @@
             </div>
           </div>
           
-          <!-- Hero Image -->
-          <div class="hidden md:block">
-            <div class="relative bg-white/10 backdrop-blur-sm rounded-lg p-6 shadow-lg">
-              <h3 class="font-bold text-xl text-white mb-4">Aktuelle Pinnwand-Einträge</h3>
-              
-              <!-- Sample Bulletin Board Entries -->
-              <div class="space-y-3">
-                <div class="bg-white/20 backdrop-blur-sm p-3 rounded-lg">
-                  <div class="flex justify-between items-start">
-                    <span class="bg-blue-500 text-white text-xs px-2 py-1 rounded-full">Stellenangebot</span>
-                    <span class="text-white/80 text-sm">Vor 2 Tagen</span>
-                  </div>
-                  <h4 class="font-medium text-white mt-2">Facharzt für Innere Medizin gesucht</h4>
-                  <p class="text-white/90 text-sm mt-1">Universitätsklinikum sucht Verstärkung ab sofort...</p>
-                </div>
-                
-                <div class="bg-white/20 backdrop-blur-sm p-3 rounded-lg">
-                  <div class="flex justify-between items-start">
-                    <span class="bg-green-500 text-white text-xs px-2 py-1 rounded-full">Verfügbarkeit</span>
-                    <span class="text-white/80 text-sm">Vor 3 Tagen</span>
-                  </div>
-                  <h4 class="font-medium text-white mt-2">Anästhesist verfügbar für Teilzeit</h4>
-                  <p class="text-white/90 text-sm mt-1">Erfahrener Facharzt sucht neue Herausforderung...</p>
-                </div>
-                
-                <div class="bg-white/20 backdrop-blur-sm p-3 rounded-lg">
-                  <div class="flex justify-between items-start">
-                    <span class="bg-purple-500 text-white text-xs px-2 py-1 rounded-full">Information</span>
-                    <span class="text-white/80 text-sm">Vor 5 Tagen</span>
-                  </div>
-                  <h4 class="font-medium text-white mt-2">Fortbildung: Notfallmedizin</h4>
-                  <p class="text-white/90 text-sm mt-1">Zweitägiger Workshop für interessierte Kollegen...</p>
-                </div>
+          <!-- Hero Entries Showcase -->
+          <div class="hidden md:block space-y-6">
+            <!-- Pinnwand-Einträge -->
+            <div class="bg-white/10 backdrop-blur-sm rounded-lg p-5 shadow-lg">
+              <div class="flex justify-between items-center mb-4">
+                <h3 class="font-bold text-xl text-white">Aktuelles aus der Pinnwand</h3>
+                <router-link :to="{ name: 'BulletinBoard' }" class="text-white hover:text-secondary-300 text-sm">
+                  Alle anzeigen →
+                </router-link>
               </div>
               
-              <div class="mt-4 text-center">
-                <router-link :to="{ name: 'BulletinBoard' }" class="text-white hover:text-secondary-300 inline-flex items-center">
-                  Alle Einträge ansehen
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
-                  </svg>
+              <!-- Pinnwand Entries -->
+              <div class="space-y-3">
+                <div v-if="loadingPinnwand" class="text-center py-3 text-white/80">
+                  <span>Einträge werden geladen...</span>
+                </div>
+                
+                <template v-else>
+                  <div v-for="entry in pinnwandEntries" :key="entry.id" class="bg-white/20 backdrop-blur-sm p-3 rounded-lg">
+                    <div class="flex justify-between items-start">
+                      <span class="bg-amber-400 text-white text-xs px-2 py-1 rounded-full">Information</span>
+                      <span class="text-white/80 text-sm">{{ formatDate(entry.timestamp) }}</span>
+                    </div>
+                    <h4 class="font-medium text-white mt-2">{{ entry.title }}</h4>
+                    <p class="text-white/90 text-sm mt-1 line-clamp-2">{{ entry.content }}</p>
+                  </div>
+                  
+                  <div v-if="pinnwandEntries.length === 0" class="text-center py-2 text-white/80">
+                    <span>Keine Einträge vorhanden</span>
+                  </div>
+                </template>
+              </div>
+            </div>
+            
+            <!-- Arztbörse-Einträge -->
+            <div class="bg-white/10 backdrop-blur-sm rounded-lg p-5 shadow-lg">
+              <div class="flex justify-between items-center mb-4">
+                <h3 class="font-bold text-xl text-white">Aktuelles aus der Arztbörse</h3>
+                <router-link :to="{ name: 'Arztboerse' }" class="text-white hover:text-secondary-300 text-sm">
+                  Alle anzeigen →
                 </router-link>
+              </div>
+              
+              <!-- Arztbörse Entries -->
+              <div class="space-y-3">
+                <div v-if="loadingArztboerse" class="text-center py-3 text-white/80">
+                  <span>Einträge werden geladen...</span>
+                </div>
+                
+                <template v-else>
+                  <div v-for="entry in arztboerseEntries" :key="entry.id" class="bg-white/20 backdrop-blur-sm p-3 rounded-lg">
+                    <div class="flex justify-between items-start">
+                      <span :class="entry.messageType === 'Angebot' ? 'bg-green-500' : 'bg-blue-500'" class="text-white text-xs px-2 py-1 rounded-full">
+                        {{ entry.messageType }}
+                      </span>
+                      <span class="text-white/80 text-sm">{{ formatDate(entry.timestamp) }}</span>
+                    </div>
+                    <h4 class="font-medium text-white mt-2">{{ entry.title }}</h4>
+                    <p class="text-white/90 text-sm mt-1 line-clamp-2">{{ entry.content }}</p>
+                  </div>
+                  
+                  <div v-if="arztboerseEntries.length === 0" class="text-center py-2 text-white/80">
+                    <span>Keine Einträge vorhanden</span>
+                  </div>
+                </template>
               </div>
             </div>
           </div>
@@ -399,9 +422,145 @@
 </template>
 
 <script setup>
-import { onMounted } from 'vue';
+import { ref, onMounted } from 'vue';
+import bulletinService from '@/services/bulletin.service';
+
+// Zustandsvariablen für die Daten
+const pinnwandEntries = ref([]);
+const arztboerseEntries = ref([]);
+const loadingPinnwand = ref(true);
+const loadingArztboerse = ref(true);
+
+// Holt die neuesten Einträge der Pinnwand und Arztbörse
+async function fetchLatestEntries() {
+  try {
+    // Lade die Pinnwand-Einträge (Typ "Information")
+    loadingPinnwand.value = true;
+    const pinnwandResponse = await bulletinService.getAllBulletins({
+      messageType: 'Information',
+      limit: 3,
+      sort: '-timestamp'
+    });
+    pinnwandEntries.value = pinnwandResponse.data || [];
+    loadingPinnwand.value = false;
+
+    // Lade die Arztbörse-Einträge (Typen "Angebot" und "Gesuch")
+    loadingArztboerse.value = true;
+    const arztboerseResponse = await bulletinService.getAllBulletins({
+      messageType: ['Angebot', 'Gesuch'].join(','),
+      limit: 3,
+      sort: '-timestamp'
+    });
+    arztboerseEntries.value = arztboerseResponse.data || [];
+    loadingArztboerse.value = false;
+  } catch (error) {
+    console.error('Fehler beim Laden der Einträge:', error);
+    // Fallback zur Demo-Daten, wenn API-Anfrage fehlschlägt
+    loadDemoData();
+    loadingPinnwand.value = false;
+    loadingArztboerse.value = false;
+  }
+}
+
+// Lädt Demo-Daten falls die API-Anfrage fehlschlägt
+function loadDemoData() {
+  // Demo-Daten für Pinnwand
+  pinnwandEntries.value = [
+    {
+      id: 1,
+      name: 'Ärztekammer Berlin',
+      email: 'fortbildung@aerztekammer-berlin.de',
+      userType: 'Klinik',
+      messageType: 'Information',
+      title: 'Fortbildung: Aktuelle Entwicklungen in der Notfallmedizin',
+      content: 'Die Ärztekammer Berlin bietet am 15.-16.07.2025 eine zertifizierte Fortbildung zu aktuellen Entwicklungen in der Notfallmedizin an. 16 CME-Punkte. Begrenzte Teilnehmerzahl, frühzeitige Anmeldung empfohlen.',
+      timestamp: new Date('2025-05-01T10:00:00'),
+    },
+    {
+      id: 2,
+      name: 'Dr. Thomas Schmidt',
+      email: 't.schmidt@mail.de',
+      userType: 'Arzt',
+      messageType: 'Information',
+      title: 'Fachärztliche Vertretungs-Pool Radiologie',
+      content: 'Organisiere Vertretungs-Pool für kurzfristige Radiologie-Einsätze (max. 3 Monate). Über 20 Kolleginnen und Kollegen bereits dabei. Interessierte Radiologen und Kliniken können mich kontaktieren.',
+      timestamp: new Date('2025-05-08T11:20:00'),
+    },
+    {
+      id: 3,
+      name: 'Medizinische Hochschule Hannover',
+      email: 'kongress@mh-hannover.de',
+      userType: 'Klinik',
+      messageType: 'Information',
+      title: 'Internationaler Kongress für Innere Medizin',
+      content: 'Vom 10.-12.09.2025 findet an der MH Hannover der 35. Internationale Kongress für Innere Medizin statt. Themenschwerpunkte: Kardiologie, Gastroenterologie, Endokrinologie. Anmeldung ab sofort möglich.',
+      timestamp: new Date('2025-04-28T14:30:00'),
+    }
+  ];
+  
+  // Demo-Daten für Arztbörse
+  arztboerseEntries.value = [
+    {
+      id: 4,
+      name: 'Klinikum München',
+      email: 'personal@klinikum-muenchen.de',
+      userType: 'Klinik',
+      messageType: 'Angebot',
+      title: 'Vertretung Notfallmedizin (2 Wochen) - übertarifliche Vergütung',
+      content: 'Suchen dringend Vertretung für unsere Notfallstation vom 15.-29.06.2025. Erfahrung in Notfallmedizin erforderlich. Übertarifliche Vergütung, Unterkunft wird gestellt.',
+      timestamp: new Date('2025-05-15T10:30:00'),
+    },
+    {
+      id: 5,
+      name: 'Dr. Julia Weber',
+      email: 'j.weber@arztpraxis.de',
+      userType: 'Arzt',
+      messageType: 'Gesuch',
+      title: 'Anästhesist verfügbar für Kurzeinsätze bis 4 Wochen',
+      content: 'Facharzt für Anästhesie mit 8 Jahren Erfahrung sucht Kurzeinsätze (1-4 Wochen) im Raum Köln ab sofort. Flexibel und kurzfristig verfügbar, auch Wochenenddienste möglich.',
+      timestamp: new Date('2025-05-12T15:45:00'),
+    },
+    {
+      id: 6,
+      name: 'Universitätsklinikum Hamburg',
+      email: 'karriere@uk-hamburg.de',
+      userType: 'Klinik',
+      messageType: 'Angebot',
+      title: 'Kardiologie - 3-Monats-Vertretung (übertariflich)',
+      content: 'Suchen für den Zeitraum 01.07.-30.09.2025 Facharzt (m/w/d) für unsere kardiologische Abteilung. Übertarifliche Vergütung, Dienstwohnung möglich, flexible Dienstplangestaltung.',
+      timestamp: new Date('2025-05-10T09:15:00'),
+    }
+  ];
+}
+
+// Formatiert das Datum für die Anzeige
+function formatDate(date) {
+  if (!date) return '';
+  
+  const dateObj = new Date(date);
+  const now = new Date();
+  const diffTime = Math.abs(now - dateObj);
+  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+  
+  if (diffDays === 0) {
+    return 'Heute';
+  } else if (diffDays === 1) {
+    return 'Gestern';
+  } else if (diffDays < 7) {
+    return `Vor ${diffDays} Tagen`;
+  } else {
+    return dateObj.toLocaleDateString('de-DE', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    });
+  }
+}
 
 onMounted(() => {
+  // Lade Daten beim Start der Seite
+  fetchLatestEntries();
+  
   // Animate the counters
   const counters = document.querySelectorAll('.counter');
   const speed = 200; // The lower the faster

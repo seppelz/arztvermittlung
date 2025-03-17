@@ -518,3 +518,69 @@ This file documents new insights and knowledge gained while working on this proj
    - Fokussierung auf qualitative Vorteile (Flexibilität, direkte Kommunikation) anstatt auf quantitative Vergütungsangaben
    - Konsistenz in allen Plattformbereichen (Homepage, Bulletin Board, Seed-Daten) bezüglich der Art der Vergütungsdarstellung
    - Sorgfältige Prüfung aller Marketingtexte auf potentiell problematische Einkommensversprechen 
+
+## Integration von echten Daten auf der Homepage
+
+1. **API-Integration mit Fehlerbehandlung**:
+   - Die Verwendung von `try/catch`-Blöcken für API-Aufrufe ist essentiell, um Fehler elegant zu behandeln
+   - Eine Implementierung von Ladezuständen (`loading`) für API-Anfragen verbessert die Benutzererfahrung
+   - Fallback-Mechanismen zu Dummy-Daten sichern eine funktionale Benutzeroberfläche, auch wenn API-Anfragen fehlschlagen
+   - Konsistente Fehlerbehandlung über alle Komponenten hinweg bietet ein einheitliches Benutzererlebnis
+
+2. **Responsive Datenpräsentation**:
+   - Unterschiedliche UI-Zustände (Laden, Daten, Fehler, Keine Daten) sollten alle berücksichtigt werden
+   - Bedingte Renderfunktionen (v-if, v-else) helfen, den richtigen Inhalt basierend auf Datenverfügbarkeit anzuzeigen
+   - Formatierung von Datumsangaben mit relativen Zeiträumen (`Heute`, `Gestern`, `Vor X Tagen`) statt nur festen Daten verbessert die Benutzerfreundlichkeit
+   - Text-Trunkierung (z.B. mit line-clamp-2) für Karteninhalte schafft Konsistenz im Layout und fokussierte Informationsdarstellung
+
+3. **Parameter für API-Anfragen**:
+   - Anfrageparameter wie `limit`, `sort` und `messageType` ermöglichen maßgeschneiderte Datenabfragen
+   - Die Kombination mehrerer Parameter-Werte (wie `['Angebot', 'Gesuch'].join(',')`) in einem Query-Parameter ist eine effiziente Technik
+   - Sortierparameter mit Präfixen (wie `-timestamp` für absteigend) sind ein gängiges API-Muster
+   - Die Beschränkung der Anzahl der zurückgegebenen Elemente (`limit`) optimiert die Leistung für Preview-Ansichten
+
+4. **Datenstruktur und -Transformation**:
+   - Die klare Unterscheidung zwischen verschiedenen Nachrichtentypen (`Information`, `Angebot`, `Gesuch`) ermöglicht spezialisierte Ansichten
+   - Einheitliche Datenmodelle zwischen Komponenten erleichtern die Wiederverwendung von Code und Logik
+   - Konsequente Benennungskonventionen für Datenfelder (`id`, `timestamp`, `messageType`) erleichtern die API-Integration
+   - Die Normalisierung von Zeitstempeln mit `new Date()` stellt sicher, dass Datumsfunktionen korrekt funktionieren
+
+5. **Gemeinsame Codebasis mit Spezialisierung**:
+   - Die Wiederverwendung ähnlicher Komponenten-Strukturen (Pinnwand und Arztbörse) mit konditionaler Logik verbessert die Wartbarkeit
+   - Ein modularer API-Service-Ansatz vereinfacht die Integration über verschiedene Komponenten hinweg
+   - Gemeinsame Hilfsfunktionen (wie Datumformatierung) sollten in wiederverwendbare Dienstprogramme extrahiert werden
+   - Die Standardisierung von UI-Elementen (Karten, Etiketten, Ladeanzeigen) über verschiedene Datentypen hinweg verbessert die visuelle Kohärenz
+
+## Best Practices für UI-Navigation und Layout
+
+1. **Menü-Positionierung und Abstand**:
+   - Ein erhöhter horizontaler Abstand (`mr-8` statt minimaler Abstände) zwischen Logo und Navigationsmenü verbessert die visuelle Balance
+   - Größere Abstände zwischen Navigationseinträgen (`space-x-5` statt `space-x-4`) erhöhen die Lesbarkeit und reduzieren versehentliche Klicks
+   - Leichtes Padding um das Logo (`pl-2`) schafft visuelle Atmung und verhindert Randkonflikte
+   - Konsistente Abstände zwischen Navigation, Logo und Aktions-Buttons sorgen für harmonisches Layout
+
+2. **Information Architecture in Hero-Sections**:
+   - Die Präsentation tatsächlicher Daten in der Hero-Section bietet einen sofortigen Einblick in die Hauptfunktionen der Plattform
+   - Die Darstellung verschiedener Inhaltstypen (Pinnwand und Arztbörse) nebeneinander verdeutlicht die unterschiedlichen Funktionalitäten
+   - Call-to-Action-Buttons sollten direkt zu den entsprechenden Funktionen führen, die in der Hero-Section vorgestellt werden
+   - Überschriften sollten den Zweck jedes Inhaltsbereichs klar identifizieren, ergänzt durch "Alle anzeigen"-Links für weiteren Zugriff
+
+3. **Mehrspaltiges Layout für komplexe Information**:
+   - Vertikale Aufteilung von Hero-Bereichen mit Grid-System (`grid md:grid-cols-2`) balanciert Text und Beispielinhalte
+   - Die Verwendung von gestaffelten Karten für Beispieleinträge (`space-y-6` für Container, `space-y-3` für Einträge) schafft klare visuelle Trennung
+   - Container mit `backdrop-blur-sm` und semitransparentem Hintergrund (`bg-white/10`) erzeugen Tiefe ohne den Hintergrund vollständig zu verdecken
+   - Konsistente Kopf- und Fußzeilenstrukturen innerhalb von Karten (oben: Typ+Datum, Mitte: Titel+Inhalt, unten: Aktionen) erleichtern das Scannen
+
+## Marketing und rechtliche Aspekte
+
+1. **Einkommensdarstellungen und rechtliche Risiken**:
+   - Verwendung von generellen Begriffen wie "übertariflich" oder "attraktiv" statt spezifischer Prozentsätze (30-50%) reduziert rechtliche Risiken
+   - Vermeidung konkreter Vergütungsangaben (wie "15.000€/Monat") schützt vor möglichen rechtlichen Herausforderungen bei nicht erreichbaren Einkommenszusagen
+   - Marketingaussagen zu Vergütungen sollten stets allgemein gehalten werden, um Missverständnisse zu vermeiden
+   - Bei Stellenangeboten in Demo-Daten sollten keine konkreten Prozentsätze verwendet werden, die als verbindliche Zusagen missverstanden werden könnten
+
+2. **Transparenz in der Kommunikation**:
+   - Klare Formulierungen zu Vorteilen (wie "übertarifliche Vergütung") sind präzisen Zahlenangaben vorzuziehen
+   - Fokussierung auf qualitative Vorteile (Flexibilität, direkte Kommunikation) anstatt auf quantitative Vergütungsangaben
+   - Konsistenz in allen Plattformbereichen (Homepage, Bulletin Board, Seed-Daten) bezüglich der Art der Vergütungsdarstellung
+   - Sorgfältige Prüfung aller Marketingtexte auf potentiell problematische Einkommensversprechen 

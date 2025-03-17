@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 ### Improved
+- Logo im Menü weiter nach links positioniert und Abstand zu Menüpunkten erhöht für bessere visuelle Balance
+- Homepage-Hero-Bereich umgestaltet, um sowohl Pinnwand- als auch Arztbörse-Einträge zu zeigen
+- Reale Daten in der Homepage statt Dummy-Daten für bessere Nutzerführung und Verständlichkeit
+- API-Integration der Homepage, um tatsächliche Einträge von Pinnwand und Arztbörse anzuzeigen
 - Enhanced hero section with modern animations and interactive elements for better user engagement
 - Replaced smiley doctor illustration with professional medical silhouette for more professional appearance
 - Added medical network visualization with connecting elements to emphasize the platform's networking aspect
@@ -42,6 +46,12 @@ All notable changes to this project will be documented in this file.
 - Fixed admin login issue by correctly checking the user role in the response structure
 
 ### Added
+- Seitentitel von "Vite App" zu "Med-Match" geändert für bessere Erkennbarkeit im Browser
+- Meta-Tags für SEO und Social Media hinzugefügt, um die Suchmaschinenpräsenz zu verbessern
+- Favicon auf das Logo (Med-MATCH.png) aktualisiert für konsistente Markenidentität
+- Homepage aktualisiert, um reale Daten aus der Pinnwand und Arztbörse anzuzeigen
+- Lade- und Fehlerbehandlung in der Homepage für API-Anfragen implementiert
+- Fallback zu Demo-Daten bei fehlgeschlagenen API-Anfragen für eine optimale Benutzererfahrung
 - Created test scripts for MongoDB Atlas connection testing
 - Added seed script for creating test users in MongoDB Atlas
 - Added production environment configuration for Vercel deployment
