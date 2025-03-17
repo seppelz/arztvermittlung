@@ -118,6 +118,7 @@ All notable changes to this project will be documented in this file.
 - Fehler bei MongoDB-Verbindung behoben (SSL-Zertifikate)
 - CORS Konfiguration angepasst um alle lokalen Entwicklungsports zu unterstützen
 - Problem mit mehreren parallel laufenden Vite-Servern behoben
+- Fehler bei der API-URL Konstruktion behoben, der zu doppelten `/api/` Pfaden führte
 
 ## [0.1.0] - 2025-03-13
 

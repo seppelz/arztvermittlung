@@ -527,6 +527,12 @@ This file documents new insights and knowledge gained while working on this proj
 
 - **Lade-Zustände**: Implementierung von Lade-Zuständen während API-Anfragen, um dem Benutzer Feedback zu geben und eine responsive Benutzeroberfläche zu gewährleisten.
 
+- **API-URL-Konstruktion**: Bei der Konstruktion von API-URLs mit Umgebungsvariablen muss sorgfältig vorgegangen werden, um Doppelungen von Pfadbestandteilen wie `/api/` zu vermeiden. Es ist empfehlenswert, die Umgebungsvariable und ihre Verwendung so zu gestalten, dass eine einheitliche URL-Struktur gewährleistet ist.
+
+- **URL-Debugging**: Bei API-Verbindungsproblemen ist das Logging der tatsächlich verwendeten URL ein wichtiges Debugging-Werkzeug, um schnell Konstruktionsprobleme zu identifizieren und zu beheben.
+
+- **Flexibles URL-Handling**: Implementierung von Logik zur dynamischen Anpassung der API-URL-Konstruktion basierend auf der Struktur der Basisadresse, um sowohl für Entwicklungs- als auch für Produktionsumgebungen korrekt zu funktionieren.
+
 ## Responsive Datenpräsentation
 
 - **Konsistente Datenansicht**: Sicherstellung, dass Daten auf verschiedenen Seiten konsistent dargestellt werden, indem dieselbe Datenquelle verwendet wird.
