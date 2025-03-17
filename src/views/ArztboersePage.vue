@@ -93,8 +93,10 @@
                 <div class="mt-auto pt-4 border-t border-gray-200">
                   <div class="flex justify-between">
                     <div>
-                      <!-- <p class="font-medium text-gray-700">{{ message.name }}</p> -->
-                      <p class="text-sm text-gray-500">{{ message.userType }}</p>
+                      <p class="text-sm text-gray-600">
+                        <span v-if="message.userType === 'Arzt'">Ein Arzt der Fachrichtung <strong>{{ message.specialty || 'unbekannt' }}</strong> sucht ab <strong>{{ formatDate(message.startDate || message.timestamp) }}</strong> eine Stelle.</span>
+                        <span v-if="message.userType === 'Klinik'">Eine Klinik aus <strong>{{ message.federalState || 'unbekannt' }}</strong> sucht ab <strong>{{ formatDate(message.startDate || message.timestamp) }}</strong> einen Arzt der Fachrichtung <strong>{{ message.specialty || 'unbekannt' }}</strong>.</span>
+                      </p>
                     </div>
                     <button 
                       @click="contactPoster(message)" 
@@ -184,23 +186,104 @@
               </div>
             </div>
             
-            <div>
-              <label for="userType" class="block text-text-dark font-semibold mb-1">Sie sind*</label>
-              <select 
-                id="userType" 
-                v-model="newMessage.userType" 
-                required 
-                class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm appearance-none"
-                @change="determineMessageType"
-              >
-                <option value="">Bitte wählen</option>
-                <option value="Arzt">Arzt</option>
-                <option value="Klinik">Klinik/Einrichtung</option>
-              </select>
-              <p v-if="newMessage.userType" class="text-sm mt-1 text-gray-600">
-                <span v-if="newMessage.userType === 'Arzt'">Sie erstellen ein <strong class="text-primary">Gesuch</strong>.</span>
-                <span v-if="newMessage.userType === 'Klinik'">Sie erstellen ein <strong class="text-success">Angebot</strong>.</span>
-              </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div>
+                <label for="userType" class="block text-text-dark font-semibold mb-1">Sie sind*</label>
+                <select 
+                  id="userType" 
+                  v-model="newMessage.userType" 
+                  required 
+                  class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm appearance-none"
+                  @change="determineMessageType"
+                >
+                  <option value="">Bitte wählen</option>
+                  <option value="Arzt">Arzt</option>
+                  <option value="Klinik">Klinik/Einrichtung</option>
+                </select>
+                <p v-if="newMessage.userType" class="text-sm mt-1 text-gray-600">
+                  <span v-if="newMessage.userType === 'Arzt'">Sie erstellen ein <strong class="text-primary">Gesuch</strong>.</span>
+                  <span v-if="newMessage.userType === 'Klinik'">Sie erstellen ein <strong class="text-success">Angebot</strong>.</span>
+                </p>
+              </div>
+              
+              <div>
+                <label for="startDate" class="block text-text-dark font-semibold mb-1">Verfügbar/Benötigt ab*</label>
+                <input 
+                  type="date" 
+                  id="startDate" 
+                  v-model="newMessage.startDate" 
+                  required 
+                  class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm"
+                />
+              </div>
+
+              <div>
+                <label for="specialty" class="block text-text-dark font-semibold mb-1">Fachrichtung*</label>
+                <select 
+                  id="specialty" 
+                  v-model="newMessage.specialty" 
+                  required 
+                  class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm appearance-none"
+                >
+                  <option value="">Bitte wählen</option>
+                  <option value="Allgemeinmedizin">Allgemeinmedizin</option>
+                  <option value="Anästhesiologie">Anästhesiologie</option>
+                  <option value="Augenheilkunde">Augenheilkunde</option>
+                  <option value="Chirurgie">Chirurgie</option>
+                  <option value="Dermatologie">Dermatologie</option>
+                  <option value="Gynäkologie">Gynäkologie</option>
+                  <option value="HNO">HNO</option>
+                  <option value="Innere Medizin">Innere Medizin</option>
+                  <option value="Kardiologie">Kardiologie</option>
+                  <option value="Neurologie">Neurologie</option>
+                  <option value="Orthopädie">Orthopädie</option>
+                  <option value="Pädiatrie">Pädiatrie</option>
+                  <option value="Psychiatrie">Psychiatrie</option>
+                  <option value="Radiologie">Radiologie</option>
+                  <option value="Urologie">Urologie</option>
+                  <option value="Sonstige">Sonstige</option>
+                </select>
+              </div>
+              
+              <div v-if="newMessage.specialty === 'Sonstige'">
+                <label for="specialtyOther" class="block text-text-dark font-semibold mb-1">Andere Fachrichtung*</label>
+                <input 
+                  type="text" 
+                  id="specialtyOther" 
+                  v-model="newMessage.specialtyOther" 
+                  required 
+                  class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm"
+                  placeholder="Bitte geben Sie Ihre Fachrichtung an"
+                />
+              </div>
+              
+              <div v-if="newMessage.userType === 'Klinik'">
+                <label for="federalState" class="block text-text-dark font-semibold mb-1">Bundesland*</label>
+                <select 
+                  id="federalState" 
+                  v-model="newMessage.federalState" 
+                  :required="newMessage.userType === 'Klinik'" 
+                  class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm appearance-none"
+                >
+                  <option value="">Bitte wählen</option>
+                  <option value="Baden-Württemberg">Baden-Württemberg</option>
+                  <option value="Bayern">Bayern</option>
+                  <option value="Berlin">Berlin</option>
+                  <option value="Brandenburg">Brandenburg</option>
+                  <option value="Bremen">Bremen</option>
+                  <option value="Hamburg">Hamburg</option>
+                  <option value="Hessen">Hessen</option>
+                  <option value="Mecklenburg-Vorpommern">Mecklenburg-Vorpommern</option>
+                  <option value="Niedersachsen">Niedersachsen</option>
+                  <option value="Nordrhein-Westfalen">Nordrhein-Westfalen</option>
+                  <option value="Rheinland-Pfalz">Rheinland-Pfalz</option>
+                  <option value="Saarland">Saarland</option>
+                  <option value="Sachsen">Sachsen</option>
+                  <option value="Sachsen-Anhalt">Sachsen-Anhalt</option>
+                  <option value="Schleswig-Holstein">Schleswig-Holstein</option>
+                  <option value="Thüringen">Thüringen</option>
+                </select>
+              </div>
             </div>
             
             <div>
@@ -365,6 +448,11 @@ const newMessage = reactive({
   messageType: '', // Will be set automatically based on userType
   title: '',
   content: '',
+  specialty: '',
+  specialtyOther: '',
+  federalState: '',
+  startDate: new Date().toISOString().split('T')[0], // Heutiges Datum als Standardwert
+  status: 'pending', // Neue Einträge werden standardmäßig auf 'pending' gesetzt
   privacyPolicyAccepted: false
 });
 
@@ -380,6 +468,9 @@ const filteredMessages = computed(() => {
   
   // Show only Angebot and Gesuch messages
   result = result.filter(msg => msg.messageType === 'Angebot' || msg.messageType === 'Gesuch');
+  
+  // Show only approved entries
+  result = result.filter(msg => msg.status === 'active' || msg.status === undefined); // Abwärtskompatibilität für bestehende Einträge
   
   // Filtern nach Nachrichtentyp
   if (currentFilter.value !== 'all') {
@@ -426,12 +517,16 @@ function submitMessage() {
   // Set messageType based on userType
   determineMessageType();
   
+  // Prepare specialty value
+  const finalSpecialty = newMessage.specialty === 'Sonstige' ? newMessage.specialtyOther : newMessage.specialty;
+  
   // Simuliere API-Aufruf
   setTimeout(() => {
     const newId = messages.value.length > 0 ? Math.max(...messages.value.map(m => m.id)) + 1 : 1;
     
     const message = {
       ...newMessage,
+      specialty: finalSpecialty, // Use the final specialty value
       id: newId,
       timestamp: new Date(),
       privacyPolicyAccepted: true
@@ -443,6 +538,8 @@ function submitMessage() {
     Object.keys(newMessage).forEach(key => {
       if (typeof newMessage[key] === 'boolean') {
         newMessage[key] = false;
+      } else if (key === 'startDate') {
+        newMessage[key] = new Date().toISOString().split('T')[0]; // Reset to today's date
       } else {
         newMessage[key] = '';
       }

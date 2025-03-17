@@ -5,6 +5,9 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 ### Improved
+- Stellenbörse: Nachrichten werden anonymisiert angezeigt, um die Vermittlung über die Plattform zu fördern
+- Stellenformular erweitert mit Feldern für Fachrichtung, Bundesland und Verfügbarkeitsdatum
+- Neuer Moderationsprozess für Stellenangebote und -gesuche (Admin-Freigabe erforderlich)
 - Stellenbörse (vormals Arztbörse): Name ist nun optional und wird nicht mehr angezeigt
 - Überarbeitetes Kontaktformular für vereinfachte Benutzerinteraktion
 - Angepasste Formulartexte für bessere Benutzerführung bei der Erstellung von Angeboten und Gesuchen
