@@ -67,7 +67,6 @@
                   <p class="text-gray-700 mb-1">
                     <span class="font-medium">E-Mail:</span> info@med-match.de
                   </p>
-                
                 </div>
                 
                 <div>
@@ -78,9 +77,6 @@
                   <p class="text-gray-700">
                     <span class="font-medium">Wochenende:</span> Geschlossen
                   </p>
-                </div>
-                
-               
                 </div>
               </div>
             </div>
