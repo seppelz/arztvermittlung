@@ -3,6 +3,9 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "installCommand": "npm install",
+  "redirects": [
+    { "source": "https://med-match.de/:path*", "destination": "https://www.med-match.de/:path*", "permanent": true }
+  ],
   "routes": [
     {
       "src": "^/assets/(.*)\\.css$",
@@ -29,12 +32,6 @@
     },
     {
       "handle": "filesystem"
-    },
-    {
-      "src": "/(.*)",
-      "host": "med-match.de",
-      "status": 301,
-      "headers": { "Location": "https://www.med-match.de/$1" }
     },
     {
       "src": "/(.*)",
