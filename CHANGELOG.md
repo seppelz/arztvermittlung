@@ -5,6 +5,8 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 ### Improved
+- Angepasste Formulartexte für bessere Benutzerführung bei der Erstellung von Angeboten und Gesuchen
+- Überarbeitete Seitentexte für klarere Kommunikation und bessere Benutzererfahrung
 - Enhanced hero section with modern animations and interactive elements for better user engagement
 - Replaced smiley doctor illustration with professional medical silhouette for more professional appearance
 - Added medical network visualization with connecting elements to emphasize the platform's networking aspect
