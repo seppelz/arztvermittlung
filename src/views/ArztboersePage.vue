@@ -287,6 +287,7 @@
 
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
+import BulletinService from '@/services/bulletin.service'
 
 // Beispieldaten für die Demonstration - nur Angebote und Gesuche
 const demoMessages = [
@@ -298,7 +299,7 @@ const demoMessages = [
     messageType: 'Angebot',
     title: 'Vertretung Notfallmedizin (2 Wochen) - übertarifliche Vergütung',
     content: 'Suchen dringend Vertretung für unsere Notfallstation vom 15.-29.06.2025. Erfahrung in Notfallmedizin erforderlich. Übertarifliche Vergütung, Unterkunft wird gestellt.',
-    timestamp: new Date('2025-05-15T10:30:00'),
+    timestamp: new Date('2025-02-15T10:30:00'),
     privacyPolicyAccepted: true
   },
   {
@@ -309,7 +310,7 @@ const demoMessages = [
     messageType: 'Gesuch',
     title: 'Anästhesist verfügbar für Kurzeinsätze bis 4 Wochen',
     content: 'Facharzt für Anästhesie mit 8 Jahren Erfahrung sucht Kurzeinsätze (1-4 Wochen) im Raum Köln ab sofort. Flexibel und kurzfristig verfügbar, auch Wochenenddienste möglich.',
-    timestamp: new Date('2025-05-12T15:45:00'),
+    timestamp: new Date('2025-01-22T15:45:00'),
     privacyPolicyAccepted: true
   },
   {
@@ -320,7 +321,7 @@ const demoMessages = [
     messageType: 'Angebot',
     title: 'Kardiologie - 3-Monats-Vertretung (übertariflich)',
     content: 'Suchen für den Zeitraum 01.07.-30.09.2025 Facharzt (m/w/d) für unsere kardiologische Abteilung. Übertarifliche Vergütung, Dienstwohnung möglich, flexible Dienstplangestaltung.',
-    timestamp: new Date('2025-05-10T09:15:00'),
+    timestamp: new Date('2025-02-01T09:15:00'),
     privacyPolicyAccepted: true
   },
   {
@@ -331,7 +332,7 @@ const demoMessages = [
     messageType: 'Angebot',
     title: 'Honorarärzte für Wochenenddienste (übertariflich)',
     content: 'Suchen regelmäßig Honorarärzte für Wochenenddienste (Fr-So). Attraktives Honorar, Unterkunft inklusive. Fachrichtung: Innere Medizin, Allgemeinmedizin.',
-    timestamp: new Date('2025-05-05T14:10:00'),
+    timestamp: new Date('2024-12-05T14:10:00'),
     privacyPolicyAccepted: true
   },
   {
@@ -342,7 +343,7 @@ const demoMessages = [
     messageType: 'Gesuch',
     title: 'Kinderärztin für 3-Monats-Einsätze verfügbar',
     content: 'Fachärztin für Pädiatrie mit 12 Jahren Berufserfahrung sucht Vertretungsstellen oder Projekteinsätze für 1-3 Monate im Raum Berlin/Brandenburg. Flexible Zeiteinteilung, auch kurzfristig verfügbar.',
-    timestamp: new Date('2025-05-03T16:30:00'),
+    timestamp: new Date('2025-01-20T16:30:00'),
     privacyPolicyAccepted: true
   }
 ];
@@ -412,6 +413,8 @@ const totalPages = computed(() => {
 
 // Methoden
 function determineMessageType() {
+  if (!newMessage.userType) return;
+  
   if (newMessage.userType === 'Arzt') {
     newMessage.messageType = 'Gesuch';
   } else if (newMessage.userType === 'Klinik') {
@@ -421,19 +424,23 @@ function determineMessageType() {
   }
 }
 
-function submitMessage() {
+async function submitMessage() {
   isSubmitting.value = true;
   
   // Set messageType based on userType
   determineMessageType();
   
-  // Simuliere API-Aufruf
-  setTimeout(() => {
-    const newId = messages.value.length > 0 ? Math.max(...messages.value.map(m => m.id)) + 1 : 1;
+  try {
+    // API-Aufruf zur Speicherung in der Datenbank
+    const response = await BulletinService.createBulletin({
+      ...newMessage,
+      timestamp: new Date()
+    });
     
+    // Lokale Anzeige aktualisieren
     const message = {
       ...newMessage,
-      id: newId,
+      id: response.data ? response.data._id : Date.now(),
       timestamp: new Date(),
       privacyPolicyAccepted: true
     };
@@ -456,7 +463,11 @@ function submitMessage() {
     setTimeout(() => {
       messageSent.value = false;
     }, 3000);
-  }, 1000);
+  } catch (error) {
+    console.error('Fehler beim Speichern des Eintrags:', error);
+    alert('Es ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut.');
+    isSubmitting.value = false;
+  }
 }
 
 function filterMessages(filter) {
@@ -519,8 +530,26 @@ function sendContact() {
 }
 
 // Initialisierung
-onMounted(() => {
-  // Hier könnten Nachrichten von einer API geladen werden
-  // Für die Demo verwenden wir die vordefinierten Daten
+onMounted(async () => {
+  try {
+    // Versuche, Daten von der API zu laden
+    const response = await BulletinService.getAllBulletins({
+      messageType: currentFilter.value === 'all' ? undefined : currentFilter.value,
+      status: 'active',
+      limit: 100
+    });
+    
+    if (response && response.data && response.data.length > 0) {
+      // Verwende Daten aus der Datenbank
+      messages.value = response.data;
+    } else {
+      // Fallback auf Demo-Daten, wenn keine Einträge in der Datenbank
+      messages.value = [...demoMessages];
+    }
+  } catch (error) {
+    console.error('Fehler beim Laden der Arztbörse-Einträge:', error);
+    // Bei Fehler verwende Demo-Daten
+    messages.value = [...demoMessages];
+  }
 });
 </script> 

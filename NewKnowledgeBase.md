@@ -248,10 +248,10 @@
 - Contact mechanisms should protect user privacy while enabling communication
 - Demo data helps visualize the final product during development
 - Modals for contact forms provide focused interaction without page navigation
-- Color-coding different message types improves scanning and information hierarchy
-- Dynamic badge styling with v-bind and conditional classes creates consistent visual language
-- Positionierung von Inhalt vor Eingabeformen folgt dem "Content-First"-Prinzip für verbesserte Benutzerführung
-- Die Umkehrung der Reihenfolge von Formular und Inhalt reduziert kognitive Belastung und verbessert die Konversionsrate
+- Zeitstempel von Veröffentlichungen sollten niemals in der Zukunft liegen, da dies unrealistisch wirkt und die Glaubwürdigkeit beeinträchtigt
+- Hybride Datenstrategie mit API-Integration und lokalen Fallback-Daten erhöht die Robustheit der Anwendung
+- Fehlerbehandlung bei API-Aufrufen ist essentiell für eine reibungslose Benutzererfahrung
+- Lokale Datenpräsentation während API-Aufrufen und Backend-Prozessierung verbessert die gefühlte Performance
 
 ## Visual Design Principles
 - Headings should have at least 4.5:1 contrast ratio with background for accessibility
@@ -519,68 +519,35 @@ This file documents new insights and knowledge gained while working on this proj
    - Konsistenz in allen Plattformbereichen (Homepage, Bulletin Board, Seed-Daten) bezüglich der Art der Vergütungsdarstellung
    - Sorgfältige Prüfung aller Marketingtexte auf potentiell problematische Einkommensversprechen 
 
-## Integration von echten Daten auf der Homepage
+## API-Integration und Datenpersistenz
 
-1. **API-Integration mit Fehlerbehandlung**:
-   - Die Verwendung von `try/catch`-Blöcken für API-Aufrufe ist essentiell, um Fehler elegant zu behandeln
-   - Eine Implementierung von Ladezuständen (`loading`) für API-Anfragen verbessert die Benutzererfahrung
-   - Fallback-Mechanismen zu Dummy-Daten sichern eine funktionale Benutzeroberfläche, auch wenn API-Anfragen fehlschlagen
-   - Konsistente Fehlerbehandlung über alle Komponenten hinweg bietet ein einheitliches Benutzererlebnis
+1. **Frontend-Backend-Verbindung**:
+   - Service-basierte Architektur trennt API-Logik von Komponenten-Darstellung
+   - Wiederverwendbare Service-Klassen für verschiedene Ressourcentypen (bulletin, user, auth)
+   - Try-Catch-Blöcke in API-Aufrufen ermöglichen bessere Fehlerbehandlung und Benutzerrückmeldung
+   - Fallback auf Demo-Daten bei API-Fehlern verhindert leere Benutzeroberflächen
 
-2. **Responsive Datenpräsentation**:
-   - Unterschiedliche UI-Zustände (Laden, Daten, Fehler, Keine Daten) sollten alle berücksichtigt werden
-   - Bedingte Renderfunktionen (v-if, v-else) helfen, den richtigen Inhalt basierend auf Datenverfügbarkeit anzuzeigen
-   - Formatierung von Datumsangaben mit relativen Zeiträumen (`Heute`, `Gestern`, `Vor X Tagen`) statt nur festen Daten verbessert die Benutzerfreundlichkeit
-   - Text-Trunkierung (z.B. mit line-clamp-2) für Karteninhalte schafft Konsistenz im Layout und fokussierte Informationsdarstellung
+2. **Optimistische UI-Updates**:
+   - Lokales Hinzufügen neuer Einträge vor API-Bestätigung verbessert gefühlte Reaktionsfähigkeit
+   - Nachträgliche Aktualisierung der lokalen ID mit der vom Server erhaltenen ID gewährleistet Datenkonsistenz
+   - Anzeige von Feedback während Ladezuständen reduziert Benutzerfrustration
+   - Temporäre Statusmeldungen (3 Sekunden) bieten Feedback ohne die Benutzeroberfläche zu überladen
 
-3. **Parameter für API-Anfragen**:
-   - Anfrageparameter wie `limit`, `sort` und `messageType` ermöglichen maßgeschneiderte Datenabfragen
-   - Die Kombination mehrerer Parameter-Werte (wie `['Angebot', 'Gesuch'].join(',')`) in einem Query-Parameter ist eine effiziente Technik
-   - Sortierparameter mit Präfixen (wie `-timestamp` für absteigend) sind ein gängiges API-Muster
-   - Die Beschränkung der Anzahl der zurückgegebenen Elemente (`limit`) optimiert die Leistung für Preview-Ansichten
+3. **Datenvalidierung und -formatierung**:
+   - Zeitstempel sollten immer im Kontext ihrer Verwendung interpretiert werden
+   - Veranstaltungsdaten können in der Zukunft liegen, Veröffentlichungsdaten sollten in der Vergangenheit oder Gegenwart sein
+   - Konsistente Datums- und Zeitformatierung über die gesamte Anwendung (toLocaleDateString mit Optionen)
+   - Automatische Typzuweisung basierend auf Benutzertyp vereinfacht die Datenerfassung (Arzt → Gesuch, Klinik → Angebot)
 
-4. **Datenstruktur und -Transformation**:
-   - Die klare Unterscheidung zwischen verschiedenen Nachrichtentypen (`Information`, `Angebot`, `Gesuch`) ermöglicht spezialisierte Ansichten
-   - Einheitliche Datenmodelle zwischen Komponenten erleichtern die Wiederverwendung von Code und Logik
-   - Konsequente Benennungskonventionen für Datenfelder (`id`, `timestamp`, `messageType`) erleichtern die API-Integration
-   - Die Normalisierung von Zeitstempeln mit `new Date()` stellt sicher, dass Datumsfunktionen korrekt funktionieren
+4. **Datenbankstruktur und Seed-Strategie**:
+   - Vorkonfigurierte Demo-Daten beschleunigen Tests und Entwicklung
+   - Automatisierte Seed-Skripte gewährleisten konsistente Testumgebungen
+   - Datenbank-Schema mit sorgfältig definierten Validierungen verhindert Datenkonsistenzprobleme
+   - Verwendung von Status-Feldern (active, pending, archived) ermöglicht flexible Inhaltsmoderation
+   - Schema-Design mit optionalen Feldern für zukünftige Erweiterungen reduziert Migrationsaufwand
 
-5. **Gemeinsame Codebasis mit Spezialisierung**:
-   - Die Wiederverwendung ähnlicher Komponenten-Strukturen (Pinnwand und Arztbörse) mit konditionaler Logik verbessert die Wartbarkeit
-   - Ein modularer API-Service-Ansatz vereinfacht die Integration über verschiedene Komponenten hinweg
-   - Gemeinsame Hilfsfunktionen (wie Datumformatierung) sollten in wiederverwendbare Dienstprogramme extrahiert werden
-   - Die Standardisierung von UI-Elementen (Karten, Etiketten, Ladeanzeigen) über verschiedene Datentypen hinweg verbessert die visuelle Kohärenz
-
-## Best Practices für UI-Navigation und Layout
-
-1. **Menü-Positionierung und Abstand**:
-   - Ein erhöhter horizontaler Abstand (`mr-8` statt minimaler Abstände) zwischen Logo und Navigationsmenü verbessert die visuelle Balance
-   - Größere Abstände zwischen Navigationseinträgen (`space-x-5` statt `space-x-4`) erhöhen die Lesbarkeit und reduzieren versehentliche Klicks
-   - Leichtes Padding um das Logo (`pl-2`) schafft visuelle Atmung und verhindert Randkonflikte
-   - Konsistente Abstände zwischen Navigation, Logo und Aktions-Buttons sorgen für harmonisches Layout
-
-2. **Information Architecture in Hero-Sections**:
-   - Die Präsentation tatsächlicher Daten in der Hero-Section bietet einen sofortigen Einblick in die Hauptfunktionen der Plattform
-   - Die Darstellung verschiedener Inhaltstypen (Pinnwand und Arztbörse) nebeneinander verdeutlicht die unterschiedlichen Funktionalitäten
-   - Call-to-Action-Buttons sollten direkt zu den entsprechenden Funktionen führen, die in der Hero-Section vorgestellt werden
-   - Überschriften sollten den Zweck jedes Inhaltsbereichs klar identifizieren, ergänzt durch "Alle anzeigen"-Links für weiteren Zugriff
-
-3. **Mehrspaltiges Layout für komplexe Information**:
-   - Vertikale Aufteilung von Hero-Bereichen mit Grid-System (`grid md:grid-cols-2`) balanciert Text und Beispielinhalte
-   - Die Verwendung von gestaffelten Karten für Beispieleinträge (`space-y-6` für Container, `space-y-3` für Einträge) schafft klare visuelle Trennung
-   - Container mit `backdrop-blur-sm` und semitransparentem Hintergrund (`bg-white/10`) erzeugen Tiefe ohne den Hintergrund vollständig zu verdecken
-   - Konsistente Kopf- und Fußzeilenstrukturen innerhalb von Karten (oben: Typ+Datum, Mitte: Titel+Inhalt, unten: Aktionen) erleichtern das Scannen
-
-## Marketing und rechtliche Aspekte
-
-1. **Einkommensdarstellungen und rechtliche Risiken**:
-   - Verwendung von generellen Begriffen wie "übertariflich" oder "attraktiv" statt spezifischer Prozentsätze (30-50%) reduziert rechtliche Risiken
-   - Vermeidung konkreter Vergütungsangaben (wie "15.000€/Monat") schützt vor möglichen rechtlichen Herausforderungen bei nicht erreichbaren Einkommenszusagen
-   - Marketingaussagen zu Vergütungen sollten stets allgemein gehalten werden, um Missverständnisse zu vermeiden
-   - Bei Stellenangeboten in Demo-Daten sollten keine konkreten Prozentsätze verwendet werden, die als verbindliche Zusagen missverstanden werden könnten
-
-2. **Transparenz in der Kommunikation**:
-   - Klare Formulierungen zu Vorteilen (wie "übertarifliche Vergütung") sind präzisen Zahlenangaben vorzuziehen
-   - Fokussierung auf qualitative Vorteile (Flexibilität, direkte Kommunikation) anstatt auf quantitative Vergütungsangaben
-   - Konsistenz in allen Plattformbereichen (Homepage, Bulletin Board, Seed-Daten) bezüglich der Art der Vergütungsdarstellung
-   - Sorgfältige Prüfung aller Marketingtexte auf potentiell problematische Einkommensversprechen 
+5. **Robuste Datenabfragen**:
+   - Parametrisierte API-Abfragen ermöglichen flexible Filterung und Sortierung
+   - Serverseitige Paginierung mit standardisierten Parametern (page, limit) optimiert Datenübertragung
+   - Dynamische Sortierparameter verbessern Benutzerinteraktion mit großen Datenmengen
+   - Error-Boundaries für API-Fehler mit benutzerfreundlichen Fallbacks erhöhen die Anwendungsrobustheit 

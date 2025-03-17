@@ -161,7 +161,7 @@ const createBulletins = async (users) => {
         userId: hospitals[0]._id,
         userType: 'Klinik',
         messageType: 'Angebot',
-        timestamp: new Date('2025-05-15T10:30:00'),
+        timestamp: new Date('2025-02-15T10:30:00'),
         status: 'active'
       },
       {
@@ -172,7 +172,7 @@ const createBulletins = async (users) => {
         userId: hospitals[1]._id,
         userType: 'Klinik',
         messageType: 'Angebot',
-        timestamp: new Date('2025-05-10T09:15:00'),
+        timestamp: new Date('2025-02-01T09:15:00'),
         status: 'active'
       },
       
@@ -185,7 +185,7 @@ const createBulletins = async (users) => {
         userId: doctors[1]._id,
         userType: 'Arzt',
         messageType: 'Gesuch',
-        timestamp: new Date('2025-05-12T15:45:00'),
+        timestamp: new Date('2025-01-22T15:45:00'),
         status: 'active'
       },
       {
@@ -196,7 +196,30 @@ const createBulletins = async (users) => {
         userId: doctors[0]._id,
         userType: 'Arzt',
         messageType: 'Gesuch',
-        timestamp: new Date('2025-05-08T11:20:00'),
+        timestamp: new Date('2025-01-10T11:20:00'),
+        status: 'active'
+      },
+      // Informationen
+      {
+        title: 'Fachärztliche Vertretungs-Pool Radiologie',
+        content: 'Organisiere Vertretungs-Pool für kurzfristige Radiologie-Einsätze (max. 3 Monate). Über 20 Kolleginnen und Kollegen bereits dabei. Interessierte Radiologen und Kliniken können mich kontaktieren.',
+        name: doctors[2] ? doctors[2].name : 'Dr. Thomas Schmidt',
+        email: doctors[2] ? doctors[2].email : 't.schmidt@mail.de',
+        userId: doctors[2] ? doctors[2]._id : null,
+        userType: 'Arzt',
+        messageType: 'Information',
+        timestamp: new Date('2025-02-08T11:20:00'),
+        status: 'active'
+      },
+      {
+        title: 'Fortbildung: Aktuelle Entwicklungen in der Notfallmedizin',
+        content: 'Die Ärztekammer Berlin bietet am 15.-16.07.2025 eine zertifizierte Fortbildung zu aktuellen Entwicklungen in der Notfallmedizin an. 16 CME-Punkte. Begrenzte Teilnehmerzahl, frühzeitige Anmeldung empfohlen.',
+        name: hospitals[2] ? hospitals[2].name : 'Ärztekammer Berlin',
+        email: hospitals[2] ? hospitals[2].email : 'fortbildung@aerztekammer-berlin.de',
+        userId: hospitals[2] ? hospitals[2]._id : null,
+        userType: 'Klinik',
+        messageType: 'Information',
+        timestamp: new Date('2025-01-15T10:00:00'),
         status: 'active'
       }
     ];

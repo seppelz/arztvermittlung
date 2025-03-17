@@ -247,6 +247,7 @@
 
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
+import BulletinService from '@/services/bulletin.service'
 
 // Beispieldaten für die Demonstration - nur Informationen
 const demoMessages = [
@@ -258,7 +259,7 @@ const demoMessages = [
     messageType: 'Information',
     title: 'Fachärztliche Vertretungs-Pool Radiologie',
     content: 'Organisiere Vertretungs-Pool für kurzfristige Radiologie-Einsätze (max. 3 Monate). Über 20 Kolleginnen und Kollegen bereits dabei. Interessierte Radiologen und Kliniken können mich kontaktieren.',
-    timestamp: new Date('2025-05-08T11:20:00'),
+    timestamp: new Date('2025-02-08T11:20:00'),
     privacyPolicyAccepted: true
   },
   {
@@ -269,7 +270,7 @@ const demoMessages = [
     messageType: 'Information',
     title: 'Fortbildung: Aktuelle Entwicklungen in der Notfallmedizin',
     content: 'Die Ärztekammer Berlin bietet am 15.-16.07.2025 eine zertifizierte Fortbildung zu aktuellen Entwicklungen in der Notfallmedizin an. 16 CME-Punkte. Begrenzte Teilnehmerzahl, frühzeitige Anmeldung empfohlen.',
-    timestamp: new Date('2025-05-01T10:00:00'),
+    timestamp: new Date('2025-01-15T10:00:00'),
     privacyPolicyAccepted: true
   },
   {
@@ -280,7 +281,29 @@ const demoMessages = [
     messageType: 'Information',
     title: 'Internationaler Kongress für Innere Medizin',
     content: 'Vom 10.-12.09.2025 findet an der MH Hannover der 35. Internationale Kongress für Innere Medizin statt. Themenschwerpunkte: Kardiologie, Gastroenterologie, Endokrinologie. Anmeldung ab sofort möglich.',
-    timestamp: new Date('2025-04-28T14:30:00'),
+    timestamp: new Date('2025-01-05T14:30:00'),
+    privacyPolicyAccepted: true
+  },
+  {
+    id: 9,
+    name: 'Deutsche Gesellschaft für Neurologie',
+    email: 'info@dgn.org',
+    userType: 'Klinik',
+    messageType: 'Information',
+    title: 'DGN-Kongress 2025: Call for Abstracts',
+    content: 'Der DGN-Kongress 2025 findet vom 12.-15.11.2025 in Berlin statt. Wir laden herzlich zum Einreichen von Abstracts ein. Einreichungsfrist: 30.04.2025. Themenschwerpunkte: Neuroinflammation, Bewegungsstörungen, Schlaganfall.',
+    timestamp: new Date('2024-12-20T09:15:00'),
+    privacyPolicyAccepted: true
+  },
+  {
+    id: 10,
+    name: 'Charité Universitätsmedizin Berlin',
+    email: 'weiterbildung@charite.de',
+    userType: 'Klinik',
+    messageType: 'Information',
+    title: 'Ultraschallkurs Abdomen und Schilddrüse',
+    content: 'Die Charité bietet vom 25.-27.04.2025 einen Ultraschallkurs für Abdomen und Schilddrüse an. Der Kurs eignet sich für Ärzte aller Fachrichtungen. 24 CME-Punkte. Begrenzte Teilnehmerzahl, frühzeitige Anmeldung empfohlen.',
+    timestamp: new Date('2025-02-10T11:45:00'),
     privacyPolicyAccepted: true
   }
 ];
@@ -340,19 +363,23 @@ const totalPages = computed(() => {
 });
 
 // Methoden
-function submitMessage() {
+async function submitMessage() {
   isSubmitting.value = true;
   
   // Always set messageType to Information
   newMessage.messageType = 'Information';
   
-  // Simuliere API-Aufruf
-  setTimeout(() => {
-    const newId = messages.value.length > 0 ? Math.max(...messages.value.map(m => m.id)) + 1 : 1;
+  try {
+    // API-Aufruf zur Speicherung in der Datenbank
+    const response = await BulletinService.createBulletin({
+      ...newMessage,
+      timestamp: new Date()
+    });
     
+    // Lokale Anzeige aktualisieren
     const message = {
       ...newMessage,
-      id: newId,
+      id: response.data ? response.data._id : Date.now(),
       timestamp: new Date(),
       privacyPolicyAccepted: true
     };
@@ -377,7 +404,11 @@ function submitMessage() {
     setTimeout(() => {
       messageSent.value = false;
     }, 3000);
-  }, 1000);
+  } catch (error) {
+    console.error('Fehler beim Speichern des Eintrags:', error);
+    alert('Es ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut.');
+    isSubmitting.value = false;
+  }
 }
 
 function sortMessages() {
@@ -435,8 +466,26 @@ function sendContact() {
 }
 
 // Initialisierung
-onMounted(() => {
-  // Hier könnten Nachrichten von einer API geladen werden
-  // Für die Demo verwenden wir die vordefinierten Daten
+onMounted(async () => {
+  try {
+    // Versuche, Daten von der API zu laden
+    const response = await BulletinService.getAllBulletins({
+      messageType: 'Information',
+      status: 'active',
+      limit: 100
+    });
+    
+    if (response && response.data && response.data.length > 0) {
+      // Verwende Daten aus der Datenbank
+      messages.value = response.data;
+    } else {
+      // Fallback auf Demo-Daten, wenn keine Einträge in der Datenbank
+      messages.value = [...demoMessages];
+    }
+  } catch (error) {
+    console.error('Fehler beim Laden der Pinnwand-Einträge:', error);
+    // Bei Fehler verwende Demo-Daten
+    messages.value = [...demoMessages];
+  }
 });
 </script> 
