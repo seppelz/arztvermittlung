@@ -120,6 +120,7 @@ All notable changes to this project will be documented in this file.
 - Problem mit mehreren parallel laufenden Vite-Servern behoben
 - Fehler bei der API-URL Konstruktion behoben, der zu doppelten `/api/` Pfaden führte
 - Fehlender API-Aufruf beim Speichern von Pinnwand-Einträgen implementiert, Daten werden nun korrekt in MongoDB gespeichert
+- CORS-Konfiguration für Produktionsumgebung verbessert, um Cross-Origin-Anfragen von der Vercel-Bereitstellung zu ermöglichen
 
 ## [0.1.0] - 2025-03-13
 
