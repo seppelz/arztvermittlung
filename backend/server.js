@@ -13,22 +13,42 @@ const contactRoutes = require('./routes/contact.routes');
 // App-Initialisierung
 const app = express();
 
-// Erweiterte CORS-Konfiguration
-app.use(cors({
-  origin: [
-    'http://localhost:5173', 
-    'http://localhost:5174', 
-    'http://localhost:5175', 
-    'http://localhost:5176', 
-    'http://localhost:5177', 
-    'https://arztvermittlung.vercel.app',
-    'https://arztvermittlung-3mbr6kqcq-seppelzs-projects.vercel.app',
-    'https://arztvermittlung-drxxb6oih-seppelzs-projects.vercel.app'
-  ],
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true
-}));
+// Determine CORS configuration based on environment
+const isProduction = process.env.NODE_ENV === 'production';
+
+// Enhanced CORS configuration
+if (isProduction) {
+  // In production, use a more permissive configuration
+  app.use(cors({
+    origin: '*', // Allow all origins in production
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true,
+    preflightContinue: false,
+    optionsSuccessStatus: 204
+  }));
+  console.log('CORS configured for production environment - allowing all origins');
+} else {
+  // In development, use a more restricted configuration
+  app.use(cors({
+    origin: [
+      'http://localhost:5173', 
+      'http://localhost:5174', 
+      'http://localhost:5175', 
+      'http://localhost:5176', 
+      'http://localhost:5177', 
+      'https://arztvermittlung.vercel.app',
+      'https://arztvermittlung-3mbr6kqcq-seppelzs-projects.vercel.app',
+      'https://arztvermittlung-drxxb6oih-seppelzs-projects.vercel.app'
+    ],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true,
+    preflightContinue: false,
+    optionsSuccessStatus: 204
+  }));
+  console.log('CORS configured for development environment - using restricted origin list');
+}
 
 app.use(express.json());
 app.use(morgan('dev'));
@@ -48,12 +68,11 @@ app.use((err, req, res, next) => {
   });
 });
 
-// MongoDB-Verbindung mit SSL-Konfiguration für Atlas
+// MongoDB-Verbindung mit aktualisierter SSL/TLS-Konfiguration für Atlas
 mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
-  ssl: true,
-  sslValidate: false // Disable SSL validation for Atlas connection
+  tlsAllowInvalidCertificates: true  // Moderner Ersatz für sslValidate: false
 })
 .then(() => {
   console.log('Mit MongoDB verbunden');
