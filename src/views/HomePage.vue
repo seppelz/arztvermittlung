@@ -410,12 +410,13 @@ const fetchBulletinEntries = async () => {
     // Fix URL construction for production vs development
     let apiUrl = '';
     
-    // Use the full domain URL in production
-    const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+    // Use the global configuration if available
+    const baseUrl = window.MED_MATCH_CONFIG?.apiUrl || 
+                   (import.meta.env.VITE_API_URL || 'http://localhost:5000/api');
     
-    // Log the environment and base URL for debugging
-    console.log(`Environment: ${import.meta.env.VITE_NODE_ENV}`);
-    console.log(`Base URL from env: ${baseUrl}`);
+    // Log for debugging
+    console.log(`Base URL from config: ${baseUrl}`);
+    console.log(`Hostname: ${window.location.hostname}`);
     
     // Properly construct API URL based on if it already contains /api
     if (baseUrl.includes('/api')) {

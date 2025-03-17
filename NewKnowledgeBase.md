@@ -622,3 +622,29 @@ This file documents new insights and knowledge gained while working on this proj
    - Log minimal connection information in production (avoid exposing sensitive parts of connection strings)
    - Use more verbose logging in development to aid debugging
    - Implement environment-specific error handling based on NODE_ENV value 
+
+## Domain Migration and Environment Configuration
+
+1. **Custom Domain API Configuration**:
+   - When migrating from a temporary deployment URL to a custom domain, API URLs need to be updated throughout the application
+   - Environment variables in Vite (`import.meta.env.VITE_*`) may not be properly injected during production builds
+   - A robust approach combines runtime detection and global configurations that are available before the application loads
+   - Using the `window.location.hostname` to detect the domain provides a reliable way to set environment-specific configurations
+
+2. **Global Configuration Pattern**:
+   - Setting a global configuration object in the `index.html` ensures it's available before any component code runs
+   - Using optional chaining with fallbacks (`window.CONFIG?.apiUrl || import.meta.env.VITE_API_URL || defaultValue`) creates a robust configuration system
+   - Centralizing API URL construction in service files ensures consistent behavior across components
+   - Logging configuration values helps with debugging deployment-specific issues
+
+3. **Environment-Specific Behavior**:
+   - Different environments (local development, staging, production) often require different API endpoints
+   - Using the domain name as an indicator of the environment provides a reliable signal for configuration
+   - Environment variables should be replicated in the global configuration for consistency
+   - API services should be designed to handle domain changes without requiring code changes
+
+4. **Multi-Domain Deployment Considerations**:
+   - When an application is deployed to multiple domains (like vercel.app and a custom domain), configuration must handle all cases
+   - CORS settings need to be updated to include all domains that will access the API
+   - Redirecting users from temporary domains to the primary domain can prevent configuration issues
+   - API URL construction should be domain-aware to prevent cross-origin request failures 

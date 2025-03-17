@@ -29,6 +29,7 @@ All notable changes to this project will be documented in this file.
 - Removed specific percentage claims about doctor earnings to avoid potential legal issues
 - Updated MongoDB connection configuration to follow current best practices by removing deprecated options
 - Improved MongoDB Atlas connection security by removing unnecessary SSL/TLS options
+- Enhanced API URL handling for custom domain with robust fallback system
 
 ### Security
 - Changed MongoDB Atlas password to improve database security
@@ -45,6 +46,7 @@ All notable changes to this project will be documented in this file.
 - Fixed seeding script to properly reset and populate empty collections
 - Fixed inconsistency between what the seeding script detected as "existing" entries
 - Fixed API URL construction in frontend components to handle both development and production environments
+- Fixed custom domain API URL configuration with global runtime configuration approach
 
 ### Added
 - Created test scripts for MongoDB Atlas connection testing

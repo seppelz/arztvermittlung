@@ -1,7 +1,10 @@
 import axios from 'axios';
 
-// Get API URL from environment variable or use a default
-const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+// Get API URL from global config, environment variable, or use a default
+const apiUrl = window.MED_MATCH_CONFIG?.apiUrl || import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+
+// Log the API URL being used
+console.log('API Service using URL:', apiUrl);
 
 // Base API configuration
 const api = axios.create({
