@@ -14,7 +14,7 @@
           <div class="text-white animate-fade-in-up">
             <h1 class="text-4xl md:text-5xl font-bold mb-4 text-white">Direkte Verbindung zwischen Ärzten und Kliniken</h1>
             <p class="text-xl mb-6 text-white/90">
-              Unsere Plattform ermöglicht den einfachen Austausch zwischen medizinischen Fachkräften und Einrichtungen - mit minimaler Registrierung.
+              Unsere Pinnwand ermöglicht den einfachen Austausch zwischen medizinischen Fachkräften und Einrichtungen - mit minimaler Registrierung.
             </p>
             <div class="flex flex-wrap gap-4">
               <router-link :to="{ name: 'BulletinBoard' }" class="btn-hero-primary px-6 py-3">
@@ -23,8 +23,8 @@
                   <path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
                 </svg>
               </router-link>
-              <router-link :to="{ name: 'Arztboerse' }" class="btn-hero-secondary px-6 py-3">
-                Arztbörse entdecken
+              <router-link :to="{ name: 'Register' }" class="btn-hero-secondary px-6 py-3">
+                Jetzt registrieren
               </router-link>
             </div>
             
@@ -40,71 +40,42 @@
             </div>
           </div>
           
-          <!-- Hero Entries Showcase -->
-          <div class="hidden md:block space-y-6">
-            <!-- Pinnwand-Einträge -->
-            <div class="bg-white/10 backdrop-blur-sm rounded-lg p-5 shadow-lg">
-              <div class="flex justify-between items-center mb-4">
-                <h3 class="font-bold text-xl text-white">Aktuelles aus der Pinnwand</h3>
-                <router-link :to="{ name: 'BulletinBoard' }" class="text-white hover:text-secondary-300 text-sm">
-                  Alle anzeigen →
-                </router-link>
-              </div>
+          <!-- Hero Image -->
+          <div class="hidden md:block">
+            <div class="relative bg-white/10 backdrop-blur-sm rounded-lg p-6 shadow-lg">
+              <h3 class="font-bold text-xl text-white mb-4">Aktuelle Pinnwand-Einträge</h3>
               
-              <!-- Pinnwand Entries -->
-              <div class="space-y-3">
-                <div v-if="loadingPinnwand" class="text-center py-3 text-white/80">
-                  <span>Einträge werden geladen...</span>
+              <!-- Dynamic Bulletin Board Entries -->
+              <div v-if="loading" class="text-white text-center py-4">
+                Lade Einträge...
+              </div>
+              <div v-else-if="error" class="text-white text-center py-4">
+                <p>Konnte Einträge nicht laden</p>
+                <p class="text-sm">{{ error }}</p>
+              </div>
+              <div v-else class="space-y-3">
+                <div v-for="(entry, index) in bulletinEntries" :key="index" class="bg-white/20 backdrop-blur-sm p-3 rounded-lg">
+                  <div class="flex justify-between items-start">
+                    <span class="bg-warning text-white text-xs px-2 py-1 rounded-full">{{ entry.messageType }}</span>
+                    <span class="text-white/80 text-sm">{{ formatDate(entry.timestamp) }}</span>
+                  </div>
+                  <h4 class="font-medium text-white mt-2">{{ entry.title }}</h4>
+                  <p class="text-white/90 text-sm mt-1">{{ entry.content.substring(0, 60) }}...</p>
                 </div>
                 
-                <template v-else>
-                  <div v-for="entry in pinnwandEntries" :key="entry.id" class="bg-white/20 backdrop-blur-sm p-3 rounded-lg">
-                    <div class="flex justify-between items-start">
-                      <span class="bg-amber-400 text-white text-xs px-2 py-1 rounded-full">Information</span>
-                      <span class="text-white/80 text-sm">{{ formatDate(entry.timestamp) }}</span>
-                    </div>
-                    <h4 class="font-medium text-white mt-2">{{ entry.title }}</h4>
-                    <p class="text-white/90 text-sm mt-1 line-clamp-2">{{ entry.content }}</p>
-                  </div>
-                  
-                  <div v-if="pinnwandEntries.length === 0" class="text-center py-2 text-white/80">
-                    <span>Keine Einträge vorhanden</span>
-                  </div>
-                </template>
-              </div>
-            </div>
-            
-            <!-- Arztbörse-Einträge -->
-            <div class="bg-white/10 backdrop-blur-sm rounded-lg p-5 shadow-lg">
-              <div class="flex justify-between items-center mb-4">
-                <h3 class="font-bold text-xl text-white">Aktuelles aus der Arztbörse</h3>
-                <router-link :to="{ name: 'Arztboerse' }" class="text-white hover:text-secondary-300 text-sm">
-                  Alle anzeigen →
-                </router-link>
+                <!-- Fallback for no entries -->
+                <div v-if="bulletinEntries.length === 0" class="text-white text-center py-4">
+                  Keine Einträge gefunden
+                </div>
               </div>
               
-              <!-- Arztbörse Entries -->
-              <div class="space-y-3">
-                <div v-if="loadingArztboerse" class="text-center py-3 text-white/80">
-                  <span>Einträge werden geladen...</span>
-                </div>
-                
-                <template v-else>
-                  <div v-for="entry in arztboerseEntries" :key="entry.id" class="bg-white/20 backdrop-blur-sm p-3 rounded-lg">
-                    <div class="flex justify-between items-start">
-                      <span :class="entry.messageType === 'Angebot' ? 'bg-green-500' : 'bg-blue-500'" class="text-white text-xs px-2 py-1 rounded-full">
-                        {{ entry.messageType }}
-                      </span>
-                      <span class="text-white/80 text-sm">{{ formatDate(entry.timestamp) }}</span>
-                    </div>
-                    <h4 class="font-medium text-white mt-2">{{ entry.title }}</h4>
-                    <p class="text-white/90 text-sm mt-1 line-clamp-2">{{ entry.content }}</p>
-                  </div>
-                  
-                  <div v-if="arztboerseEntries.length === 0" class="text-center py-2 text-white/80">
-                    <span>Keine Einträge vorhanden</span>
-                  </div>
-                </template>
+              <div class="mt-4 text-center">
+                <router-link :to="{ name: 'BulletinBoard' }" class="text-white hover:text-secondary-300 inline-flex items-center">
+                  Alle Einträge ansehen
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                  </svg>
+                </router-link>
               </div>
             </div>
           </div>
@@ -422,144 +393,93 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
-import bulletinService from '@/services/bulletin.service';
+import { onMounted, ref } from 'vue';
+import axios from 'axios';
 
-// Zustandsvariablen für die Daten
-const pinnwandEntries = ref([]);
-const arztboerseEntries = ref([]);
-const loadingPinnwand = ref(true);
-const loadingArztboerse = ref(true);
+// State for bulletin board entries
+const bulletinEntries = ref([]);
+const loading = ref(true);
+const error = ref(null);
 
-// Holt die neuesten Einträge der Pinnwand und Arztbörse
-async function fetchLatestEntries() {
-  try {
-    // Lade die Pinnwand-Einträge (Typ "Information")
-    loadingPinnwand.value = true;
-    const pinnwandResponse = await bulletinService.getAllBulletins({
-      messageType: 'Information',
-      limit: 3,
-      sort: '-timestamp'
-    });
-    pinnwandEntries.value = pinnwandResponse.data || [];
-    loadingPinnwand.value = false;
-
-    // Lade die Arztbörse-Einträge (Typen "Angebot" und "Gesuch")
-    loadingArztboerse.value = true;
-    const arztboerseResponse = await bulletinService.getAllBulletins({
-      messageType: ['Angebot', 'Gesuch'].join(','),
-      limit: 3,
-      sort: '-timestamp'
-    });
-    arztboerseEntries.value = arztboerseResponse.data || [];
-    loadingArztboerse.value = false;
-  } catch (error) {
-    console.error('Fehler beim Laden der Einträge:', error);
-    // Fallback zur Demo-Daten, wenn API-Anfrage fehlschlägt
-    loadDemoData();
-    loadingPinnwand.value = false;
-    loadingArztboerse.value = false;
-  }
-}
-
-// Lädt Demo-Daten falls die API-Anfrage fehlschlägt
-function loadDemoData() {
-  // Demo-Daten für Pinnwand
-  pinnwandEntries.value = [
-    {
-      id: 1,
-      name: 'Ärztekammer Berlin',
-      email: 'fortbildung@aerztekammer-berlin.de',
-      userType: 'Klinik',
-      messageType: 'Information',
-      title: 'Fortbildung: Aktuelle Entwicklungen in der Notfallmedizin',
-      content: 'Die Ärztekammer Berlin bietet am 15.-16.07.2025 eine zertifizierte Fortbildung zu aktuellen Entwicklungen in der Notfallmedizin an. 16 CME-Punkte. Begrenzte Teilnehmerzahl, frühzeitige Anmeldung empfohlen.',
-      timestamp: new Date('2025-05-01T10:00:00'),
-    },
-    {
-      id: 2,
-      name: 'Dr. Thomas Schmidt',
-      email: 't.schmidt@mail.de',
-      userType: 'Arzt',
-      messageType: 'Information',
-      title: 'Fachärztliche Vertretungs-Pool Radiologie',
-      content: 'Organisiere Vertretungs-Pool für kurzfristige Radiologie-Einsätze (max. 3 Monate). Über 20 Kolleginnen und Kollegen bereits dabei. Interessierte Radiologen und Kliniken können mich kontaktieren.',
-      timestamp: new Date('2025-05-08T11:20:00'),
-    },
-    {
-      id: 3,
-      name: 'Medizinische Hochschule Hannover',
-      email: 'kongress@mh-hannover.de',
-      userType: 'Klinik',
-      messageType: 'Information',
-      title: 'Internationaler Kongress für Innere Medizin',
-      content: 'Vom 10.-12.09.2025 findet an der MH Hannover der 35. Internationale Kongress für Innere Medizin statt. Themenschwerpunkte: Kardiologie, Gastroenterologie, Endokrinologie. Anmeldung ab sofort möglich.',
-      timestamp: new Date('2025-04-28T14:30:00'),
-    }
-  ];
+// Fetch bulletin board entries from the API
+const fetchBulletinEntries = async () => {
+  loading.value = true;
+  error.value = null;
   
-  // Demo-Daten für Arztbörse
-  arztboerseEntries.value = [
+  try {
+    // Fetch only 3 latest entries of type 'Information'
+    const response = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/bulletin`, {
+      params: {
+        messageType: 'Information',
+        limit: 3,
+        sort: '-timestamp'
+      }
+    });
+    
+    if (response.data && response.data.data) {
+      bulletinEntries.value = response.data.data;
+    }
+  } catch (err) {
+    console.error('Error fetching bulletin entries:', err);
+    error.value = 'Fehler beim Laden der Daten';
+    
+    // Fallback to demo data if API fails
+    useDemoData();
+  } finally {
+    loading.value = false;
+  }
+};
+
+// Use demo data as fallback
+const useDemoData = () => {
+  bulletinEntries.value = [
     {
       id: 4,
-      name: 'Klinikum München',
-      email: 'personal@klinikum-muenchen.de',
-      userType: 'Klinik',
-      messageType: 'Angebot',
-      title: 'Vertretung Notfallmedizin (2 Wochen) - übertarifliche Vergütung',
-      content: 'Suchen dringend Vertretung für unsere Notfallstation vom 15.-29.06.2025. Erfahrung in Notfallmedizin erforderlich. Übertarifliche Vergütung, Unterkunft wird gestellt.',
-      timestamp: new Date('2025-05-15T10:30:00'),
+      messageType: 'Information',
+      title: 'Fachärztliche Vertretungs-Pool Radiologie',
+      content: 'Organisiere Vertretungs-Pool für kurzfristige Radiologie-Einsätze (max. 3 Monate).',
+      timestamp: new Date('2025-05-08T11:20:00')
     },
     {
-      id: 5,
-      name: 'Dr. Julia Weber',
-      email: 'j.weber@arztpraxis.de',
-      userType: 'Arzt',
-      messageType: 'Gesuch',
-      title: 'Anästhesist verfügbar für Kurzeinsätze bis 4 Wochen',
-      content: 'Facharzt für Anästhesie mit 8 Jahren Erfahrung sucht Kurzeinsätze (1-4 Wochen) im Raum Köln ab sofort. Flexibel und kurzfristig verfügbar, auch Wochenenddienste möglich.',
-      timestamp: new Date('2025-05-12T15:45:00'),
+      id: 7,
+      messageType: 'Information',
+      title: 'Fortbildung: Aktuelle Entwicklungen in der Notfallmedizin',
+      content: 'Die Ärztekammer Berlin bietet am 15.-16.07.2025 eine zertifizierte Fortbildung zu aktuellen Entwicklungen in der Notfallmedizin an.',
+      timestamp: new Date('2025-05-01T10:00:00')
     },
     {
-      id: 6,
-      name: 'Universitätsklinikum Hamburg',
-      email: 'karriere@uk-hamburg.de',
-      userType: 'Klinik',
-      messageType: 'Angebot',
-      title: 'Kardiologie - 3-Monats-Vertretung (übertariflich)',
-      content: 'Suchen für den Zeitraum 01.07.-30.09.2025 Facharzt (m/w/d) für unsere kardiologische Abteilung. Übertarifliche Vergütung, Dienstwohnung möglich, flexible Dienstplangestaltung.',
-      timestamp: new Date('2025-05-10T09:15:00'),
+      id: 8,
+      messageType: 'Information',
+      title: 'Internationaler Kongress für Innere Medizin',
+      content: 'Vom 10.-12.09.2025 findet an der MH Hannover der 35. Internationale Kongress für Innere Medizin statt.',
+      timestamp: new Date('2025-04-28T14:30:00')
     }
   ];
-}
+};
 
-// Formatiert das Datum für die Anzeige
-function formatDate(date) {
+// Format date
+const formatDate = (date) => {
   if (!date) return '';
   
-  const dateObj = new Date(date);
   const now = new Date();
-  const diffTime = Math.abs(now - dateObj);
-  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+  const postDate = new Date(date);
+  const diffTime = Math.abs(now - postDate);
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   
-  if (diffDays === 0) {
-    return 'Heute';
-  } else if (diffDays === 1) {
-    return 'Gestern';
-  } else if (diffDays < 7) {
-    return `Vor ${diffDays} Tagen`;
-  } else {
-    return dateObj.toLocaleDateString('de-DE', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
-    });
-  }
-}
+  if (diffDays <= 1) return 'Heute';
+  if (diffDays <= 2) return 'Gestern';
+  if (diffDays <= 7) return `Vor ${diffDays} Tagen`;
+  
+  return postDate.toLocaleDateString('de-DE', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  });
+};
 
 onMounted(() => {
-  // Lade Daten beim Start der Seite
-  fetchLatestEntries();
+  // Fetch bulletin entries
+  fetchBulletinEntries();
   
   // Animate the counters
   const counters = document.querySelectorAll('.counter');

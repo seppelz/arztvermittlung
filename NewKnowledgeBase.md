@@ -248,10 +248,10 @@
 - Contact mechanisms should protect user privacy while enabling communication
 - Demo data helps visualize the final product during development
 - Modals for contact forms provide focused interaction without page navigation
-- Zeitstempel von Veröffentlichungen sollten niemals in der Zukunft liegen, da dies unrealistisch wirkt und die Glaubwürdigkeit beeinträchtigt
-- Hybride Datenstrategie mit API-Integration und lokalen Fallback-Daten erhöht die Robustheit der Anwendung
-- Fehlerbehandlung bei API-Aufrufen ist essentiell für eine reibungslose Benutzererfahrung
-- Lokale Datenpräsentation während API-Aufrufen und Backend-Prozessierung verbessert die gefühlte Performance
+- Color-coding different message types improves scanning and information hierarchy
+- Dynamic badge styling with v-bind and conditional classes creates consistent visual language
+- Positionierung von Inhalt vor Eingabeformen folgt dem "Content-First"-Prinzip für verbesserte Benutzerführung
+- Die Umkehrung der Reihenfolge von Formular und Inhalt reduziert kognitive Belastung und verbessert die Konversionsrate
 
 ## Visual Design Principles
 - Headings should have at least 4.5:1 contrast ratio with background for accessibility
@@ -519,35 +519,44 @@ This file documents new insights and knowledge gained while working on this proj
    - Konsistenz in allen Plattformbereichen (Homepage, Bulletin Board, Seed-Daten) bezüglich der Art der Vergütungsdarstellung
    - Sorgfältige Prüfung aller Marketingtexte auf potentiell problematische Einkommensversprechen 
 
-## API-Integration und Datenpersistenz
+## API Integration mit Error-Handling
 
-1. **Frontend-Backend-Verbindung**:
-   - Service-basierte Architektur trennt API-Logik von Komponenten-Darstellung
-   - Wiederverwendbare Service-Klassen für verschiedene Ressourcentypen (bulletin, user, auth)
-   - Try-Catch-Blöcke in API-Aufrufen ermöglichen bessere Fehlerbehandlung und Benutzerrückmeldung
-   - Fallback auf Demo-Daten bei API-Fehlern verhindert leere Benutzeroberflächen
+- **Fehlerbehandlung mit Fallback-Mechanismen**: Implementierung von Fallback-Strategien, wenn API-Aufrufe fehlschlagen. Durch das Bereitstellen von Demo-Daten als Fallback wird sichergestellt, dass die Benutzeroberfläche immer bedeutungsvolle Informationen anzeigt, selbst wenn die API nicht verfügbar ist.
 
-2. **Optimistische UI-Updates**:
-   - Lokales Hinzufügen neuer Einträge vor API-Bestätigung verbessert gefühlte Reaktionsfähigkeit
-   - Nachträgliche Aktualisierung der lokalen ID mit der vom Server erhaltenen ID gewährleistet Datenkonsistenz
-   - Anzeige von Feedback während Ladezuständen reduziert Benutzerfrustration
-   - Temporäre Statusmeldungen (3 Sekunden) bieten Feedback ohne die Benutzeroberfläche zu überladen
+- **Dynamische API-Endpunkte**: Verwendung von Umgebungsvariablen für API-Endpunkte ermöglicht flexible Entwicklung und Deployment auf verschiedenen Umgebungen (Entwicklung, Staging, Produktion).
 
-3. **Datenvalidierung und -formatierung**:
-   - Zeitstempel sollten immer im Kontext ihrer Verwendung interpretiert werden
-   - Veranstaltungsdaten können in der Zukunft liegen, Veröffentlichungsdaten sollten in der Vergangenheit oder Gegenwart sein
-   - Konsistente Datums- und Zeitformatierung über die gesamte Anwendung (toLocaleDateString mit Optionen)
-   - Automatische Typzuweisung basierend auf Benutzertyp vereinfacht die Datenerfassung (Arzt → Gesuch, Klinik → Angebot)
+- **Lade-Zustände**: Implementierung von Lade-Zuständen während API-Anfragen, um dem Benutzer Feedback zu geben und eine responsive Benutzeroberfläche zu gewährleisten.
 
-4. **Datenbankstruktur und Seed-Strategie**:
-   - Vorkonfigurierte Demo-Daten beschleunigen Tests und Entwicklung
-   - Automatisierte Seed-Skripte gewährleisten konsistente Testumgebungen
-   - Datenbank-Schema mit sorgfältig definierten Validierungen verhindert Datenkonsistenzprobleme
-   - Verwendung von Status-Feldern (active, pending, archived) ermöglicht flexible Inhaltsmoderation
-   - Schema-Design mit optionalen Feldern für zukünftige Erweiterungen reduziert Migrationsaufwand
+## Responsive Datenpräsentation
 
-5. **Robuste Datenabfragen**:
-   - Parametrisierte API-Abfragen ermöglichen flexible Filterung und Sortierung
-   - Serverseitige Paginierung mit standardisierten Parametern (page, limit) optimiert Datenübertragung
-   - Dynamische Sortierparameter verbessern Benutzerinteraktion mit großen Datenmengen
-   - Error-Boundaries für API-Fehler mit benutzerfreundlichen Fallbacks erhöhen die Anwendungsrobustheit 
+- **Konsistente Datenansicht**: Sicherstellung, dass Daten auf verschiedenen Seiten konsistent dargestellt werden, indem dieselbe Datenquelle verwendet wird.
+
+- **Bedingte Renderingmuster**: Verwendung von Vue.js v-if/v-else-if/v-else-Mustern für eine elegante Handhabung verschiedener Datenzustände (Laden, Fehler, leer, Daten vorhanden).
+
+## Parameter für API-Anfragen
+
+- **Filterung, Sortierung und Paginierung**: Backend-API unterstützt Abfrageparameter für Filterung (messageType), Sortierung (sort) und Paginierung (page, limit), was eine flexible Datenabfrage für verschiedene Anwendungsfälle ermöglicht.
+
+## Datenstruktur und -transformation
+
+- **Konsistentes Datumsformat**: Implementierung einer wiederverwendbaren Funktion zur Formatierung von Zeitstempeln in benutzerfreundliche relative Zeitangaben ("Heute", "Gestern", "Vor X Tagen").
+
+- **Inhaltskürzung**: Verwendung von Substring-Methoden für die Anzeige von Vorschauen längerer Texte, während die vollständigen Inhalte auf detaillierteren Seiten angezeigt werden.
+
+## Spezialisierung von gemeinsam genutzter Codebasis
+
+- **Komponenten mit unterschiedlichem Fokus**: Die Homepage zeigt eine reduzierte, fokussierte Ansicht von Daten, während dedizierte Seiten (wie BulletinBoard) umfassendere Funktionen und vollständige Datensätze bieten.
+
+## Best Practices für UI Navigation und Layout
+
+- **Menü-Positionierung**: Das Logo sollte immer an prominenter Stelle im Menü platziert sein, vorzugsweise links oben, um die Markenidentität zu stärken.
+
+- **Informationsarchitektur in Hero-Sektionen**: Strukturierung von Helden-Sektionen mit klarer Hierarchie: Hauptüberschrift → Unterüberschrift → Call-to-Action Buttons → zusätzliche Kontextinformationen.
+
+- **Mehrspaltenlayouts für komplexe Informationen**: Verwendung von Grid-Layouts für die übersichtliche Darstellung zusammenhängender, aber unterschiedlicher Informationsblöcke.
+
+## Marketing und rechtliche Aspekte
+
+- **Einkommensdarstellung**: Bei der Beschreibung der Vergütung sollten spezifische Beträge vermieden werden; stattdessen sind relative Begriffe wie "übertariflich" zu verwenden.
+
+- **Transparenz in der Kommunikation**: Klare Kommunikation über Registrierungsanforderungen und Datenschutzrichtlinien, um Vertrauen aufzubauen und rechtliche Anforderungen zu erfüllen. 

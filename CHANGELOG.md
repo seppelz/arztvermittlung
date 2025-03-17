@@ -27,8 +27,6 @@ All notable changes to this project will be documented in this file.
 - Increased logo size in header and footer for better visibility and brand recognition
 - Streamlined navigation by removing Team menu item for more focused user experience
 - Removed specific percentage claims about doctor earnings to avoid potential legal issues
-- Korrigierte Zeitstempel für alle Pinnwand- und Arztbörse-Einträge, damit keine Veröffentlichungsdaten in der Zukunft liegen
-- Verbesserte API-Integration für Pinnwand und Arztbörse zur persistenten Datenspeicherung in der Datenbank
 
 ### Security
 - Changed MongoDB Atlas password to improve database security
@@ -97,6 +95,14 @@ All notable changes to this project will be documented in this file.
 - Login options updated to use guest access instead of admin credentials
 - Benutzertyp-Schema im Mongoose-Modell um 'Gast' für Demo-Zugang erweitert
 - Deployment-Prozess für einfachere Inbetriebnahme
+- Verbesserte Position des Logos im Menü für bessere Sichtbarkeit
+- Überarbeitung der Hero-Sektion auf der Homepage mit modernerem, strukturierterem Design
+- Verbesserte Leserlichkeit durch Anpassung der Header-Farben
+- Verbesserte Call-to-Action Buttons mit eindeutigeren Handlungsaufforderungen
+- Footer mit verbesserter Sichtbarkeit und klarer strukturierter Information
+- Verbesserte Anzeige von Zeitstempeln bei Bulletin-Board Einträgen
+- Verbesserte Backend-Connection zu MongoDB Atlas durch Aktualisierung der SSL/TLS-Konfiguration
+- Integration der Pinnwand-Einträge auf der Homepage mit Live-Daten vom API mit Fallback zu Demo-Daten
 
 ### Behoben
 - Fehlende Registrierungsfunktion im Backend hinzugefügt
@@ -109,6 +115,9 @@ All notable changes to this project will be documented in this file.
 - Security improvements for authentication system
 - Usertype validation error bei der Erstellung von Gast-Benutzern behoben
 - MIME-Typ-Fehler in Vercel-Deployment für statische Assets (CSS, JS, SVG) behoben
+- Fehler bei MongoDB-Verbindung behoben (SSL-Zertifikate)
+- CORS Konfiguration angepasst um alle lokalen Entwicklungsports zu unterstützen
+- Problem mit mehreren parallel laufenden Vite-Servern behoben
 
 ## [0.1.0] - 2025-03-13
 
@@ -196,3 +205,12 @@ All notable changes to this project will be documented in this file.
 - Improved contrast of headings for better readability
 - Enhanced visual hierarchy with stronger heading styles 
 - Strengthened h2 heading colors for better visibility and hierarchy 
+
+### Added
+- Neuer Seitentitel "Med-Match: Direkte Arzt-Klinik Vermittlung" für bessere SEO
+- Meta-Tags für verbesserte Suchmaschinen-Optimierung
+- Verwendung des Med-MATCH Logos als Favicon
+- Dedizierte Seite für Stellenangebote
+- Dedizierte Seite für Stellengesuche
+- Darstellung von Stellenanzeigen auf der Startseite
+- Funktionalität zum Senden von Kontaktanfragen zu Pinnwand-Einträgen
