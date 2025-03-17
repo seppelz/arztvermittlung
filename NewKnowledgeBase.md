@@ -533,6 +533,10 @@ This file documents new insights and knowledge gained while working on this proj
 
 - **Flexibles URL-Handling**: Implementierung von Logik zur dynamischen Anpassung der API-URL-Konstruktion basierend auf der Struktur der Basisadresse, um sowohl für Entwicklungs- als auch für Produktionsumgebungen korrekt zu funktionieren.
 
+- **Vollständige API-Integration**: Bei der Implementierung von Formularen muss sichergestellt werden, dass die Daten tatsächlich an die Backend-API gesendet werden, anstatt nur lokal manipuliert zu werden. Die Simulation von API-Aufrufen in Prototypen sollte in der Produktionsversion durch echte API-Calls ersetzt werden.
+
+- **Konsistente ID-Handhabung**: MongoDB verwendet `_id` für Dokument-IDs, während Frontend-Komponenten oft einfach `id` verwenden. Bei der API-Integration sollte darauf geachtet werden, diese Unterschiede zu überbrücken, indem eine konsistente ID-Handhabung implementiert wird (z.B. durch Mapping von `_id` zu `id`).
+
 ## Responsive Datenpräsentation
 
 - **Konsistente Datenansicht**: Sicherstellung, dass Daten auf verschiedenen Seiten konsistent dargestellt werden, indem dieselbe Datenquelle verwendet wird.
@@ -542,6 +546,14 @@ This file documents new insights and knowledge gained while working on this proj
 ## Parameter für API-Anfragen
 
 - **Filterung, Sortierung und Paginierung**: Backend-API unterstützt Abfrageparameter für Filterung (messageType), Sortierung (sort) und Paginierung (page, limit), was eine flexible Datenabfrage für verschiedene Anwendungsfälle ermöglicht.
+
+## Datenansatz: Demo- vs. Live-Daten
+
+- **Stufenweiser Übergang von Demo- zu Live-Daten**: Die Entwicklung sollte mit Dummy-Daten beginnen, aber ein klarer Pfad zur Integration echter API-Daten muss von Anfang an geplant werden. Codekommentare und TODOs sollten ersetzt werden, sobald die echte API-Integration implementiert ist.
+
+- **Fallback-Strategie**: Bei API-Fehlern oder leeren Ergebnissen ist es sinnvoll, auf vorbereitete Demo-Daten zurückzugreifen, um eine gute Benutzererfahrung auch in Fehlersituationen zu gewährleisten.
+
+- **Entwicklungsfortschritt dokumentieren**: Es ist wichtig, dem Entwicklungsteam klar zu kommunizieren, welche Teile der Anwendung bereits mit der tatsächlichen API verbunden sind und welche noch Demo-Daten verwenden.
 
 ## Datenstruktur und -transformation
 
