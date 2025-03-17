@@ -162,13 +162,33 @@ const seedBulletinEntries = async () => {
         privacyPolicyAccepted: true
       },
       {
-        name: 'Medizinische Hochschule Hannover',
-        email: 'kongress@mh-hannover.de',
+        name: 'Deutsche Gesellschaft für Innere Medizin',
+        email: 'kongress@dgim.de',
         userType: 'Klinik',
         messageType: 'Information',
-        title: 'Internationaler Kongress für Innere Medizin',
-        content: 'Vom 10.-12.07.2025 findet an der MH Hannover der 35. Internationale Kongress für Innere Medizin statt. Themenschwerpunkte: Kardiologie, Gastroenterologie, Endokrinologie. Anmeldung ab sofort möglich. Frühbucherrabatt bis zum 15.05.2025. Wir freuen uns auf Ihre Teilnahme an diesem wichtigen Fachkongress.',
-        timestamp: new Date('2025-02-28T14:30:00'),
+        title: '131. Kongress der DGIM in Wiesbaden',
+        content: 'Der 131. Kongress der Deutschen Gesellschaft für Innere Medizin (DGIM) findet vom 03. bis 06. Mai 2025 in Wiesbaden statt. Schwerpunktthemen: Digitalisierung und Präzisionsmedizin. Anmeldung ab sofort möglich. Frühbucherrabatt bis zum 15.02.2025. Wir freuen uns auf Ihre Teilnahme an diesem wichtigen Fachkongress.',
+        timestamp: new Date('2025-01-15T14:30:00'),
+        privacyPolicyAccepted: true
+      },
+      {
+        name: 'Medizinische Hochschule Hannover',
+        email: 'messe@mh-hannover.de',
+        userType: 'Klinik',
+        messageType: 'Information',
+        title: 'Hannover Herz Lungen Messe 2025',
+        content: 'Die Hannover Herz Lungen Messe 2025 wird am 21. und 22. März 2025 an der Medizinischen Hochschule Hannover veranstaltet. Aktuelle Fortschritte in Kardiologie und Pneumologie. Hochkarätige Vorträge und praktische Workshops für Fachärzte und Assistenzärzte. Begrenzte Teilnehmerzahl, frühzeitige Anmeldung empfohlen.',
+        timestamp: new Date('2024-12-10T09:00:00'),
+        privacyPolicyAccepted: true
+      },
+      {
+        name: 'European Federation of Internal Medicine',
+        email: 'ecim2025@efim.org',
+        userType: 'Klinik',
+        messageType: 'Information',
+        title: '23. Europäischer Kongress für Innere Medizin',
+        content: 'Der 23. Europäische Kongress für Innere Medizin (ECIM 2025) findet vom 5. bis 8. März 2025 in Florenz, Italien, statt. Internationale Experten diskutieren neueste Erkenntnisse und Entwicklungen in der Inneren Medizin. Abstracts können bis zum 15.12.2024 eingereicht werden. Attraktives Rahmenprogramm in der kulturellen Hauptstadt der Toskana.',
+        timestamp: new Date('2025-01-20T11:15:00'),
         privacyPolicyAccepted: true
       },
       {

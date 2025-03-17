@@ -462,16 +462,23 @@ const useDemoData = () => {
     {
       id: 7,
       messageType: 'Information',
-      title: 'Fortbildung: Aktuelle Entwicklungen in der Notfallmedizin',
-      content: 'Die Ärztekammer Berlin bietet am 15.-16.07.2025 eine zertifizierte Fortbildung zu aktuellen Entwicklungen in der Notfallmedizin an.',
-      timestamp: new Date('2025-05-01T10:00:00')
+      title: '131. Kongress der DGIM in Wiesbaden',
+      content: 'Der 131. Kongress der Deutschen Gesellschaft für Innere Medizin (DGIM) findet vom 03. bis 06. Mai 2025 in Wiesbaden statt. Schwerpunktthemen: Digitalisierung und Präzisionsmedizin.',
+      timestamp: new Date('2025-01-15T10:00:00')
     },
     {
       id: 8,
       messageType: 'Information',
-      title: 'Internationaler Kongress für Innere Medizin',
-      content: 'Vom 10.-12.09.2025 findet an der MH Hannover der 35. Internationale Kongress für Innere Medizin statt.',
-      timestamp: new Date('2025-04-28T14:30:00')
+      title: 'Hannover Herz Lungen Messe 2025',
+      content: 'Die Hannover Herz Lungen Messe 2025 wird am 21. und 22. März 2025 an der Medizinischen Hochschule Hannover veranstaltet. Aktuelle Fortschritte in Kardiologie und Pneumologie.',
+      timestamp: new Date('2024-12-10T14:30:00')
+    },
+    {
+      id: 9,
+      messageType: 'Information',
+      title: '23. Europäischer Kongress für Innere Medizin',
+      content: 'Der 23. Europäische Kongress für Innere Medizin (ECIM 2025) findet vom 5. bis 8. März 2025 in Florenz, Italien, statt. Internationale Experten diskutieren neueste Erkenntnisse.',
+      timestamp: new Date('2025-01-20T09:15:00')
     }
   ];
 };

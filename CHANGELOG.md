@@ -30,6 +30,7 @@ All notable changes to this project will be documented in this file.
 - Updated MongoDB connection configuration to follow current best practices by removing deprecated options
 - Improved MongoDB Atlas connection security by removing unnecessary SSL/TLS options
 - Enhanced API URL handling for custom domain with robust fallback system
+- Updated demo data with real medical congress information for more accurate content
 
 ### Security
 - Changed MongoDB Atlas password to improve database security

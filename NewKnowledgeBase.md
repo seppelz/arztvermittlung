@@ -648,3 +648,29 @@ This file documents new insights and knowledge gained while working on this proj
    - CORS settings need to be updated to include all domains that will access the API
    - Redirecting users from temporary domains to the primary domain can prevent configuration issues
    - API URL construction should be domain-aware to prevent cross-origin request failures 
+
+## Data Accuracy and Platform Credibility
+
+1. **Real Data vs. Fictional Data**:
+   - Using real, verifiable medical congress information instead of fictional events enhances platform credibility
+   - Medical professionals can immediately recognize legitimate events which improves user trust
+   - Accurate dates, locations and organizers for events demonstrate attention to detail and industry knowledge
+   - Demo data should mirror the quality and accuracy expected in actual user-generated content
+
+2. **Strategic Data Selection**:
+   - Including a mix of national (DGIM) and international (ECIM) events appeals to a broader medical audience
+   - Featuring specialized events (like the Hannover Herz Lungen Messe) demonstrates understanding of medical specializations
+   - Selecting events across different dates provides a realistic timeline of upcoming medical gatherings
+   - Including detailed information like abstract submission deadlines adds authenticity to demo entries
+
+3. **Implementation Considerations**:
+   - Demo data should be consistent across both frontend fallbacks and database seeds
+   - Timestamps should be selected to ensure events appear in a logical chronological order
+   - Event descriptions should include all key information: dates, location, focus areas, and registration details
+   - When using real events, facts should be verified and contact information should be accurate or appropriately anonymized
+
+4. **Content Lifecycle Management**:
+   - Demo data with real events requires periodic review to ensure continued relevance
+   - Outdated events should be replaced with current ones to maintain platform freshness
+   - A strategy for cycling demo content keeps the platform looking current even with minimal user activity
+   - Documentation should include information about the source and validity of demo data 
