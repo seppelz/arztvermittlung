@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 ### Improved
+- Überarbeitetes Kontaktformular für vereinfachte Benutzerinteraktion
 - Angepasste Formulartexte für bessere Benutzerführung bei der Erstellung von Angeboten und Gesuchen
 - Überarbeitete Seitentexte für klarere Kommunikation und bessere Benutzererfahrung
 - Enhanced hero section with modern animations and interactive elements for better user engagement
