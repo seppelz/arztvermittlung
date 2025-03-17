@@ -407,8 +407,16 @@ const fetchBulletinEntries = async () => {
   error.value = null;
   
   try {
-    // Fetch only 3 latest entries of type 'Information'
-    const response = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/bulletin`, {
+    // Fix URL construction to avoid duplicate /api/
+    // Extract base URL without trailing /api if it exists
+    const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+    const apiUrl = baseUrl.endsWith('/api') 
+      ? `${baseUrl}/bulletin` 
+      : `${baseUrl}/api/bulletin`;
+    
+    console.log('Fetching from URL:', apiUrl); // For debugging
+    
+    const response = await axios.get(apiUrl, {
       params: {
         messageType: 'Information',
         limit: 3,
