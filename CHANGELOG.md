@@ -77,6 +77,9 @@ All notable changes to this project will be documented in this file.
 - Backend README with documentation for seeding and API endpoints
 - Improved error handling for API requests in frontend components
 - Added NewKnowledgeBase.md to document lessons learned and best practices
+- Admin-Bereich um Stellenbörse-Komponente erweitert zur Verwaltung von Stellenangeboten und -gesuchen
+- Status-Management für Stellenangebote und -gesuche (Freigeben, Archivieren, Wiederherstellen)
+- Detailansicht für Stellenangebote und -gesuche im Admin-Bereich
 
 ### Hinzugefügt
 - Admin-Komponente für die Benutzerverwaltung mit Filter-, Such- und Paginierungsfunktionen

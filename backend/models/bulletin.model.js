@@ -15,7 +15,6 @@ const bulletinSchema = new mongoose.Schema({
   },
   name: {
     type: String,
-    required: [true, 'Bitte geben Sie einen Namen ein'],
     trim: true
   },
   email: {
@@ -45,9 +44,23 @@ const bulletinSchema = new mongoose.Schema({
   status: {
     type: String,
     enum: ['active', 'pending', 'archived'],
-    default: 'active'
+    default: 'pending'
   },
-  // Für zukünftige Erweiterungen
+  specialty: {
+    type: String,
+    trim: true
+  },
+  specialtyOther: {
+    type: String,
+    trim: true
+  },
+  federalState: {
+    type: String,
+    trim: true
+  },
+  startDate: {
+    type: Date
+  },
   category: {
     type: String,
     trim: true
