@@ -56,7 +56,7 @@
             </li>
             <li>
               <router-link :to="{ name: 'ForHospitals' }" class="footer-link">
-                Für Kliniken
+                Für Kliniken / Einrichtungen
               </router-link>
             </li>
             <li>

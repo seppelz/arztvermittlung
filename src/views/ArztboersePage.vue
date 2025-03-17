@@ -2,7 +2,7 @@
   <div>
     <section class="bg-dark text-white py-12">
       <div class="container mx-auto px-4">
-        <h1 class="text-4xl md:text-5xl font-extrabold mb-4 leading-tight">Arztbörse</h1>
+        <h1 class="text-4xl md:text-5xl font-extrabold mb-4 leading-tight">Stellenbörse</h1>
         <p class="text-xl max-w-3xl">
           Hier finden Ärzte und Einrichtungen kurzfristige Einsätze (1 Woche bis 3 Monate). 
           Ärzte profitieren von übertariflichen Vergütungen, Kliniken lösen Personalengpässe schnell und unkompliziert.

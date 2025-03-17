@@ -33,10 +33,9 @@
                 <h3 class="text-xl font-semibold mb-3 text-primary">Für Ärzte</h3>
                 <ul class="list-disc pl-5 space-y-2 text-gray-700">
                   <li>Kostenlose Registrierung und Profilerstellung</li>
-                  <li>Angabe von Fachrichtung, Qualifikationen und Präferenzen</li>
                   <li>Direkter Kontakt zu interessierten Kliniken</li>
-                  <li>Keine versteckten Kosten oder Provisionen</li>
                   <li>Volle Kontrolle über persönliche Daten</li>
+                  <li>Vermittlungssupport durch Fachärzte möglich</li>
                 </ul>
               </div>
               <div>
@@ -45,7 +44,7 @@
                   <li>Kostenlose Erstellung von Stellenangeboten</li>
                   <li>Zugang zu einer Datenbank qualifizierter Ärzte</li>
                   <li>Keine Vorabkosten - Zahlung nur bei erfolgreicher Vermittlung</li>
-                  <li>Deutlich niedrigere Vermittlungsgebühren im Vergleich zu Agenturen</li>
+                  <li>Deutlich niedrigere Vermittlungsgebühren im Vergleich zu Agenturen (einmalig)</li>
                   <li>Schnelle und unkomplizierte Prozesse</li>
                 </ul>
               </div>
@@ -63,7 +62,7 @@
                 </div>
                 <h3 class="text-lg font-semibold mb-2">Transparenz</h3>
                 <p class="text-gray-600">
-                  Alle Konditionen, Gebühren und Vermittlungsprozesse werden klar und transparent kommuniziert. Bei uns gibt es keine versteckten Kosten.
+                  Alle Konditionen, Gebühren und Vermittlungsprozesse werden klar und transparent kommuniziert.
                 </p>
               </div>
               

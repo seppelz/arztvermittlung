@@ -55,7 +55,7 @@
             class="nav-link"
             active-class="nav-link-active"
           >
-            Arztbörse
+            Stellenbörse
           </router-link>
           <router-link
             :to="{ name: 'About' }"

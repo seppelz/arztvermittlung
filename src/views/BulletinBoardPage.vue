@@ -108,7 +108,7 @@
         
         <!-- Neue Nachricht erstellen - Breiteres, kompakteres Formular -->
         <div class="max-w-7xl mx-auto bg-white rounded-lg shadow-strong p-6 mb-8 border border-gray-200">
-          <h2 class="text-2xl md:text-3xl font-bold mb-6 text-center text-heading border-b-2 border-primary pb-3">Neue Information erstellen</h2>
+          <h2 class="text-2xl md:text-3xl font-bold mb-6 text-center text-heading border-b-2 border-primary pb-3">Neue Nachricht anpinnen</h2>
           
           <form @submit.prevent="submitMessage" class="space-y-5">
             <!-- Zwei-Spalten-Layout für kompakteren Look -->
@@ -145,7 +145,7 @@
                   v-model="newMessage.title" 
                   required 
                   class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm"
-                  placeholder="Titel Ihrer Information"
+                  placeholder="Titel Ihrer Nachricht"
                 />
               </div>
             </div>
@@ -195,8 +195,8 @@
           </form>
           
           <div v-if="messageSent" class="mt-6 p-4 bg-success bg-opacity-10 text-success rounded-lg border-2 border-success">
-            <p class="font-semibold">Vielen Dank für Ihre Information!</p>
-            <p>Ihre Information wurde erfolgreich veröffentlicht.</p>
+            <p class="font-semibold">Vielen Dank für Ihre Nachricht!</p>
+            <p>Ihre Nachricht wurde erfolgreich veröffentlicht.</p>
           </div>
         </div>
       </div>

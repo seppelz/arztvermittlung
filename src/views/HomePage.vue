@@ -14,7 +14,7 @@
           <div class="text-white animate-fade-in-up">
             <h1 class="text-4xl md:text-5xl font-bold mb-4 text-white">Direkte Verbindung zwischen Ärzten und Kliniken</h1>
             <p class="text-xl mb-6 text-white/90">
-              Unsere Pinnwand ermöglicht den einfachen Austausch zwischen medizinischen Fachkräften und Einrichtungen - mit minimaler Registrierung.
+              Unsere Pinnwand ermöglicht den einfachen Austausch zwischen medizinischen Fachkräften und Einrichtungen.
             </p>
             <div class="flex flex-wrap gap-4">
               <router-link :to="{ name: 'BulletinBoard' }" class="btn-hero-primary px-6 py-3">
@@ -89,7 +89,7 @@
         <div class="text-center mb-16">
           <h2 class="text-3xl md:text-4xl font-bold text-primary-800 mb-6">Warum MedMatch?</h2>
           <p class="text-xl text-neutral-600 max-w-3xl mx-auto">
-            Unsere Plattform verbindet Ärzte und medizinische Einrichtungen direkt für kurzfristige Einsätze von einer Woche bis zu drei Monaten – ohne teure Vermittlungsgebühren.
+            Unsere Plattform verbindet Ärzte und medizinische Einrichtungen direkt für kurzfristige Einsätze von einer Woche bis zu drei Monaten – ohne teure Vermittlungsgebühren. Darüber hinaus ermöglicht sie einen unkomplizierten und direkten Austausch zwischen Kollegen.
           </p>
         </div>
 
