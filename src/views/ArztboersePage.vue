@@ -93,7 +93,7 @@
                 <div class="mt-auto pt-4 border-t border-gray-200">
                   <div class="flex justify-between">
                     <div>
-                      <p class="font-medium text-gray-700">{{ message.name }}</p>
+                      <!-- <p class="font-medium text-gray-700">{{ message.name }}</p> -->
                       <p class="text-sm text-gray-500">{{ message.userType }}</p>
                     </div>
                     <button 
@@ -149,14 +149,13 @@
             <!-- Zwei-Spalten-Layout für kompakteren Look -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
               <div>
-                <label for="name" class="block text-text-dark font-semibold mb-1">Name*</label>
+                <label for="name" class="block text-text-dark font-semibold mb-1">Name</label>
                 <input 
                   type="text" 
                   id="name" 
                   v-model="newMessage.name" 
-                  required 
                   class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm"
-                  placeholder="Ihr Name oder Einrichtung"
+                  placeholder="Ihr Name oder Einrichtung (optional)"
                 />
               </div>
               

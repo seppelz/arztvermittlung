@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 ### Improved
+- Stellenbörse (vormals Arztbörse): Name ist nun optional und wird nicht mehr angezeigt
 - Überarbeitetes Kontaktformular für vereinfachte Benutzerinteraktion
 - Angepasste Formulartexte für bessere Benutzerführung bei der Erstellung von Angeboten und Gesuchen
 - Überarbeitete Seitentexte für klarere Kommunikation und bessere Benutzererfahrung
