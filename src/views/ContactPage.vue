@@ -61,27 +61,13 @@
             <div>
               <h2 class="text-2xl font-semibold mb-6">Kontaktinformationen</h2>
               <div class="bg-white p-6 rounded-lg shadow-md space-y-6">
-                <div>
-                  <h3 class="text-lg font-semibold mb-2">Adresse</h3>
-                  <p class="text-gray-700">
-                    MedMatch GmbH<br>
-                    Musterstraße 123<br>
-                    10115 Berlin<br>
-                    Deutschland
-                  </p>
-                </div>
                 
                 <div>
                   <h3 class="text-lg font-semibold mb-2">Kontakt</h3>
                   <p class="text-gray-700 mb-1">
                     <span class="font-medium">E-Mail:</span> info@med-match.de
                   </p>
-                  <p class="text-gray-700 mb-1">
-                    <span class="font-medium">Telefon:</span> +49 (0) 30 1234 5678
-                  </p>
-                  <p class="text-gray-700">
-                    <span class="font-medium">Fax:</span> +49 (0) 30 1234 5679
-                  </p>
+                
                 </div>
                 
                 <div>
