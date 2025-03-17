@@ -32,6 +32,12 @@
     },
     {
       "src": "/(.*)",
+      "host": "med-match.de",
+      "status": 301,
+      "headers": { "Location": "https://www.med-match.de/$1" }
+    },
+    {
+      "src": "/(.*)",
       "dest": "/"
     }
   ],
