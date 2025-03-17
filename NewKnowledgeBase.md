@@ -52,6 +52,20 @@
    - Feature-Cards, Buttons, Badges und Alerts als wiederverwendbare Klassengruppen
    - Standardisierte Margin- und Padding-Werte für konsistentes Spacing über alle Komponenten
 
+### Assets und Ressourcen
+
+1. **Verwaltung von statischen Assets**:
+   - Assets im `public` Verzeichnis werden bei der Kompilierung direkt kopiert und behalten ihren Pfad bei, während Assets in `src/assets` durch Vite verarbeitet werden
+   - Bilder und Logos im `public` Verzeichnis werden mit absolutem Pfad (z.B. `/Med-MATCH.png`) referenziert, nicht mit `@/` Präfix
+   - Logos und andere zentrale visuelle Elemente sollten für konsistente Markenidentität über alle Plattformbereiche standardisiert werden
+   - Logogrößen sollten zwischen Header (h-12) und Footer (h-12) konsistent sein, um eine einheitliche visuelle Repräsentation der Marke sicherzustellen
+
+2. **Navigation und Menüstruktur**:
+   - Fokussierte Navigation mit weniger Menüpunkten verbessert die Benutzerführung und reduziert kognitive Belastung
+   - Prioritisierung von essenziellen Menüpunkten hilft Benutzern, die wichtigsten Funktionen der Plattform schneller zu finden
+   - Konsistenz zwischen Desktop-, Mobil- und Footer-Navigation ist entscheidend für ein kohärentes Benutzererlebnis
+   - Bei der Entfernung von Menüpunkten müssen alle Navigationsbereiche (Header-Desktop, Header-Mobil, Footer) aktualisiert werden
+
 ## Animationstechniken für moderne Webinterfaces
 
 1. **Strategischer Einsatz von CSS-Animationen**:
@@ -422,6 +436,22 @@ Dieses Dokument enthält wichtige Lernpunkte, die während der Entwicklung der M
 
 This file documents new insights and knowledge gained while working on this project.
 
+## Specialized Feature Pages
+
+- Splitting general functionalities into specialized pages (e.g., Pinnwand for information, Arztbörse for job posts) creates a more intuitive user experience
+- User-type dependent workflows simplify the posting process by automatically setting relevant properties (e.g., post type)
+- Specialized pages allow for targeted filtering and presentation of content without overwhelming users with unnecessary options
+- Creating dedicated spaces for specific use cases (information sharing vs. job marketplace) helps users find exactly what they need
+- Feature-specific guidance text and UI elements improve user understanding of the purpose of each section
+
+## Component Architecture
+
+- Reusing similar component structures with conditional rendering is more efficient than creating entirely separate components
+- Maintaining similar form structures across related features helps keep the codebase DRY while providing differentiated user experiences
+- Thoughtful component architecture allows for sharing business logic while presenting different UIs
+- Computed properties provide efficient real-time content filtering without redundant code
+- Vue's reactive system makes it easy to implement conditional form behavior (like automatic message type determination)
+
 ## MongoDB Atlas Connection
 
 - MongoDB Atlas connections may require specific SSL/TLS settings to work properly
@@ -474,3 +504,17 @@ This file documents new insights and knowledge gained while working on this proj
    - Logo and company description should have priority placement (typically spanning multiple columns on desktop)
    - Font sizes may need adjustment at different breakpoints to maintain readability
    - Maintaining sufficient touch targets (min 44x44px) for all interactive elements improves mobile usability 
+
+## Marketing und rechtliche Aspekte
+
+1. **Einkommensdarstellungen und rechtliche Risiken**:
+   - Verwendung von generellen Begriffen wie "übertariflich" oder "attraktiv" statt spezifischer Prozentsätze (30-50%) reduziert rechtliche Risiken
+   - Vermeidung konkreter Vergütungsangaben (wie "15.000€/Monat") schützt vor möglichen rechtlichen Herausforderungen bei nicht erreichbaren Einkommenszusagen
+   - Marketingaussagen zu Vergütungen sollten stets allgemein gehalten werden, um Missverständnisse zu vermeiden
+   - Bei Stellenangeboten in Demo-Daten sollten keine konkreten Prozentsätze verwendet werden, die als verbindliche Zusagen missverstanden werden könnten
+
+2. **Transparenz in der Kommunikation**:
+   - Klare Formulierungen zu Vorteilen (wie "übertarifliche Vergütung") sind präzisen Zahlenangaben vorzuziehen
+   - Fokussierung auf qualitative Vorteile (Flexibilität, direkte Kommunikation) anstatt auf quantitative Vergütungsangaben
+   - Konsistenz in allen Plattformbereichen (Homepage, Bulletin Board, Seed-Daten) bezüglich der Art der Vergütungsdarstellung
+   - Sorgfältige Prüfung aller Marketingtexte auf potentiell problematische Einkommensversprechen 

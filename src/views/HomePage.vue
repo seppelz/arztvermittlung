@@ -108,7 +108,7 @@
             </div>
             <h3 class="text-xl font-bold text-primary-800 mb-3">Übertarifliche Vergütung</h3>
             <p class="text-neutral-600">
-              Ärzte erhalten für kurzfristige Einsätze 30-50% über der regulären Vergütung. Kliniken sparen trotzdem im Vergleich zu klassischen Personaldienstleistern.
+              Ärzte erhalten für kurzfristige Einsätze eine attraktive übertarifliche Vergütung. Kliniken sparen trotzdem im Vergleich zu klassischen Personaldienstleistern.
             </p>
           </div>
 
@@ -304,7 +304,7 @@
               Bereit für übertarifliche Kurzeinsätze?
             </h2>
             <p class="text-xl text-white/90 mb-8">
-              Ärzte: Erhöhen Sie Ihr Einkommen durch flexible Kurzeinsätze (1 Woche bis 3 Monate) mit 30-50% Honorarzuschlag. Kliniken: Überbrücken Sie Personalengpässe schnell und unkompliziert mit qualifizierten Fachärzten.
+              Ärzte: Erhöhen Sie Ihr Einkommen durch flexible Kurzeinsätze (1 Woche bis 3 Monate) mit attraktivem Honorarzuschlag. Kliniken: Überbrücken Sie Personalengpässe schnell und unkompliziert mit qualifizierten Fachärzten.
             </p>
             <div class="flex flex-wrap justify-center gap-4">
               <router-link :to="{ name: 'ForDoctors' }" class="btn-white text-lg px-8 py-3 bg-white text-secondary-700 hover:bg-neutral-100">
@@ -335,9 +335,9 @@
               Stellenangebot
             </div>
             <div class="p-6">
-              <h3 class="text-xl font-bold text-primary-800 mb-3">Facharzt Anästhesie – 8 Wochen (+50%)</h3>
+              <h3 class="text-xl font-bold text-primary-800 mb-3">Facharzt Anästhesie – 8 Wochen (übertariflich)</h3>
               <p class="text-neutral-600 mb-4 line-clamp-3">
-                Universitätsklinikum Frankfurt sucht für Juli-August 2025 einen Facharzt für Anästhesie. Vergütung 50% über Tarif, flexible Arbeitszeiten, Unterkunft kann gestellt werden.
+                Universitätsklinikum Frankfurt sucht für Juli-August 2025 einen Facharzt für Anästhesie. Übertarifliche Vergütung, flexible Arbeitszeiten, Unterkunft kann gestellt werden.
               </p>
               <div class="flex justify-between items-center">
                 <span class="text-sm text-neutral-500">Vor 2 Tagen</span>
@@ -373,7 +373,7 @@
             <div class="p-6">
               <h3 class="text-xl font-bold text-primary-800 mb-3">Kurzzeitvertretung Gynäkologie (6 Wochen)</h3>
               <p class="text-neutral-600 mb-4 line-clamp-3">
-                Praxisklinik in Berlin sucht für den Zeitraum 15.08.-30.09. eine Vertretung für Gynäkologie. Übertarifliche Vergütung (bis zu 15.000€/Monat), flexible Arbeitszeiten möglich.
+                Praxisklinik in Berlin sucht für den Zeitraum 15.08.-30.09. eine Vertretung für Gynäkologie. Übertarifliche Vergütung, flexible Arbeitszeiten möglich.
               </p>
               <div class="flex justify-between items-center">
                 <span class="text-sm text-neutral-500">Vor 5 Tagen</span>

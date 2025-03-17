@@ -12,9 +12,9 @@
             class="flex items-center gap-2 font-bold text-2xl no-underline hover:no-underline"
           >
             <img
-              src="@/assets/logo.svg"
+              src="/Med-MATCH.png"
               alt="MedMatch Logo"
-              class="h-9 w-auto"
+              class="h-12 w-auto"
             />
             <span class="hidden md:block">MedMatch</span>
           </router-link>
@@ -51,18 +51,18 @@
             Pinnwand
           </router-link>
           <router-link
+            :to="{ name: 'Arztboerse' }"
+            class="nav-link"
+            active-class="nav-link-active"
+          >
+            Arztbörse
+          </router-link>
+          <router-link
             :to="{ name: 'About' }"
             class="nav-link"
             active-class="nav-link-active"
           >
             Über uns
-          </router-link>
-          <router-link
-            :to="{ name: 'Team' }"
-            class="nav-link"
-            active-class="nav-link-active"
-          >
-            Team
           </router-link>
           <router-link
             :to="{ name: 'Contact' }"
@@ -193,20 +193,20 @@
             Pinnwand
           </router-link>
           <router-link
+            :to="{ name: 'Arztboerse' }"
+            @click="mobileMenuOpen = false"
+            class="mobile-nav-link"
+            active-class="mobile-nav-link-active"
+          >
+            Arztbörse
+          </router-link>
+          <router-link
             :to="{ name: 'About' }"
             @click="mobileMenuOpen = false"
             class="mobile-nav-link"
             active-class="mobile-nav-link-active"
           >
             Über uns
-          </router-link>
-          <router-link
-            :to="{ name: 'Team' }"
-            @click="mobileMenuOpen = false"
-            class="mobile-nav-link"
-            active-class="mobile-nav-link-active"
-          >
-            Team
           </router-link>
           <router-link
             :to="{ name: 'Contact' }"

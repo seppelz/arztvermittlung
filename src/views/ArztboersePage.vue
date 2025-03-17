@@ -2,9 +2,10 @@
   <div>
     <section class="bg-dark text-white py-12">
       <div class="container mx-auto px-4">
-        <h1 class="text-4xl md:text-5xl font-extrabold mb-4 leading-tight">Pinnwand</h1>
+        <h1 class="text-4xl md:text-5xl font-extrabold mb-4 leading-tight">Arztbörse</h1>
         <p class="text-xl max-w-3xl">
-          Hier finden Sie Informationen und Ankündigungen rund um medizinische Fortbildungen, Veranstaltungen und andere berufsrelevante Themen.
+          Hier finden Ärzte und Einrichtungen kurzfristige Einsätze (1 Woche bis 3 Monate). 
+          Ärzte profitieren von übertariflichen Vergütungen, Kliniken lösen Personalengpässe schnell und unkompliziert.
         </p>
       </div>
     </section>
@@ -14,8 +15,30 @@
         <!-- Filter-Optionen -->
         <div class="max-w-7xl mx-auto mb-8">
           <div class="bg-white rounded-lg shadow-md p-4 flex flex-wrap gap-4 items-center border border-gray-200">
+            <h3 class="text-lg font-bold text-heading mr-4">Filter:</h3>
+            
             <div class="flex items-center space-x-2">
-              <h3 class="text-lg font-bold text-heading mr-4">Informationen</h3>
+              <button 
+                @click="filterMessages('all')" 
+                class="px-4 py-2 rounded-lg transition-colors shadow-sm"
+                :class="currentFilter === 'all' ? 'bg-primary text-white font-bold' : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-300'"
+              >
+                Alle
+              </button>
+              <button 
+                @click="filterMessages('Angebot')" 
+                class="px-4 py-2 rounded-lg transition-colors shadow-sm"
+                :class="currentFilter === 'Angebot' ? 'bg-success text-white font-bold' : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-300'"
+              >
+                Angebote
+              </button>
+              <button 
+                @click="filterMessages('Gesuch')" 
+                class="px-4 py-2 rounded-lg transition-colors shadow-sm"
+                :class="currentFilter === 'Gesuch' ? 'bg-primary text-white font-bold' : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-300'"
+              >
+                Gesuche
+              </button>
             </div>
             
             <div class="ml-auto flex items-center">
@@ -36,7 +59,7 @@
         <!-- Nachrichten-Grid -->
         <div class="max-w-7xl mx-auto mb-16">
           <div v-if="filteredMessages.length === 0" class="text-center py-8">
-            <p class="text-gray-500 text-lg">Keine Informationen gefunden. Erstellen Sie die erste!</p>
+            <p class="text-gray-500 text-lg">Keine Angebote oder Gesuche gefunden. Erstellen Sie die erste!</p>
           </div>
           
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -45,11 +68,23 @@
               :key="message.id" 
               class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-strong transition-shadow duration-300 flex flex-col border border-gray-200"
             >
-              <div class="h-2 w-full bg-warning"></div>
+              <div 
+                class="h-2 w-full" 
+                :class="{
+                  'bg-success': message.messageType === 'Angebot',
+                  'bg-primary': message.messageType === 'Gesuch'
+                }"
+              ></div>
               <div class="p-6 flex-grow">
                 <div class="flex justify-between items-start mb-3">
-                  <span class="inline-block px-3 py-1 text-xs font-bold rounded-full bg-warning bg-opacity-20 text-warning border border-warning">
-                    Information
+                  <span 
+                    class="inline-block px-3 py-1 text-xs font-bold rounded-full" 
+                    :class="{
+                      'bg-success bg-opacity-20 text-success border border-success': message.messageType === 'Angebot',
+                      'bg-primary bg-opacity-20 text-primary border border-primary': message.messageType === 'Gesuch'
+                    }"
+                  >
+                    {{ message.messageType }}
                   </span>
                   <span class="text-sm text-gray-500">{{ formatDate(message.timestamp) }}</span>
                 </div>
@@ -108,7 +143,7 @@
         
         <!-- Neue Nachricht erstellen - Breiteres, kompakteres Formular -->
         <div class="max-w-7xl mx-auto bg-white rounded-lg shadow-strong p-6 mb-8 border border-gray-200">
-          <h2 class="text-2xl md:text-3xl font-bold mb-6 text-center text-heading border-b-2 border-primary pb-3">Neue Information erstellen</h2>
+          <h2 class="text-2xl md:text-3xl font-bold mb-6 text-center text-heading border-b-2 border-primary pb-3">Neues Angebot/Gesuch erstellen</h2>
           
           <form @submit.prevent="submitMessage" class="space-y-5">
             <!-- Zwei-Spalten-Layout für kompakteren Look -->
@@ -145,7 +180,7 @@
                   v-model="newMessage.title" 
                   required 
                   class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm"
-                  placeholder="Titel Ihrer Information"
+                  placeholder="Titel Ihres Angebots/Gesuchs"
                 />
               </div>
             </div>
@@ -157,11 +192,16 @@
                 v-model="newMessage.userType" 
                 required 
                 class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm appearance-none"
+                @change="determineMessageType"
               >
                 <option value="">Bitte wählen</option>
                 <option value="Arzt">Arzt</option>
                 <option value="Klinik">Klinik/Einrichtung</option>
               </select>
+              <p v-if="newMessage.userType" class="text-sm mt-1 text-gray-600">
+                <span v-if="newMessage.userType === 'Arzt'">Sie erstellen ein <strong class="text-primary">Gesuch</strong>.</span>
+                <span v-if="newMessage.userType === 'Klinik'">Sie erstellen ein <strong class="text-success">Angebot</strong>.</span>
+              </p>
             </div>
             
             <div>
@@ -172,7 +212,7 @@
                 required 
                 rows="4" 
                 class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm"
-                placeholder="Ihre Information hier..."
+                placeholder="Ihr Angebot/Gesuch hier..."
               ></textarea>
             </div>
             
@@ -189,14 +229,14 @@
                 class="bg-primary hover:bg-primary-dark text-white font-bold py-2 px-8 rounded-lg shadow-strong transition-colors duration-300 text-lg transform hover:scale-105"
                 :disabled="isSubmitting"
               >
-                {{ isSubmitting ? 'Wird gesendet...' : 'Information veröffentlichen' }}
+                {{ isSubmitting ? 'Wird gesendet...' : newMessage.userType === 'Arzt' ? 'Gesuch veröffentlichen' : newMessage.userType === 'Klinik' ? 'Angebot veröffentlichen' : 'Veröffentlichen' }}
               </button>
             </div>
           </form>
           
           <div v-if="messageSent" class="mt-6 p-4 bg-success bg-opacity-10 text-success rounded-lg border-2 border-success">
-            <p class="font-semibold">Vielen Dank für Ihre Information!</p>
-            <p>Ihre Information wurde erfolgreich veröffentlicht.</p>
+            <p class="font-semibold">Vielen Dank für Ihre Nachricht!</p>
+            <p>Ihre Nachricht wurde erfolgreich veröffentlicht.</p>
           </div>
         </div>
       </div>
@@ -206,7 +246,7 @@
     <div v-if="showContactModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div class="bg-white rounded-lg shadow-xl p-8 max-w-lg w-full mx-4">
         <h3 class="text-2xl font-bold mb-4 text-heading border-b-2 border-primary pb-3">Kontakt aufnehmen</h3>
-        <p class="mb-6">Sie möchten Kontakt mit <strong>{{ selectedMessage.name }}</strong> aufnehmen bezüglich der Information: <strong>{{ selectedMessage.title }}</strong></p>
+        <p class="mb-6">Sie möchten Kontakt mit <strong>{{ selectedMessage.name }}</strong> aufnehmen bezüglich der Nachricht: <strong>{{ selectedMessage.title }}</strong></p>
         
         <form @submit.prevent="sendContact" class="space-y-4">
           <div>
@@ -248,45 +288,68 @@
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
 
-// Beispieldaten für die Demonstration - nur Informationen
+// Beispieldaten für die Demonstration - nur Angebote und Gesuche
 const demoMessages = [
   {
-    id: 4,
-    name: 'Dr. Thomas Schmidt',
-    email: 't.schmidt@mail.de',
+    id: 1,
+    name: 'Klinikum München',
+    email: 'personal@klinikum-muenchen.de',
+    userType: 'Klinik',
+    messageType: 'Angebot',
+    title: 'Vertretung Notfallmedizin (2 Wochen) - übertarifliche Vergütung',
+    content: 'Suchen dringend Vertretung für unsere Notfallstation vom 15.-29.06.2025. Erfahrung in Notfallmedizin erforderlich. Übertarifliche Vergütung, Unterkunft wird gestellt.',
+    timestamp: new Date('2025-05-15T10:30:00'),
+    privacyPolicyAccepted: true
+  },
+  {
+    id: 2,
+    name: 'Dr. Julia Weber',
+    email: 'j.weber@arztpraxis.de',
     userType: 'Arzt',
-    messageType: 'Information',
-    title: 'Fachärztliche Vertretungs-Pool Radiologie',
-    content: 'Organisiere Vertretungs-Pool für kurzfristige Radiologie-Einsätze (max. 3 Monate). Über 20 Kolleginnen und Kollegen bereits dabei. Interessierte Radiologen und Kliniken können mich kontaktieren.',
-    timestamp: new Date('2025-05-08T11:20:00'),
+    messageType: 'Gesuch',
+    title: 'Anästhesist verfügbar für Kurzeinsätze bis 4 Wochen',
+    content: 'Facharzt für Anästhesie mit 8 Jahren Erfahrung sucht Kurzeinsätze (1-4 Wochen) im Raum Köln ab sofort. Flexibel und kurzfristig verfügbar, auch Wochenenddienste möglich.',
+    timestamp: new Date('2025-05-12T15:45:00'),
     privacyPolicyAccepted: true
   },
   {
-    id: 7,
-    name: 'Ärztekammer Berlin',
-    email: 'fortbildung@aerztekammer-berlin.de',
+    id: 3,
+    name: 'Universitätsklinikum Hamburg',
+    email: 'karriere@uk-hamburg.de',
     userType: 'Klinik',
-    messageType: 'Information',
-    title: 'Fortbildung: Aktuelle Entwicklungen in der Notfallmedizin',
-    content: 'Die Ärztekammer Berlin bietet am 15.-16.07.2025 eine zertifizierte Fortbildung zu aktuellen Entwicklungen in der Notfallmedizin an. 16 CME-Punkte. Begrenzte Teilnehmerzahl, frühzeitige Anmeldung empfohlen.',
-    timestamp: new Date('2025-05-01T10:00:00'),
+    messageType: 'Angebot',
+    title: 'Kardiologie - 3-Monats-Vertretung (übertariflich)',
+    content: 'Suchen für den Zeitraum 01.07.-30.09.2025 Facharzt (m/w/d) für unsere kardiologische Abteilung. Übertarifliche Vergütung, Dienstwohnung möglich, flexible Dienstplangestaltung.',
+    timestamp: new Date('2025-05-10T09:15:00'),
     privacyPolicyAccepted: true
   },
   {
-    id: 8,
-    name: 'Medizinische Hochschule Hannover',
-    email: 'kongress@mh-hannover.de',
+    id: 5,
+    name: 'Rehaklinik Schwarzwald',
+    email: 'personal@rehaklinik-schwarzwald.de',
     userType: 'Klinik',
-    messageType: 'Information',
-    title: 'Internationaler Kongress für Innere Medizin',
-    content: 'Vom 10.-12.09.2025 findet an der MH Hannover der 35. Internationale Kongress für Innere Medizin statt. Themenschwerpunkte: Kardiologie, Gastroenterologie, Endokrinologie. Anmeldung ab sofort möglich.',
-    timestamp: new Date('2025-04-28T14:30:00'),
+    messageType: 'Angebot',
+    title: 'Honorarärzte für Wochenenddienste (übertariflich)',
+    content: 'Suchen regelmäßig Honorarärzte für Wochenenddienste (Fr-So). Attraktives Honorar, Unterkunft inklusive. Fachrichtung: Innere Medizin, Allgemeinmedizin.',
+    timestamp: new Date('2025-05-05T14:10:00'),
+    privacyPolicyAccepted: true
+  },
+  {
+    id: 6,
+    name: 'Dr. Sarah Müller',
+    email: 's.mueller@gmail.com',
+    userType: 'Arzt',
+    messageType: 'Gesuch',
+    title: 'Kinderärztin für 3-Monats-Einsätze verfügbar',
+    content: 'Fachärztin für Pädiatrie mit 12 Jahren Berufserfahrung sucht Vertretungsstellen oder Projekteinsätze für 1-3 Monate im Raum Berlin/Brandenburg. Flexible Zeiteinteilung, auch kurzfristig verfügbar.',
+    timestamp: new Date('2025-05-03T16:30:00'),
     privacyPolicyAccepted: true
   }
 ];
 
 // Zustandsvariablen
 const messages = ref([...demoMessages]);
+const currentFilter = ref('all');
 const sortOrder = ref('newest');
 const currentPage = ref(1);
 const itemsPerPage = 6;
@@ -300,7 +363,7 @@ const newMessage = reactive({
   name: '',
   email: '',
   userType: '',
-  messageType: 'Information', // Always set to Information
+  messageType: '', // Will be set automatically based on userType
   title: '',
   content: '',
   privacyPolicyAccepted: false
@@ -316,8 +379,13 @@ const contactForm = reactive({
 const filteredMessages = computed(() => {
   let result = [...messages.value];
   
-  // Only show Information messages
-  result = result.filter(msg => msg.messageType === 'Information');
+  // Show only Angebot and Gesuch messages
+  result = result.filter(msg => msg.messageType === 'Angebot' || msg.messageType === 'Gesuch');
+  
+  // Filtern nach Nachrichtentyp
+  if (currentFilter.value !== 'all') {
+    result = result.filter(msg => msg.messageType === currentFilter.value);
+  }
   
   // Sortieren
   result.sort((a, b) => {
@@ -335,16 +403,29 @@ const filteredMessages = computed(() => {
 });
 
 const totalPages = computed(() => {
-  let filteredTotal = messages.value.filter(msg => msg.messageType === 'Information');
+  let filteredTotal = messages.value.filter(msg => msg.messageType === 'Angebot' || msg.messageType === 'Gesuch');
+  if (currentFilter.value !== 'all') {
+    filteredTotal = filteredTotal.filter(msg => msg.messageType === currentFilter.value);
+  }
   return Math.ceil(filteredTotal.length / itemsPerPage);
 });
 
 // Methoden
+function determineMessageType() {
+  if (newMessage.userType === 'Arzt') {
+    newMessage.messageType = 'Gesuch';
+  } else if (newMessage.userType === 'Klinik') {
+    newMessage.messageType = 'Angebot';
+  } else {
+    newMessage.messageType = '';
+  }
+}
+
 function submitMessage() {
   isSubmitting.value = true;
   
-  // Always set messageType to Information
-  newMessage.messageType = 'Information';
+  // Set messageType based on userType
+  determineMessageType();
   
   // Simuliere API-Aufruf
   setTimeout(() => {
@@ -363,8 +444,6 @@ function submitMessage() {
     Object.keys(newMessage).forEach(key => {
       if (typeof newMessage[key] === 'boolean') {
         newMessage[key] = false;
-      } else if (key === 'messageType') {
-        newMessage[key] = 'Information';
       } else {
         newMessage[key] = '';
       }
@@ -378,6 +457,11 @@ function submitMessage() {
       messageSent.value = false;
     }, 3000);
   }, 1000);
+}
+
+function filterMessages(filter) {
+  currentFilter.value = filter;
+  currentPage.value = 1; // Zurück zur ersten Seite
 }
 
 function sortMessages() {

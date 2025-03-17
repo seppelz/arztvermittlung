@@ -6,9 +6,9 @@
         <div class="col-span-1 md:col-span-2">
           <div class="flex items-center gap-2 mb-4">
             <img
-              src="@/assets/logo.svg"
+              src="/Med-MATCH.png"
               alt="MedMatch Logo"
-              class="h-10 w-auto"
+              class="h-12 w-auto"
             />
             <span class="text-xl font-bold text-white">MedMatch</span>
           </div>

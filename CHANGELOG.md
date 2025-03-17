@@ -23,6 +23,10 @@ All notable changes to this project will be documented in this file.
 - Improved footer text visibility by changing text colors from neutral-200/300 to white for better contrast
 - Enhanced footer section borders with increased opacity for better visual separation
 - Improved social media icons in footer with higher contrast background colors
+- Updated site logo in header to new Med-MATCH.png for improved brand identity
+- Increased logo size in header and footer for better visibility and brand recognition
+- Streamlined navigation by removing Team menu item for more focused user experience
+- Removed specific percentage claims about doctor earnings to avoid potential legal issues
 
 ### Security
 - Changed MongoDB Atlas password to improve database security
@@ -41,6 +45,11 @@ All notable changes to this project will be documented in this file.
 - Created test scripts for MongoDB Atlas connection testing
 - Added seed script for creating test users in MongoDB Atlas
 - Added production environment configuration for Vercel deployment
+- Split bulletin board functionality into two separate pages: "Pinnwand" for information messages and "Arztbörse" for job offers and requests
+- Created dedicated "Arztbörse" page to handle job offers from clinics and job requests from doctors
+- New menu item "Arztbörse" in main navigation for direct access to the job marketplace
+- Automatic message type determination based on user type in Arztbörse (Clinic → Angebot, Doctor → Gesuch)
+- Simplified post creation process with clearer user guidance based on user type
 
 ### Hinzugefügt
 - Admin-Komponente für die Benutzerverwaltung mit Filter-, Such- und Paginierungsfunktionen

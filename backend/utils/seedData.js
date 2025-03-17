@@ -154,8 +154,8 @@ const createBulletins = async (users) => {
     const bulletins = [
       // Angebote von Kliniken
       {
-        title: 'Vertretung Notfallmedizin (2 Wochen) - +30% Vergütung',
-        content: 'Suchen dringend Vertretung für unsere Notfallstation vom 15.-29.06.2025. Erfahrung in Notfallmedizin erforderlich. +30% über regulärem Tarif, Unterkunft wird gestellt.',
+        title: 'Vertretung Notfallmedizin (2 Wochen) - übertarifliche Vergütung',
+        content: 'Suchen dringend Vertretung für unsere Notfallstation vom 15.-29.06.2025. Erfahrung in Notfallmedizin erforderlich. Übertarifliche Vergütung, Unterkunft wird gestellt.',
         name: hospitals[0].name,
         email: hospitals[0].email,
         userId: hospitals[0]._id,
@@ -166,7 +166,7 @@ const createBulletins = async (users) => {
       },
       {
         title: 'Kardiologie - 3-Monats-Vertretung (übertariflich)',
-        content: 'Suchen für den Zeitraum 01.07.-30.09.2025 Facharzt (m/w/d) für unsere kardiologische Abteilung. Vergütung 40% über TV-Ärzte, Dienstwohnung möglich, flexible Dienstplangestaltung.',
+        content: 'Suchen für den Zeitraum 01.07.-30.09.2025 Facharzt (m/w/d) für unsere kardiologische Abteilung. Übertarifliche Vergütung, Dienstwohnung möglich, flexible Dienstplangestaltung.',
         name: hospitals[1].name,
         email: hospitals[1].email,
         userId: hospitals[1]._id,

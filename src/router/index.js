@@ -55,6 +55,11 @@ const routes = [
     component: () => import('@/views/BulletinBoardPage.vue')
   },
   {
+    path: '/arztboerse',
+    name: 'Arztboerse',
+    component: () => import('@/views/ArztboersePage.vue')
+  },
+  {
     path: '/privacy',
     name: 'Privacy',
     component: () => import('@/views/PrivacyPage.vue')
