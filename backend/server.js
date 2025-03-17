@@ -15,6 +15,13 @@ const app = express();
 
 // Determine CORS configuration based on environment
 const isProduction = process.env.NODE_ENV === 'production';
+console.log('------------------------------------------------------------');
+console.log(`Environment: ${process.env.NODE_ENV}`);
+console.log(`Production mode: ${isProduction}`);
+console.log(`MongoDB URI: ${process.env.MONGODB_URI ? 'Set (first few chars: ' + process.env.MONGODB_URI.substring(0, 20) + '...)' : 'Not set'}`);
+console.log(`JWT Secret: ${process.env.JWT_SECRET ? 'Set (length: ' + process.env.JWT_SECRET.length + ')' : 'Not set'}`);
+console.log(`Port: ${process.env.PORT || 5000}`);
+console.log('------------------------------------------------------------');
 
 // Enhanced CORS configuration
 if (isProduction) {
@@ -58,6 +65,16 @@ app.use('/api/auth', authRoutes);
 app.use('/api/bulletin', bulletinRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/contacts', contactRoutes);
+
+// Add a test route to verify the server is running correctly
+app.get('/api/status', (req, res) => {
+  res.json({
+    status: 'ok',
+    environment: process.env.NODE_ENV,
+    time: new Date().toISOString(),
+    cors: isProduction ? 'all-origins' : 'restricted-list'
+  });
+});
 
 // Generische Fehlerbehandlung
 app.use((err, req, res, next) => {

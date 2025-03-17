@@ -103,6 +103,7 @@ All notable changes to this project will be documented in this file.
 - Verbesserte Anzeige von Zeitstempeln bei Bulletin-Board Einträgen
 - Verbesserte Backend-Connection zu MongoDB Atlas durch Aktualisierung der SSL/TLS-Konfiguration
 - Integration der Pinnwand-Einträge auf der Homepage mit Live-Daten vom API mit Fallback zu Demo-Daten
+- Erweiterte Server-Logs für bessere Diagnose von Produktions- und Entwicklungsumgebungen
 
 ### Behoben
 - Fehlende Registrierungsfunktion im Backend hinzugefügt
@@ -217,3 +218,4 @@ All notable changes to this project will be documented in this file.
 - Dedizierte Seite für Stellengesuche
 - Darstellung von Stellenanzeigen auf der Startseite
 - Funktionalität zum Senden von Kontaktanfragen zu Pinnwand-Einträgen
+- Status-API-Endpunkt für einfache Server- und Umgebungsüberprüfung
