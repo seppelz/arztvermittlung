@@ -674,3 +674,11 @@ This file documents new insights and knowledge gained while working on this proj
    - Outdated events should be replaced with current ones to maintain platform freshness
    - A strategy for cycling demo content keeps the platform looking current even with minimal user activity
    - Documentation should include information about the source and validity of demo data 
+
+## API URL Configuration Best Practices
+
+- **Consistent API URL Strategy**: Ensure all components that make API calls use the same configuration strategy. Inconsistent API URL handling can lead to hard-to-diagnose CORS errors in production environments.
+- **Global Configuration Priority**: Always check the global configuration (window.MED_MATCH_CONFIG?.apiUrl) first, then fall back to environment variables, and finally to a default value.
+- **URL Construction Helper**: Implement a reusable helper function for API URL construction to avoid duplicating the configuration logic across components.
+- **Logging for Debugging**: Include appropriate logging in API helpers to aid in diagnosing issues in different environments.
+- **Production Testing**: Always test API integrations in a production-like environment to catch CORS and API URL related issues before deployment. 

@@ -300,18 +300,13 @@ const loadError = ref(null);
 
 // API URL construction helper
 const getApiUrl = (endpoint) => {
-  const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+  const baseUrl = window.MED_MATCH_CONFIG?.apiUrl || 
+    import.meta.env.VITE_API_URL ||
+    'http://localhost:5000/api';
   
-  // Log environment info for debugging
-  console.log(`Environment: ${import.meta.env.VITE_NODE_ENV}`);
-  console.log(`Base URL from env: ${baseUrl}`);
+  console.log(`Using API URL from ${window.MED_MATCH_CONFIG?.apiUrl ? 'global config' : 'environment'}: ${baseUrl}`);
   
-  // Properly handle URLs that already include /api
-  if (baseUrl.includes('/api')) {
-    return `${baseUrl}/${endpoint}`;
-  } else {
-    return `${baseUrl}/api/${endpoint}`;
-  }
+  return `${baseUrl}/${endpoint}`;
 };
 
 // Fetch actual bulletin board entries from the API

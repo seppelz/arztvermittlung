@@ -31,6 +31,10 @@ All notable changes to this project will be documented in this file.
 - Improved MongoDB Atlas connection security by removing unnecessary SSL/TLS options
 - Enhanced API URL handling for custom domain with robust fallback system
 - Updated demo data with real medical congress information for more accurate content
+- Updated demo data with real medical congress information for more accurate content
+- Enhanced hero section with better spacing and readability
+- Improved MongoDB connection configuration for better reliability
+- Better handling of API URL configuration across components
 
 ### Security
 - Changed MongoDB Atlas password to improve database security
@@ -48,6 +52,8 @@ All notable changes to this project will be documented in this file.
 - Fixed inconsistency between what the seeding script detected as "existing" entries
 - Fixed API URL construction in frontend components to handle both development and production environments
 - Fixed custom domain API URL configuration with global runtime configuration approach
+- Fixed API URL configuration in BulletinBoardPage.vue to use the global config before falling back to environment variables
+- Fixed CORS issue when adding new bulletin entries
 
 ### Added
 - Created test scripts for MongoDB Atlas connection testing
@@ -62,6 +68,7 @@ All notable changes to this project will be documented in this file.
 - Database content inspection script for debugging database state
 - Backend README with documentation for seeding and API endpoints
 - Improved error handling for API requests in frontend components
+- Added NewKnowledgeBase.md to document lessons learned and best practices
 
 ### Hinzugefügt
 - Admin-Komponente für die Benutzerverwaltung mit Filter-, Such- und Paginierungsfunktionen
