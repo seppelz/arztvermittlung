@@ -4,6 +4,10 @@ const Bulletin = require('../models/bulletin.model');
 const Contact = require('../models/contact.model');
 require('dotenv').config();
 
+// Parse command line arguments
+const args = process.argv.slice(2);
+const FORCE_SEED = args.includes('--force');
+
 const connectDB = async () => {
   try {
     await mongoose.connect(process.env.MONGODB_URI, {
@@ -21,23 +25,54 @@ const connectDB = async () => {
 const clearCollections = async () => {
   try {
     // Only clear the collections we're going to seed
-    await Bulletin.deleteMany({});
-    await Contact.deleteMany({});
-    console.log('Collections cleared.');
+    if (FORCE_SEED) {
+      await Bulletin.deleteMany({});
+      await Contact.deleteMany({});
+      console.log('Collections cleared for forced seeding.');
+    }
   } catch (err) {
     console.error('Error clearing collections:', err);
     process.exit(1);
   }
 };
 
+// Check the User schema to ensure we're using the correct fields
+const inspectUserSchema = () => {
+  const userSchema = User.schema.obj;
+  console.log('User schema required fields:');
+  Object.keys(userSchema).forEach(key => {
+    const field = userSchema[key];
+    if (field.required) {
+      console.log(`- ${key}: ${field.type.name} (required)`);
+    }
+  });
+};
+
+// Inspect contact schema
+const inspectContactSchema = () => {
+  const contactSchema = Contact.schema.obj;
+  console.log('Contact schema status enum values:');
+  if (contactSchema.status && contactSchema.status.enum) {
+    console.log('Status enum values:', contactSchema.status.enum);
+  } else {
+    console.log('Status field does not have enum values defined');
+  }
+};
+
 const seedDummyUsers = async () => {
   try {
+    // Inspect schema to understand required fields
+    inspectUserSchema();
+    
     // Check if we already have users
     const existingUsers = await User.countDocuments();
-    if (existingUsers > 0) {
+    if (existingUsers > 0 && !FORCE_SEED) {
       console.log(`${existingUsers} users already exist. Skipping user seeding.`);
       return;
     }
+
+    // Get actual status values from schema to avoid enum errors
+    const statusValues = User.schema.path('isVerified') ? [true, false] : [];
 
     const users = [
       {
@@ -45,26 +80,51 @@ const seedDummyUsers = async () => {
         email: 'gast@med-match.de',
         password: '$2a$10$QlwUJNvBSxiV4GnE4PxM1u2qZkxUB22d7aY9G9j2jjFwHGD1bF3Oq', // "password" hashed
         userType: 'Gast',
-        isVerified: true
+        isVerified: true,
+        username: 'gast' // Add username field which appears to be required
       },
       {
         name: 'Dr. Andreas Müller',
         email: 'dr.mueller@med-match.de',
         password: '$2a$10$QlwUJNvBSxiV4GnE4PxM1u2qZkxUB22d7aY9G9j2jjFwHGD1bF3Oq', // "password" hashed
         userType: 'Arzt',
-        isVerified: true
+        isVerified: true,
+        username: 'dr.mueller'
       },
       {
         name: 'Universitätsklinikum Dresden',
         email: 'personal@uniklinikum-dresden.de',
         password: '$2a$10$QlwUJNvBSxiV4GnE4PxM1u2qZkxUB22d7aY9G9j2jjFwHGD1bF3Oq', // "password" hashed
         userType: 'Klinik',
-        isVerified: true
+        isVerified: true,
+        username: 'uniklinikum'
       }
     ];
 
-    await User.insertMany(users);
-    console.log(`${users.length} users seeded.`);
+    // If forcing, only insert if not already present (by email)
+    if (FORCE_SEED) {
+      for (const user of users) {
+        const exists = await User.findOne({ email: user.email });
+        if (!exists) {
+          try {
+            await User.create(user);
+            console.log(`Created user: ${user.name}`);
+          } catch (err) {
+            console.error(`Error creating user ${user.email}:`, err.message);
+          }
+        } else {
+          console.log(`User ${user.email} already exists, skipping.`);
+        }
+      }
+    } else {
+      try {
+        await User.insertMany(users);
+      } catch (err) {
+        console.error('Error inserting users:', err.message);
+      }
+    }
+    
+    console.log(`User seeding completed.`);
   } catch (err) {
     console.error('Error seeding users:', err);
   }
@@ -74,7 +134,7 @@ const seedBulletinEntries = async () => {
   try {
     // Check if we already have bulletin entries
     const existingEntries = await Bulletin.countDocuments();
-    if (existingEntries > 0) {
+    if (existingEntries > 0 && !FORCE_SEED) {
       console.log(`${existingEntries} bulletin entries already exist. Skipping bulletin seeding.`);
       return;
     }
@@ -133,8 +193,12 @@ const seedBulletinEntries = async () => {
       }
     ];
 
-    await Bulletin.insertMany(bulletinEntries);
-    console.log(`${bulletinEntries.length} bulletin entries seeded.`);
+    try {
+      await Bulletin.insertMany(bulletinEntries);
+      console.log(`${bulletinEntries.length} bulletin entries seeded.`);
+    } catch (err) {
+      console.error('Error inserting bulletin entries:', err.message);
+    }
   } catch (err) {
     console.error('Error seeding bulletin entries:', err);
   }
@@ -142,14 +206,17 @@ const seedBulletinEntries = async () => {
 
 const seedContactRequests = async () => {
   try {
+    // Inspect contact schema to understand requirements
+    inspectContactSchema();
+    
     // Check if we already have contact requests
     const existingContacts = await Contact.countDocuments();
-    if (existingContacts > 0) {
+    if (existingContacts > 0 && !FORCE_SEED) {
       console.log(`${existingContacts} contact requests already exist. Skipping contact seeding.`);
       return;
     }
 
-    // Create some sample contact requests
+    // Create some sample contact requests with correct enum values
     const contactRequests = [
       {
         name: 'Dr. Maria Schneider',
@@ -158,7 +225,7 @@ const seedContactRequests = async () => {
         recipientName: 'Ärztekammer Berlin',
         recipientEmail: 'fortbildung@aerztekammer-berlin.de',
         messageTitle: 'Fortbildung: Aktuelle Entwicklungen in der Notfallmedizin',
-        status: 'neu',
+        status: 'pending', // Using the actual enum value from schema
         createdAt: new Date('2025-03-12T14:22:00')
       },
       {
@@ -168,13 +235,17 @@ const seedContactRequests = async () => {
         recipientName: 'Dr. Thomas Schmidt',
         recipientEmail: 't.schmidt@facharzt.de',
         messageTitle: 'Fachärztlicher Vertretungs-Pool Radiologie',
-        status: 'beantwortet',
+        status: 'responded', // Using the actual enum value from schema
         createdAt: new Date('2025-03-10T09:45:00')
       }
     ];
 
-    await Contact.insertMany(contactRequests);
-    console.log(`${contactRequests.length} contact requests seeded.`);
+    try {
+      await Contact.insertMany(contactRequests);
+      console.log(`${contactRequests.length} contact requests seeded.`);
+    } catch (err) {
+      console.error('Error inserting contact requests:', err.message);
+    }
   } catch (err) {
     console.error('Error seeding contact requests:', err);
   }
@@ -182,8 +253,10 @@ const seedContactRequests = async () => {
 
 const seedDatabase = async () => {
   await connectDB();
-  // Uncomment if you want to clear collections before seeding
-  // await clearCollections();
+  
+  // Always call clearCollections which will only clear if FORCE_SEED is true
+  await clearCollections();
+  
   await seedDummyUsers();
   await seedBulletinEntries();
   await seedContactRequests();

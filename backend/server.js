@@ -85,14 +85,10 @@ app.use((err, req, res, next) => {
   });
 });
 
-// MongoDB-Verbindung mit aktualisierter SSL/TLS-Konfiguration für Atlas
-mongoose.connect(process.env.MONGODB_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-  tlsAllowInvalidCertificates: true  // Moderner Ersatz für sslValidate: false
-})
+// MongoDB-Verbindung mit aktualisierter Konfiguration für Atlas
+mongoose.connect(process.env.MONGODB_URI)
 .then(() => {
-  console.log('Mit MongoDB verbunden');
+  console.log('Mit MongoDB Atlas verbunden');
   const PORT = process.env.PORT || 5000;
   app.listen(PORT, () => {
     console.log(`Server läuft auf Port ${PORT}`);

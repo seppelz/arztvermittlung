@@ -27,6 +27,8 @@ All notable changes to this project will be documented in this file.
 - Increased logo size in header and footer for better visibility and brand recognition
 - Streamlined navigation by removing Team menu item for more focused user experience
 - Removed specific percentage claims about doctor earnings to avoid potential legal issues
+- Updated MongoDB connection configuration to follow current best practices by removing deprecated options
+- Improved MongoDB Atlas connection security by removing unnecessary SSL/TLS options
 
 ### Security
 - Changed MongoDB Atlas password to improve database security
@@ -40,6 +42,9 @@ All notable changes to this project will be documented in this file.
 - Fixed CORS issues with Vercel deployment by updating API URL configuration
 - Updated CORS configuration to allow requests from Vercel domain
 - Fixed admin login issue by correctly checking the user role in the response structure
+- Fixed seeding script to properly reset and populate empty collections
+- Fixed inconsistency between what the seeding script detected as "existing" entries
+- Fixed API URL construction in frontend components to handle both development and production environments
 
 ### Added
 - Created test scripts for MongoDB Atlas connection testing
@@ -50,6 +55,10 @@ All notable changes to this project will be documented in this file.
 - New menu item "Arztbörse" in main navigation for direct access to the job marketplace
 - Automatic message type determination based on user type in Arztbörse (Clinic → Angebot, Doctor → Gesuch)
 - Simplified post creation process with clearer user guidance based on user type
+- Database seeding mechanism with `--force` option to reset and populate collections
+- Database content inspection script for debugging database state
+- Backend README with documentation for seeding and API endpoints
+- Improved error handling for API requests in frontend components
 
 ### Hinzugefügt
 - Admin-Komponente für die Benutzerverwaltung mit Filter-, Such- und Paginierungsfunktionen

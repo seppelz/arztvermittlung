@@ -578,3 +578,47 @@ This file documents new insights and knowledge gained while working on this proj
 - **Einkommensdarstellung**: Bei der Beschreibung der Vergütung sollten spezifische Beträge vermieden werden; stattdessen sind relative Begriffe wie "übertariflich" zu verwenden.
 
 - **Transparenz in der Kommunikation**: Klare Kommunikation über Registrierungsanforderungen und Datenschutzrichtlinien, um Vertrauen aufzubauen und rechtliche Anforderungen zu erfüllen. 
+
+## Best Practices
+
+- API URL construction should handle both development and production environments by checking if the URL already includes `/api`
+- Command line arguments can be used to modify script behavior (e.g., `--force` flag for seeding)
+- Database seeding scripts should have mechanisms to force reset collections when needed
+- Data validation should happen both in frontend and backend
+- Create helper scripts to inspect and debug database state
+
+## MongoDB & Database Management
+
+- MongoDB collections can appear to have entries when counting documents but still return empty results due to schema mismatches
+- The `mongoose.connection.db.listCollections()` method can help identify what collections actually exist
+- Using `countDocuments()` without filters will count all documents, even if they have schema mismatches
+- Database seeding should preserve existing users but allow recreation of test data
+
+## Architecture
+
+- Separation of concerns between backend API logic and database helper scripts
+- Careful error handling in database operations to prevent script failures
+- Always provide debug/inspection tools alongside data manipulation tools 
+
+## MongoDB Atlas Best Practices
+
+1. **Connection String Configuration**:
+   - Avoid duplicating connection string parameters like `MONGODB_URI=MONGODB_URI=` which can cause connection issues
+   - Store MongoDB connection strings in secure environment variables without hardcoding credentials
+   - Use clear naming convention for database connection environment variables (`MONGODB_URI`)
+
+2. **Modern MongoDB Connection Options**:
+   - Deprecated options like `useNewUrlParser` and `useUnifiedTopology` are no longer needed in newer versions of Mongoose
+   - These options are now default in Mongoose v6+ and including them generates deprecation warnings
+   - Simple `mongoose.connect(uri)` without options is sufficient for most applications
+
+3. **Security Best Practices**:
+   - Avoid using `tlsAllowInvalidCertificates: true` in production environments as it bypasses certificate validation
+   - This option should only be used in development/testing environments when necessary
+   - For production deployments, ensure proper certificate validation is enabled
+   - MongoDB Atlas provides secure connections by default with valid certificates
+
+4. **Environment-specific Configuration**:
+   - Log minimal connection information in production (avoid exposing sensitive parts of connection strings)
+   - Use more verbose logging in development to aid debugging
+   - Implement environment-specific error handling based on NODE_ENV value 
