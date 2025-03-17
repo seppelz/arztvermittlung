@@ -301,9 +301,17 @@ const loadError = ref(null);
 // API URL construction helper
 const getApiUrl = (endpoint) => {
   const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-  return baseUrl.endsWith('/api') 
-    ? `${baseUrl}/${endpoint}` 
-    : `${baseUrl}/api/${endpoint}`;
+  
+  // Log environment info for debugging
+  console.log(`Environment: ${import.meta.env.VITE_NODE_ENV}`);
+  console.log(`Base URL from env: ${baseUrl}`);
+  
+  // Properly handle URLs that already include /api
+  if (baseUrl.includes('/api')) {
+    return `${baseUrl}/${endpoint}`;
+  } else {
+    return `${baseUrl}/api/${endpoint}`;
+  }
 };
 
 // Fetch actual bulletin board entries from the API

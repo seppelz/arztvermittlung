@@ -4,291 +4,193 @@ const Bulletin = require('../models/bulletin.model');
 const Contact = require('../models/contact.model');
 require('dotenv').config();
 
-// MongoDB-Verbindung
-mongoose.connect(process.env.MONGODB_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-})
-.then(() => console.log('Mit MongoDB verbunden'))
-.catch(err => {
-  console.error('MongoDB-Verbindungsfehler:', err);
-  process.exit(1);
-});
-
-// Admin-Benutzer erstellen
-const createAdmins = async () => {
+const connectDB = async () => {
   try {
-    // Bestehende Admin-Benutzer löschen
-    await User.deleteMany({ role: 'admin' });
-    
-    // Neue Admin-Benutzer erstellen
-    const admins = [
-      {
-        username: 'siggi',
-        email: 'siggi@medmatch.de',
-        password: 'Medmatch2023!',
-        name: 'Siggi Admin',
-        role: 'admin',
-        userType: 'Administrator',
-        status: 'active'
-      },
-      {
-        username: 'sebas',
-        email: 'sebas@medmatch.de',
-        password: 'Medmatch2023!',
-        name: 'Sebas Admin',
-        role: 'admin',
-        userType: 'Administrator',
-        status: 'active'
-      }
-    ];
-    
-    const createdAdmins = await User.create(admins);
-    console.log(`${createdAdmins.length} Admin-Benutzer erstellt`);
-    
-    return createdAdmins;
-  } catch (error) {
-    console.error('Fehler beim Erstellen der Admin-Benutzer:', error);
+    await mongoose.connect(process.env.MONGODB_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      tlsAllowInvalidCertificates: true
+    });
+    console.log('MongoDB connected for seeding...');
+  } catch (err) {
+    console.error('MongoDB connection error:', err);
     process.exit(1);
   }
 };
 
-// Demo-Benutzer erstellen
-const createUsers = async () => {
+const clearCollections = async () => {
   try {
-    // Bestehende normale Benutzer löschen
-    await User.deleteMany({ role: 'user' });
-    
-    // Neue Benutzer erstellen
-    const users = [
-      // Ärzte
-      {
-        username: 'drmueller',
-        email: 'dr.mueller@beispiel.de',
-        password: 'Password123!',
-        name: 'Dr. Thomas Müller',
-        phone: '0170-1234567',
-        role: 'user',
-        userType: 'Arzt',
-        specialization: 'Innere Medizin',
-        profileCompleted: true,
-        status: 'active',
-        availability: [
-          {
-            from: new Date('2025-06-01'),
-            to: new Date('2025-08-31'),
-            location: 'Deutschlandweit'
-          }
-        ]
-      },
-      {
-        username: 'drweber',
-        email: 'dr.weber@beispiel.de',
-        password: 'Password123!',
-        name: 'Dr. Julia Weber',
-        phone: '0171-2345678',
-        role: 'user',
-        userType: 'Arzt',
-        specialization: 'Anästhesie',
-        profileCompleted: true,
-        status: 'active',
-        availability: [
-          {
-            from: new Date('2025-07-01'),
-            to: new Date('2025-07-31'),
-            location: 'Köln und Umgebung'
-          }
-        ]
-      },
-      
-      // Kliniken
-      {
-        username: 'klinikmuenchen',
-        email: 'personal@klinikum-muenchen.de',
-        password: 'Password123!',
-        name: 'Klinikum München',
-        phone: '089-12345678',
-        role: 'user',
-        userType: 'Klinik',
-        location: 'München',
-        hospitalSize: 'Groß',
-        profileCompleted: true,
-        status: 'active'
-      },
-      {
-        username: 'uniklinikfrankfurt',
-        email: 'personal@uniklinik-frankfurt.de',
-        password: 'Password123!',
-        name: 'Universitätsklinikum Frankfurt',
-        phone: '069-12345678',
-        role: 'user',
-        userType: 'Klinik',
-        location: 'Frankfurt',
-        hospitalSize: 'Groß',
-        profileCompleted: true,
-        status: 'active'
-      }
-    ];
-    
-    const createdUsers = await User.create(users);
-    console.log(`${createdUsers.length} Benutzer erstellt`);
-    
-    return createdUsers;
-  } catch (error) {
-    console.error('Fehler beim Erstellen der Benutzer:', error);
-    process.exit(1);
-  }
-};
-
-// Demo-Pinnwand-Einträge erstellen
-const createBulletins = async (users) => {
-  try {
-    // Bestehende Pinnwand-Einträge löschen
+    // Only clear the collections we're going to seed
     await Bulletin.deleteMany({});
-    
-    // Ärzte und Kliniken filtern
-    const doctors = users.filter(user => user.userType === 'Arzt');
-    const hospitals = users.filter(user => user.userType === 'Klinik');
-    
-    // Neue Pinnwand-Einträge erstellen
-    const bulletins = [
-      // Angebote von Kliniken
-      {
-        title: 'Vertretung Notfallmedizin (2 Wochen) - übertarifliche Vergütung',
-        content: 'Suchen dringend Vertretung für unsere Notfallstation vom 15.-29.06.2025. Erfahrung in Notfallmedizin erforderlich. Übertarifliche Vergütung, Unterkunft wird gestellt.',
-        name: hospitals[0].name,
-        email: hospitals[0].email,
-        userId: hospitals[0]._id,
-        userType: 'Klinik',
-        messageType: 'Angebot',
-        timestamp: new Date('2025-02-15T10:30:00'),
-        status: 'active'
-      },
-      {
-        title: 'Kardiologie - 3-Monats-Vertretung (übertariflich)',
-        content: 'Suchen für den Zeitraum 01.07.-30.09.2025 Facharzt (m/w/d) für unsere kardiologische Abteilung. Übertarifliche Vergütung, Dienstwohnung möglich, flexible Dienstplangestaltung.',
-        name: hospitals[1].name,
-        email: hospitals[1].email,
-        userId: hospitals[1]._id,
-        userType: 'Klinik',
-        messageType: 'Angebot',
-        timestamp: new Date('2025-02-01T09:15:00'),
-        status: 'active'
-      },
-      
-      // Gesuche von Ärzten
-      {
-        title: 'Anästhesist verfügbar für Kurzeinsätze bis 4 Wochen',
-        content: 'Facharzt für Anästhesie mit 8 Jahren Erfahrung sucht Kurzeinsätze (1-4 Wochen) im Raum Köln ab sofort. Flexibel und kurzfristig verfügbar, auch Wochenenddienste möglich.',
-        name: doctors[1].name,
-        email: doctors[1].email,
-        userId: doctors[1]._id,
-        userType: 'Arzt',
-        messageType: 'Gesuch',
-        timestamp: new Date('2025-01-22T15:45:00'),
-        status: 'active'
-      },
-      {
-        title: 'Internist für Kurzeinsätze bis 3 Monate',
-        content: 'Facharzt für Innere Medizin mit 12 Jahren Berufserfahrung sucht Vertretungsstellen oder Projekteinsätze für 1-3 Monate. Flexible Zeiteinteilung, auch kurzfristig verfügbar.',
-        name: doctors[0].name,
-        email: doctors[0].email,
-        userId: doctors[0]._id,
-        userType: 'Arzt',
-        messageType: 'Gesuch',
-        timestamp: new Date('2025-01-10T11:20:00'),
-        status: 'active'
-      },
-      // Informationen
-      {
-        title: 'Fachärztliche Vertretungs-Pool Radiologie',
-        content: 'Organisiere Vertretungs-Pool für kurzfristige Radiologie-Einsätze (max. 3 Monate). Über 20 Kolleginnen und Kollegen bereits dabei. Interessierte Radiologen und Kliniken können mich kontaktieren.',
-        name: doctors[2] ? doctors[2].name : 'Dr. Thomas Schmidt',
-        email: doctors[2] ? doctors[2].email : 't.schmidt@mail.de',
-        userId: doctors[2] ? doctors[2]._id : null,
-        userType: 'Arzt',
-        messageType: 'Information',
-        timestamp: new Date('2025-02-08T11:20:00'),
-        status: 'active'
-      },
-      {
-        title: 'Fortbildung: Aktuelle Entwicklungen in der Notfallmedizin',
-        content: 'Die Ärztekammer Berlin bietet am 15.-16.07.2025 eine zertifizierte Fortbildung zu aktuellen Entwicklungen in der Notfallmedizin an. 16 CME-Punkte. Begrenzte Teilnehmerzahl, frühzeitige Anmeldung empfohlen.',
-        name: hospitals[2] ? hospitals[2].name : 'Ärztekammer Berlin',
-        email: hospitals[2] ? hospitals[2].email : 'fortbildung@aerztekammer-berlin.de',
-        userId: hospitals[2] ? hospitals[2]._id : null,
-        userType: 'Klinik',
-        messageType: 'Information',
-        timestamp: new Date('2025-01-15T10:00:00'),
-        status: 'active'
-      }
-    ];
-    
-    const createdBulletins = await Bulletin.create(bulletins);
-    console.log(`${createdBulletins.length} Pinnwand-Einträge erstellt`);
-    
-    return createdBulletins;
-  } catch (error) {
-    console.error('Fehler beim Erstellen der Pinnwand-Einträge:', error);
-    process.exit(1);
-  }
-};
-
-// Demo-Kontaktanfragen erstellen
-const createContacts = async (users, bulletins) => {
-  try {
-    // Bestehende Kontaktanfragen löschen
     await Contact.deleteMany({});
-    
-    // Neue Kontaktanfragen erstellen
-    const contacts = [
+    console.log('Collections cleared.');
+  } catch (err) {
+    console.error('Error clearing collections:', err);
+    process.exit(1);
+  }
+};
+
+const seedDummyUsers = async () => {
+  try {
+    // Check if we already have users
+    const existingUsers = await User.countDocuments();
+    if (existingUsers > 0) {
+      console.log(`${existingUsers} users already exist. Skipping user seeding.`);
+      return;
+    }
+
+    const users = [
       {
-        name: users[2].name,
-        email: users[2].email,
-        fromUserId: users[2]._id,
-        toUserId: users[0]._id,
-        relatedPostId: bulletins[3]._id,
-        message: 'Sehr geehrter Dr. Müller, wir suchen dringend eine Vertretung für unsere internistische Abteilung im Juli 2025. Wären Sie in diesem Zeitraum verfügbar?',
-        timestamp: new Date('2025-05-20T09:30:00'),
-        status: 'pending'
+        name: 'Gastbenutzer',
+        email: 'gast@med-match.de',
+        password: '$2a$10$QlwUJNvBSxiV4GnE4PxM1u2qZkxUB22d7aY9G9j2jjFwHGD1bF3Oq', // "password" hashed
+        userType: 'Gast',
+        isVerified: true
       },
       {
-        name: users[3].name,
-        email: users[3].email,
-        fromUserId: users[3]._id,
-        toUserId: users[1]._id,
-        relatedPostId: bulletins[2]._id,
-        message: 'Guten Tag Dr. Weber, wir haben in unserem OP dringenden Bedarf für einen Anästhesisten vom 15.06.-15.07.2025. Hätten Sie Interesse an dieser Position?',
-        timestamp: new Date('2025-05-18T14:15:00'),
-        status: 'viewed'
+        name: 'Dr. Andreas Müller',
+        email: 'dr.mueller@med-match.de',
+        password: '$2a$10$QlwUJNvBSxiV4GnE4PxM1u2qZkxUB22d7aY9G9j2jjFwHGD1bF3Oq', // "password" hashed
+        userType: 'Arzt',
+        isVerified: true
+      },
+      {
+        name: 'Universitätsklinikum Dresden',
+        email: 'personal@uniklinikum-dresden.de',
+        password: '$2a$10$QlwUJNvBSxiV4GnE4PxM1u2qZkxUB22d7aY9G9j2jjFwHGD1bF3Oq', // "password" hashed
+        userType: 'Klinik',
+        isVerified: true
       }
     ];
-    
-    const createdContacts = await Contact.create(contacts);
-    console.log(`${createdContacts.length} Kontaktanfragen erstellt`);
-    
-    return createdContacts;
-  } catch (error) {
-    console.error('Fehler beim Erstellen der Kontaktanfragen:', error);
-    process.exit(1);
+
+    await User.insertMany(users);
+    console.log(`${users.length} users seeded.`);
+  } catch (err) {
+    console.error('Error seeding users:', err);
   }
 };
 
-// Alle Seed-Funktionen ausführen
-const seedAll = async () => {
+const seedBulletinEntries = async () => {
   try {
-    const admins = await createAdmins();
-    const users = await createUsers();
-    const bulletins = await createBulletins([...users]);
-    const contacts = await createContacts([...users], [...bulletins]);
-    
-    console.log('Seed-Daten erfolgreich erstellt');
-    process.exit(0);
-  } catch (error) {
-    console.error('Fehler beim Erstellen der Seed-Daten:', error);
-    process.exit(1);
+    // Check if we already have bulletin entries
+    const existingEntries = await Bulletin.countDocuments();
+    if (existingEntries > 0) {
+      console.log(`${existingEntries} bulletin entries already exist. Skipping bulletin seeding.`);
+      return;
+    }
+
+    // Create some realistic bulletin entries
+    const bulletinEntries = [
+      {
+        name: 'Ärztekammer Berlin',
+        email: 'fortbildung@aerztekammer-berlin.de',
+        userType: 'Klinik',
+        messageType: 'Information',
+        title: 'Fortbildung: Aktuelle Entwicklungen in der Notfallmedizin',
+        content: 'Die Ärztekammer Berlin bietet am 15.-16.06.2025 eine zertifizierte Fortbildung zu aktuellen Entwicklungen in der Notfallmedizin an. 16 CME-Punkte. Begrenzte Teilnehmerzahl, frühzeitige Anmeldung empfohlen. Für weitere Informationen besuchen Sie bitte unsere Website oder kontaktieren Sie uns direkt.',
+        timestamp: new Date('2025-03-01T10:00:00'),
+        privacyPolicyAccepted: true
+      },
+      {
+        name: 'Dr. Thomas Schmidt',
+        email: 't.schmidt@facharzt.de',
+        userType: 'Arzt',
+        messageType: 'Information',
+        title: 'Fachärztlicher Vertretungs-Pool Radiologie',
+        content: 'Ich organisiere einen Vertretungs-Pool für kurzfristige Radiologie-Einsätze (max. 3 Monate). Über 20 Kolleginnen und Kollegen sind bereits dabei. Interessierte Radiologen und Kliniken können mich gerne kontaktieren. Wir bieten flexible Einsatzzeiten und faire Konditionen für alle Beteiligten.',
+        timestamp: new Date('2025-03-08T11:20:00'),
+        privacyPolicyAccepted: true
+      },
+      {
+        name: 'Medizinische Hochschule Hannover',
+        email: 'kongress@mh-hannover.de',
+        userType: 'Klinik',
+        messageType: 'Information',
+        title: 'Internationaler Kongress für Innere Medizin',
+        content: 'Vom 10.-12.07.2025 findet an der MH Hannover der 35. Internationale Kongress für Innere Medizin statt. Themenschwerpunkte: Kardiologie, Gastroenterologie, Endokrinologie. Anmeldung ab sofort möglich. Frühbucherrabatt bis zum 15.05.2025. Wir freuen uns auf Ihre Teilnahme an diesem wichtigen Fachkongress.',
+        timestamp: new Date('2025-02-28T14:30:00'),
+        privacyPolicyAccepted: true
+      },
+      {
+        name: 'Universitätsklinikum Dresden',
+        email: 'personal@uniklinikum-dresden.de',
+        userType: 'Klinik',
+        messageType: 'Angebot',
+        title: 'Oberarzt (m/w/d) für Neurologie',
+        content: 'Das Universitätsklinikum Dresden sucht einen Oberarzt (m/w/d) für die Abteilung Neurologie. Wir bieten eine übertarifliche Vergütung, flexible Arbeitszeiten und exzellente Forschungsmöglichkeiten. Bewerber sollten über eine Facharztausbildung Neurologie und mehrjährige klinische Erfahrung verfügen. Wir freuen uns auf Ihre Bewerbung!',
+        timestamp: new Date('2025-03-10T09:15:00'),
+        privacyPolicyAccepted: true
+      },
+      {
+        name: 'Dr. Laura Meyer',
+        email: 'l.meyer@arztpraxis.de',
+        userType: 'Arzt',
+        messageType: 'Gesuch',
+        title: 'Facharzt für Allgemeinmedizin sucht Praxisvertretung',
+        content: 'Als Facharzt für Allgemeinmedizin mit 8 Jahren Berufserfahrung suche ich eine Praxisvertretung im Raum München für 3-6 Monate ab September 2025. Flexible Arbeitszeiten möglich, gerne auch Teilzeit. Ich bringe umfangreiche Erfahrung in der ambulanten Versorgung mit und bin an einer kollegialen Zusammenarbeit interessiert.',
+        timestamp: new Date('2025-03-05T16:45:00'),
+        privacyPolicyAccepted: true
+      }
+    ];
+
+    await Bulletin.insertMany(bulletinEntries);
+    console.log(`${bulletinEntries.length} bulletin entries seeded.`);
+  } catch (err) {
+    console.error('Error seeding bulletin entries:', err);
   }
 };
 
-// Seed-Funktionen ausführen
-seedAll(); 
+const seedContactRequests = async () => {
+  try {
+    // Check if we already have contact requests
+    const existingContacts = await Contact.countDocuments();
+    if (existingContacts > 0) {
+      console.log(`${existingContacts} contact requests already exist. Skipping contact seeding.`);
+      return;
+    }
+
+    // Create some sample contact requests
+    const contactRequests = [
+      {
+        name: 'Dr. Maria Schneider',
+        email: 'maria.schneider@arzt.de',
+        message: 'Ich interessiere mich für die Fortbildung zur Notfallmedizin. Ist eine Teilnahme auch online möglich?',
+        recipientName: 'Ärztekammer Berlin',
+        recipientEmail: 'fortbildung@aerztekammer-berlin.de',
+        messageTitle: 'Fortbildung: Aktuelle Entwicklungen in der Notfallmedizin',
+        status: 'neu',
+        createdAt: new Date('2025-03-12T14:22:00')
+      },
+      {
+        name: 'Klinikum Nürnberg',
+        email: 'radiologie@klinikum-nuernberg.de',
+        message: 'Wir suchen dringend eine Vertretung für unsere Radiologie-Abteilung für 6 Wochen ab Mai. Ist das über Ihren Pool möglich?',
+        recipientName: 'Dr. Thomas Schmidt',
+        recipientEmail: 't.schmidt@facharzt.de',
+        messageTitle: 'Fachärztlicher Vertretungs-Pool Radiologie',
+        status: 'beantwortet',
+        createdAt: new Date('2025-03-10T09:45:00')
+      }
+    ];
+
+    await Contact.insertMany(contactRequests);
+    console.log(`${contactRequests.length} contact requests seeded.`);
+  } catch (err) {
+    console.error('Error seeding contact requests:', err);
+  }
+};
+
+const seedDatabase = async () => {
+  await connectDB();
+  // Uncomment if you want to clear collections before seeding
+  // await clearCollections();
+  await seedDummyUsers();
+  await seedBulletinEntries();
+  await seedContactRequests();
+  
+  console.log('Database seeding completed!');
+  process.exit(0);
+};
+
+// Run the seeding
+seedDatabase(); 
