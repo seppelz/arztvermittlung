@@ -54,6 +54,8 @@ All notable changes to this project will be documented in this file.
 - Verbesserte Darstellung von Stellenanzeigen mit klaren Informationen wie Fachrichtung, Bundesland und Startdatum
 - Seed-Daten aktualisiert mit Bundesland- und Fachrichtungs-Informationen für relevantere Beispieleinträge
 - Stellenbörse-Formular vereinfacht und fokussiert auf die wichtigsten Informationen
+- Verbesserte Admin-Oberfläche für Pinnwand-Einträge mit vollständiger Unterstützung aller Datenbankfelder
+- Enhanced Admin UI with comprehensive bulletin edit form aligned with database model
 
 ### Security
 - Changed MongoDB Atlas password to improve database security

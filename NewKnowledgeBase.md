@@ -452,7 +452,11 @@ This document tracks key insights and lessons learned about the codebase to impr
 - Vercel serverless functions have specific requirements for MongoDB connections that may differ from local development
 - Form validations must be consistent with database model validations to avoid confusing error messages
 - Conditional field requirements based on other fields (e.g., federalState required only for Klinik Angebot types) should be synchronized between frontend forms and backend models
-- Controllers should provide detailed validation error messages to help users understand what went wrong with form submissions 
+- Controllers should provide detailed validation error messages to help users understand what went wrong with form submissions
+- Admin interfaces must provide full access to all database fields to ensure proper management of data
+- Modal forms in admin interfaces should respect the same validation rules as public forms but provide greater flexibility for administrators
+- Conditional visibility of form fields based on other field values ensures that admin forms remain relevant and focused
+- Reusing validation logic across frontend forms and admin interfaces ensures consistency in data management
 
 ## Node.js Backend Architecture
 - Pay close attention to import paths in Node.js applications, especially between singular and plural folder names like "middleware" vs "middlewares" which can cause module resolution errors in production

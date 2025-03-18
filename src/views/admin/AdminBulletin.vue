@@ -6,6 +6,7 @@
       <div class="flex">
         <button 
           class="bg-primary-600 hover:bg-primary-700 text-white font-medium py-2 px-4 rounded-lg flex items-center shadow-sm"
+          @click="openNewBulletinModal"
         >
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -230,6 +231,259 @@
         </div>
       </div>
     </div>
+
+    <!-- Edit/View Modal -->
+    <div v-if="showBulletinModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 overflow-y-auto">
+      <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+        <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center sticky top-0 bg-white z-10">
+          <h3 class="text-lg font-bold text-gray-900">
+            {{ isEditMode ? 'Pinnwand-Eintrag bearbeiten' : 'Pinnwand-Eintrag anzeigen' }}
+          </h3>
+          <button @click="closeBulletinModal" class="text-gray-400 hover:text-gray-500">
+            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        
+        <form @submit.prevent="saveBulletin" class="p-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Titel -->
+            <div class="col-span-2">
+              <label for="edit-title" class="block text-sm font-medium text-gray-700 mb-1">Titel*</label>
+              <input 
+                id="edit-title"
+                v-model="editingBulletin.title"
+                type="text"
+                :disabled="!isEditMode"
+                class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+              />
+            </div>
+            
+            <!-- Basisinformationen -->
+            <div>
+              <label for="edit-name" class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+              <input 
+                id="edit-name"
+                v-model="editingBulletin.name"
+                type="text"
+                :disabled="!isEditMode"
+                class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+              />
+            </div>
+            
+            <div>
+              <label for="edit-email" class="block text-sm font-medium text-gray-700 mb-1">E-Mail*</label>
+              <input 
+                id="edit-email"
+                v-model="editingBulletin.email"
+                type="email"
+                :disabled="!isEditMode"
+                class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+              />
+            </div>
+            
+            <div>
+              <label for="edit-phone" class="block text-sm font-medium text-gray-700 mb-1">Telefon</label>
+              <input 
+                id="edit-phone"
+                v-model="editingBulletin.phone"
+                type="text"
+                :disabled="!isEditMode"
+                class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+              />
+            </div>
+            
+            <div>
+              <label for="edit-userType" class="block text-sm font-medium text-gray-700 mb-1">Benutzertyp*</label>
+              <select 
+                id="edit-userType"
+                v-model="editingBulletin.userType"
+                :disabled="!isEditMode"
+                class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+              >
+                <option value="Arzt">Arzt</option>
+                <option value="Klinik">Klinik</option>
+              </select>
+            </div>
+            
+            <div>
+              <label for="edit-messageType" class="block text-sm font-medium text-gray-700 mb-1">Nachrichtentyp*</label>
+              <select 
+                id="edit-messageType"
+                v-model="editingBulletin.messageType"
+                :disabled="!isEditMode"
+                class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+              >
+                <option value="Angebot">Angebot</option>
+                <option value="Gesuch">Gesuch</option>
+                <option value="Information">Information</option>
+              </select>
+            </div>
+            
+            <div>
+              <label for="edit-specialty" class="block text-sm font-medium text-gray-700 mb-1">Fachrichtung</label>
+              <input 
+                id="edit-specialty"
+                v-model="editingBulletin.specialty"
+                type="text"
+                :disabled="!isEditMode"
+                class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+              />
+            </div>
+            
+            <div>
+              <label for="edit-status" class="block text-sm font-medium text-gray-700 mb-1">Status*</label>
+              <select 
+                id="edit-status"
+                v-model="editingBulletin.status"
+                :disabled="!isEditMode"
+                class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+              >
+                <option value="active">Aktiv</option>
+                <option value="pending">Ausstehend</option>
+                <option value="archived">Archiviert</option>
+              </select>
+            </div>
+            
+            <!-- Angebots-/Gesuchsspezifische Felder -->
+            <div v-if="editingBulletin.messageType === 'Angebot' || editingBulletin.messageType === 'Gesuch'">
+              <label for="edit-startDate" class="block text-sm font-medium text-gray-700 mb-1">Verfügbar ab*</label>
+              <input 
+                id="edit-startDate"
+                v-model="formattedStartDate"
+                type="date"
+                :disabled="!isEditMode"
+                class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+              />
+            </div>
+            
+            <div v-if="editingBulletin.userType === 'Klinik' && editingBulletin.messageType === 'Angebot'">
+              <label for="edit-federalState" class="block text-sm font-medium text-gray-700 mb-1">Bundesland*</label>
+              <select 
+                id="edit-federalState"
+                v-model="editingBulletin.federalState"
+                :disabled="!isEditMode"
+                class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+              >
+                <option value="">Bitte wählen</option>
+                <option value="Baden-Württemberg">Baden-Württemberg</option>
+                <option value="Bayern">Bayern</option>
+                <option value="Berlin">Berlin</option>
+                <option value="Brandenburg">Brandenburg</option>
+                <option value="Bremen">Bremen</option>
+                <option value="Hamburg">Hamburg</option>
+                <option value="Hessen">Hessen</option>
+                <option value="Mecklenburg-Vorpommern">Mecklenburg-Vorpommern</option>
+                <option value="Niedersachsen">Niedersachsen</option>
+                <option value="Nordrhein-Westfalen">Nordrhein-Westfalen</option>
+                <option value="Rheinland-Pfalz">Rheinland-Pfalz</option>
+                <option value="Saarland">Saarland</option>
+                <option value="Sachsen">Sachsen</option>
+                <option value="Sachsen-Anhalt">Sachsen-Anhalt</option>
+                <option value="Schleswig-Holstein">Schleswig-Holstein</option>
+                <option value="Thüringen">Thüringen</option>
+              </select>
+            </div>
+            
+            <!-- Weitere optionale Felder -->
+            <div>
+              <label for="edit-location" class="block text-sm font-medium text-gray-700 mb-1">Ort</label>
+              <input 
+                id="edit-location"
+                v-model="editingBulletin.location"
+                type="text"
+                :disabled="!isEditMode"
+                class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+              />
+            </div>
+            
+            <div>
+              <label for="edit-duration" class="block text-sm font-medium text-gray-700 mb-1">Dauer</label>
+              <input 
+                id="edit-duration"
+                v-model="editingBulletin.duration"
+                type="text"
+                :disabled="!isEditMode"
+                class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+              />
+            </div>
+            
+            <div>
+              <label for="edit-compensation" class="block text-sm font-medium text-gray-700 mb-1">Vergütung</label>
+              <input 
+                id="edit-compensation"
+                v-model="editingBulletin.compensation"
+                type="number"
+                :disabled="!isEditMode"
+                class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+              />
+            </div>
+            
+            <div v-if="isEditMode">
+              <label for="edit-featured" class="block text-sm font-medium text-gray-700 mb-1">
+                <input 
+                  id="edit-featured"
+                  v-model="editingBulletin.featured"
+                  type="checkbox"
+                  class="h-4 w-4 mr-2 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                />
+                Hervorgehoben
+              </label>
+            </div>
+
+            <div v-if="isEditMode">
+              <label for="edit-privacyPolicyAccepted" class="block text-sm font-medium text-gray-700 mb-1">
+                <input 
+                  id="edit-privacyPolicyAccepted"
+                  v-model="editingBulletin.privacyPolicyAccepted"
+                  type="checkbox"
+                  class="h-4 w-4 mr-2 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                />
+                Datenschutzerklärung akzeptiert
+              </label>
+            </div>
+
+            <!-- Inhalt -->
+            <div class="col-span-2">
+              <label for="edit-content" class="block text-sm font-medium text-gray-700 mb-1">Inhalt*</label>
+              <textarea 
+                id="edit-content"
+                v-model="editingBulletin.content"
+                rows="6"
+                :disabled="!isEditMode"
+                class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+              ></textarea>
+            </div>
+          </div>
+          
+          <div class="flex justify-end mt-6 space-x-3">
+            <button 
+              v-if="!isEditMode" 
+              type="button" 
+              @click="enableEditMode" 
+              class="bg-primary-500 hover:bg-primary-600 text-white font-medium py-2 px-4 rounded-md shadow-sm"
+            >
+              Bearbeiten
+            </button>
+            <button 
+              v-if="isEditMode" 
+              type="submit" 
+              class="bg-primary-500 hover:bg-primary-600 text-white font-medium py-2 px-4 rounded-md shadow-sm"
+            >
+              Speichern
+            </button>
+            <button 
+              type="button" 
+              @click="closeBulletinModal" 
+              class="bg-white hover:bg-gray-50 text-gray-700 font-medium py-2 px-4 border border-gray-300 rounded-md shadow-sm"
+            >
+              {{ isEditMode ? 'Abbrechen' : 'Schließen' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -247,6 +501,24 @@ const statusFilter = ref('all');
 const sortOrder = ref('newest');
 const currentPage = ref(1);
 const pageSize = ref(10);
+
+// Modal und Bearbeitungsstatus
+const showBulletinModal = ref(false);
+const isEditMode = ref(false);
+const editingBulletin = ref({});
+
+// Formatiertes Startdatum für das Datums-Input-Feld
+const formattedStartDate = computed({
+  get: () => {
+    if (!editingBulletin.value.startDate) return '';
+    // ISO-Datum für input[type="date"] (YYYY-MM-DD)
+    const date = new Date(editingBulletin.value.startDate);
+    return date.toISOString().split('T')[0];
+  },
+  set: (newValue) => {
+    editingBulletin.value.startDate = newValue ? new Date(newValue) : null;
+  }
+});
 
 // Holen der Bulletin-Einträge vom Server
 const fetchBulletins = async () => {
@@ -333,16 +605,97 @@ const getStatusLabel = (status) => {
   }
 };
 
+// Neues Bulletin anlegen
+const openNewBulletinModal = () => {
+  editingBulletin.value = {
+    title: '',
+    content: '',
+    name: '',
+    email: '',
+    phone: '',
+    userType: 'Arzt',
+    messageType: 'Information',
+    status: 'pending',
+    specialty: '',
+    federalState: '',
+    startDate: null,
+    location: '',
+    duration: '',
+    compensation: null,
+    featured: false,
+    privacyPolicyAccepted: true
+  };
+  isEditMode.value = true;
+  showBulletinModal.value = true;
+};
+
 // Pinnwand-Eintrag ansehen
 const viewBulletin = (bulletin) => {
-  console.log('Pinnwand-Eintrag ansehen:', bulletin);
-  // Implementierung der Detailansicht
+  editingBulletin.value = { ...bulletin };
+  isEditMode.value = false;
+  showBulletinModal.value = true;
+};
+
+// Bearbeitungsmodus aktivieren
+const enableEditMode = () => {
+  isEditMode.value = true;
+};
+
+// Modal schließen
+const closeBulletinModal = () => {
+  showBulletinModal.value = false;
+  isEditMode.value = false;
+  editingBulletin.value = {};
 };
 
 // Pinnwand-Eintrag bearbeiten
 const editBulletin = (bulletin) => {
-  console.log('Pinnwand-Eintrag bearbeiten:', bulletin);
-  // Implementierung des Bearbeitungs-Dialogs
+  editingBulletin.value = { ...bulletin };
+  isEditMode.value = true;
+  showBulletinModal.value = true;
+};
+
+// Pinnwand-Eintrag speichern
+const saveBulletin = async () => {
+  try {
+    // Pflichtfelder validieren
+    if (!editingBulletin.value.title || !editingBulletin.value.content || !editingBulletin.value.email) {
+      alert('Bitte füllen Sie alle Pflichtfelder aus.');
+      return;
+    }
+    
+    // Validierung für Angebote und Gesuche
+    if ((editingBulletin.value.messageType === 'Angebot' || editingBulletin.value.messageType === 'Gesuch') && !editingBulletin.value.startDate) {
+      alert('Für Angebote und Gesuche ist ein Startdatum erforderlich.');
+      return;
+    }
+    
+    // Validierung für Klinik-Angebote
+    if (editingBulletin.value.userType === 'Klinik' && editingBulletin.value.messageType === 'Angebot' && !editingBulletin.value.federalState) {
+      alert('Für Klinik-Angebote ist ein Bundesland erforderlich.');
+      return;
+    }
+
+    // Erstellung eines neuen Bulletins oder Aktualisierung eines bestehenden
+    let response;
+    const bulletinData = { ...editingBulletin.value };
+    delete bulletinData.id; // ID entfernen, da MongoDB _id verwendet
+    
+    if (bulletinData._id) {
+      const id = bulletinData._id;
+      delete bulletinData._id; // _id kann nicht aktualisiert werden
+      response = await bulletinService.updateBulletin(id, bulletinData);
+    } else {
+      response = await bulletinService.createBulletin(bulletinData);
+    }
+    
+    // Nach erfolgreichem Speichern, aktualisieren wir die lokale Liste
+    await fetchBulletins();
+    closeBulletinModal();
+  } catch (err) {
+    console.error('Error saving bulletin:', err);
+    alert('Fehler beim Speichern des Eintrags: ' + (err.response?.data?.message || err.message));
+  }
 };
 
 // Pinnwand-Eintrag löschen
@@ -354,21 +707,6 @@ const deleteBulletin = async (id) => {
   } catch (err) {
     console.error('Error deleting bulletin:', err);
     alert('Fehler beim Löschen des Eintrags. Bitte versuchen Sie es später erneut.');
-  }
-};
-
-// Aktualisieren des Status eines Bulletin-Eintrags
-const updateBulletinStatus = async (id, newStatus) => {
-  try {
-    await bulletinService.updateBulletin(id, { status: newStatus });
-    // Nach erfolgreicher Aktualisierung den Eintrag in der lokalen Liste aktualisieren
-    const index = bulletins.value.findIndex(item => item.id === id);
-    if (index !== -1) {
-      bulletins.value[index].status = newStatus;
-    }
-  } catch (err) {
-    console.error('Error updating bulletin status:', err);
-    alert('Fehler beim Aktualisieren des Status. Bitte versuchen Sie es später erneut.');
   }
 };
 
