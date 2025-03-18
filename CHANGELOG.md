@@ -5,6 +5,8 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 ### Improved
+- Enhanced header branding with white MedMatch text for better contrast and visibility
+- Increased spacing between navigation items in header menu for improved readability
 - Stellenbörse: Nachrichten werden anonymisiert angezeigt, um die Vermittlung über die Plattform zu fördern
 - Stellenformular erweitert mit Feldern für Fachrichtung, Bundesland und Verfügbarkeitsdatum
 - Neuer Moderationsprozess für Stellenangebote und -gesuche (Admin-Freigabe erforderlich)

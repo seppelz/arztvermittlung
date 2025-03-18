@@ -16,12 +16,12 @@
               alt="MedMatch Logo"
               class="h-12 w-auto"
             />
-            <span class="hidden md:block">MedMatch</span>
+            <span class="hidden md:block text-white">MedMatch</span>
           </router-link>
         </div>
 
         <!-- Desktop Navigation -->
-        <nav class="hidden md:flex space-x-4">
+        <nav class="hidden md:flex space-x-6">
           <router-link
             :to="{ name: 'Home' }"
             class="nav-link"

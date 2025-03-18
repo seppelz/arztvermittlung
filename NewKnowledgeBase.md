@@ -503,6 +503,23 @@ This document tracks key insights and lessons learned about the codebase to impr
    - Verwendung spezifischer Datumswerte (z.B. Verfügbarkeitsdatum statt Erstellungsdatum) für kontextbezogene Titel
    - Standardisierte Datumsinformationen in Titeln für bessere Übersichtlichkeit und Konsistenz 
 
+## Header-Design für medizinische Plattformen
+
+1. **Lesbarkeit und Kontrast im Header**:
+   - Die Verwendung von weißem Text auf dunkleren Hintergründen (wie Gradienten) verbessert die Lesbarkeit und Sichtbarkeit
+   - Der Markenname sollte sich durch ausreichenden Kontrast klar vom Hintergrund abheben, um die Markenidentität zu stärken
+   - Farbkombinationen sollten WCAG-Kontrastrichtlinien (mindestens 4.5:1) folgen, besonders für Navigationstext
+
+2. **Optimales Spacing für Navigation**:
+   - Erhöhter horizontaler Abstand zwischen Navigationseinträgen (space-x-6 statt space-x-4) verbessert die Lesbarkeit und visuelle Trennung
+   - Ausgewogene Abstände zwischen Logo/Markenname und dem ersten Navigationselement reduzieren visuelle Kompression
+   - Konsistente Abstände im responsiven Design unterstützen eine professionelle Darstellung auf allen Geräten
+
+3. **Responsive Header-Anpassungen**:
+   - Die mobile Anzeige sollte klare Kontraste beibehalten, besonders bei komprimierter Navigation
+   - Farbübergänge von Desktop zu Mobil sollten konsistent bleiben, um ein einheitliches Markenerlebnis zu gewährleisten
+   - Bei der Entwicklung von Styling-Änderungen müssen sowohl Desktop- als auch Mobile-Varianten berücksichtigt werden
+
 ## Cross-Service Integration
 
 - **Demo vs. Real Data Integration**: When transitioning from demo data to real API data, it's critical to maintain both sources temporarily with a preference for real data to ensure smooth user experience without data gaps.
