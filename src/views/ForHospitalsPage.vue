@@ -153,6 +153,17 @@ async function submitForm() {
   submitError.value = null
   
   try {
+    // Check required fields
+    if (!form.hospitalName || !form.contactEmail || !form.jobDescription) {
+      submitError.value = 'Bitte füllen Sie alle erforderlichen Felder aus.'
+      return
+    }
+    
+    if (!form.privacyPolicyAccepted) {
+      submitError.value = 'Bitte akzeptieren Sie die Datenschutzerklärung, um fortzufahren.'
+      return
+    }
+    
     // Generate a title based on specialty and start date
     const formattedDate = form.startDate ? new Date(form.startDate).toLocaleDateString('de-DE', {
       day: '2-digit',
@@ -167,26 +178,30 @@ async function submitForm() {
       title: generatedTitle,
       name: form.hospitalName,
       email: form.contactEmail,
-      content: form.jobDescription,
-      specialty: form.specialty,
+      content: form.jobDescription || 'Keine Beschreibung angegeben',
+      specialty: form.specialty || '',
       userType: 'Klinik',
       messageType: 'Angebot',
       startDate: form.startDate || new Date().toISOString().split('T')[0],
-      federalState: '', // Optional field
-      requiredQualifications: form.requiredQualifications,
-      salary: form.salary,
-      privacyPolicyAccepted: form.privacyPolicyAccepted,
-      status: 'pending', // New entries start as pending for moderation
+      federalState: '',
+      phone: '',
+      requiredQualifications: form.requiredQualifications || '',
+      salary: form.salary || '',
+      privacyPolicyAccepted: true,
+      status: 'pending',
       timestamp: new Date()
     }
     
+    console.log('Submitting data to backend:', bulletinData)
+    
     // Send the data to the backend
-    await bulletinService.createBulletin(bulletinData)
+    const response = await bulletinService.createBulletin(bulletinData)
+    console.log('Response from backend:', response)
     
     // Show success message
     formSubmitted.value = true
     
-    // Optional: Reset form after submission
+    // Reset form after submission
     Object.keys(form).forEach(key => {
       if (typeof form[key] === 'boolean') {
         form[key] = false
@@ -200,7 +215,25 @@ async function submitForm() {
     
   } catch (error) {
     console.error('Error submitting form:', error)
-    submitError.value = 'Fehler beim Speichern Ihrer Anfrage. Bitte versuchen Sie es später erneut.'
+    
+    // Extract detailed error message if available
+    let errorMessage = 'Fehler beim Speichern Ihrer Anfrage.'
+    
+    if (error.response && error.response.data) {
+      if (error.response.data.message) {
+        errorMessage = error.response.data.message
+      } else if (error.response.data.error) {
+        errorMessage = error.response.data.error
+      }
+      
+      // Check for validation errors
+      if (error.response.data.errors) {
+        const validationErrors = error.response.data.errors
+        errorMessage = 'Validierungsfehler: ' + Object.values(validationErrors).join(', ')
+      }
+    }
+    
+    submitError.value = errorMessage + ' Bitte versuchen Sie es später erneut.'
   } finally {
     isSubmitting.value = false
   }
