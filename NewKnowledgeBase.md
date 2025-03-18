@@ -761,3 +761,27 @@ Die Implementierung eines vollständigen Kontaktformularsystems hat wichtige Erk
 3. **Optimistische UI-Updates**: Sofortige Benutzeroberflächen-Aktualisierungen vor der Serverbestätigung verbessern die wahrgenommene Leistung, während Fehlerbehandlungsroutinen Inkonsistenzen verhindern.
 
 Diese Erkenntnisse bilden eine solide Grundlage für die Implementierung ähnlicher Funktionen in anderen Teilen der Anwendung und können als Referenz für zukünftige Entwicklungen dienen. 
+
+## Form Field Consistency Across User Types
+
+When designing forms for different user types (doctors, clinics, etc.), it's crucial to maintain consistency in essential fields:
+
+### Essential Contact Fields
+
+1. **Email Address**: 
+   - Required for all user types as the primary communication channel
+   - Should be validated with proper email format
+   - Must be prominently placed in forms to ensure visibility
+
+2. **Contact Information Symmetry**:
+   - Forms for doctors and forms for clinics should collect equivalent information
+   - This ensures balanced communication capabilities between parties
+   - Helps maintain data consistency across the platform
+
+3. **Common Required Fields Across Forms**:
+   - Email address
+   - User/entity name
+   - Privacy policy acceptance
+   - Terms of service acceptance
+
+This approach ensures that regardless of which side of the platform a user engages with, we always have sufficient information to facilitate meaningful connections and communications. 

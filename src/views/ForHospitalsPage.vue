@@ -24,6 +24,19 @@
                   <label for="hospitalName" class="block text-text-dark font-semibold mb-2">Name der Einrichtung/Klinik (Ansprechpartner)</label>
                   <input type="text" id="hospitalName" v-model="form.hospitalName" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm" />
                 </div>
+                
+                <!-- Add email field -->
+                <div class="md:col-span-2">
+                  <label for="contactEmail" class="block text-text-dark font-semibold mb-2">E-Mail-Adresse *</label>
+                  <input 
+                    type="email" 
+                    id="contactEmail" 
+                    v-model="form.contactEmail" 
+                    required
+                    class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm" 
+                    placeholder="Ihre E-Mail-Adresse für Rückmeldungen"
+                  />
+                </div>
               </div>
             </div>
             
