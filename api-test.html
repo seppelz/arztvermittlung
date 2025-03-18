@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Test</title>
+</head>
+<body>
+    <h1>API Connection Test</h1>
+    <div id="result"></div>
+
+    <script>
+        // Test various API URLs
+        const urls = [
+            'http://med-match.de/api/bulletin',
+            'https://med-match.de/api/bulletin',
+            'http://med-match.de/api',
+            'https://med-match.de/api'
+        ];
+
+        // Function to check API
+        async function testApi(url) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML += `<h3>Testing ${url}</h3>`;
+            
+            try {
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+                
+                // Check if response is JSON or HTML
+                const contentType = response.headers.get('content-type');
+                resultDiv.innerHTML += `<p>Status: ${response.status}</p>`;
+                resultDiv.innerHTML += `<p>Content-Type: ${contentType}</p>`;
+                
+                if (contentType && contentType.includes('application/json')) {
+                    const data = await response.json();
+                    resultDiv.innerHTML += `<p>Response is valid JSON</p>`;
+                    resultDiv.innerHTML += `<pre>${JSON.stringify(data, null, 2).substring(0, 200)}...</pre>`;
+                } else {
+                    const text = await response.text();
+                    resultDiv.innerHTML += `<p>Response is NOT JSON (possibly HTML)</p>`;
+                    resultDiv.innerHTML += `<pre>${text.substring(0, 200)}...</pre>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML += `<p>Error: ${error.message}</p>`;
+            }
+            
+            resultDiv.innerHTML += `<hr>`;
+        }
+
+        // Test all URLs
+        window.onload = async () => {
+            for (const url of urls) {
+                await testApi(url);
+            }
+        };
+    </script>
+</body>
+</html> 

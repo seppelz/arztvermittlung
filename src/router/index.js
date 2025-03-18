@@ -133,6 +133,35 @@ const routes = [
   }
 ]
 
+// Wrap dynamic imports with error handling
+routes.forEach(route => {
+  if (typeof route.component === 'function') {
+    const originalComponent = route.component;
+    route.component = () => {
+      return originalComponent().catch(err => {
+        console.error(`Error loading component for route ${route.path}:`, err);
+        // Return a fallback component
+        return import('@/views/NotFoundPage.vue');
+      });
+    };
+  }
+  
+  if (route.children) {
+    route.children.forEach(childRoute => {
+      if (typeof childRoute.component === 'function') {
+        const originalChildComponent = childRoute.component;
+        childRoute.component = () => {
+          return originalChildComponent().catch(err => {
+            console.error(`Error loading component for child route ${route.path}/${childRoute.path}:`, err);
+            // Return a fallback component
+            return import('@/views/NotFoundPage.vue');
+          });
+        };
+      }
+    });
+  }
+});
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes,
@@ -167,5 +196,15 @@ router.beforeEach((to, from, next) => {
     next()
   }
 })
+
+// Error handling for navigation failures
+router.onError((error) => {
+  console.error('Router error:', error);
+  if (error.message.includes('Failed to fetch dynamically imported module')) {
+    console.error('Module loading error - this might be caused by a network issue or incorrect build configuration');
+  } else if (error.message.includes('expected expression, got')) {
+    console.error('Parsing error - this might be caused by invalid JavaScript being returned from the server');
+  }
+});
 
 export default router 

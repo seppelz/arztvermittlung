@@ -85,6 +85,10 @@ All notable changes to this project will be documented in this file.
 - Fixed admin dashboard bulletin display by updating API URL configuration to point to production server
 - Enhanced bulletin service to handle different API response formats
 - Fixed bulletin service API endpoints to correctly use '/bulletin' instead of '/bulletins' to match backend routes
+- Fixed Vue Router SyntaxError by updating API URL to use www subdomain (https://www.med-match.de/api)
+- Added robust error handling to router configuration to prevent cryptic parsing errors
+- Enhanced app initialization with proper error catching to provide better diagnostic information
+- Fixed dynamic import issues by adding fallback routes when component loading fails
 
 ### Added
 - Created test scripts for MongoDB Atlas connection testing

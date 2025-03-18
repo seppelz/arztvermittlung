@@ -460,7 +460,7 @@ This document tracks key insights and lessons learned about the codebase to impr
 
 ## API Configuration for Production Deployments
 
-- **Default API URL Configuration**: When deploying to production, always set the default API URL in the api.js service to point to the production endpoint (e.g., `https://med-match.de/api`) rather than localhost
+- **Default API URL Configuration**: When deploying to production, always set the default API URL in the api.js service to point to the production endpoint (e.g., `https://www.med-match.de/api`) rather than localhost
 - **API Response Format Handling**: Services should be designed to handle both nested data structures (response.data.data) and direct array responses (response.data) as API response formats may differ between environments
 - **Environment-Specific Testing**: Always test admin interfaces with the production API after deployment, as local development environments may mask API connectivity issues
 - **Frontend-Backend Synchronization**: When the backend is deployed separately from the frontend (e.g., on Vercel), ensure that both systems are using compatible API response formats
@@ -468,6 +468,10 @@ This document tracks key insights and lessons learned about the codebase to impr
 - **Error Handling for Production**: Enhance error logging in production environments to provide detailed diagnostic information for troubleshooting API communication issues
 - **Cross-Origin Considerations**: Production deployments often involve different domains for frontend and API, requiring proper CORS configuration
 - **API Endpoint Naming Consistency**: Ensure that frontend service endpoint paths (e.g., '/bulletin' vs '/bulletins') exactly match the backend route definitions, as even small discrepancies will cause 404 errors in production while potentially working in development due to different error handling
+- **Subdomain Sensitivity**: API URLs must specifically include the correct subdomain (www vs non-www) as redirects between these may cause CORS issues or return HTML instead of JSON, leading to parsing errors
+- **SyntaxError Debugging**: "SyntaxError: expected expression, got '<'" typically indicates HTML is being returned instead of JavaScript/JSON, often due to HTTP redirects or 404 responses
+- **Vue Router Error Handling**: Add error handlers to both the router (router.onError) and Vue application (app.config.errorHandler) to provide better diagnostics for dynamic import issues
+- **Fallback Components**: Implement fallback components and routes to gracefully handle loading failures and prevent the entire application from crashing
 
 ## Node.js Backend Architecture
 - Pay close attention to import paths in Node.js applications, especially between singular and plural folder names like "middleware" vs "middlewares" which can cause module resolution errors in production
