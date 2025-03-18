@@ -21,11 +21,17 @@
               <h3 class="text-xl font-bold mb-6 pb-2 border-b-2 border-accent text-heading">Informationen zur Einrichtung</h3>
               <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="md:col-span-2">
-                  <label for="hospitalName" class="block text-text-dark font-semibold mb-2">Name der Einrichtung/Klinik (Ansprechpartner)</label>
-                  <input type="text" id="hospitalName" v-model="form.hospitalName" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm" />
+                  <label for="hospitalName" class="block text-text-dark font-semibold mb-2">Name der Einrichtung/Klinik (Ansprechpartner) *</label>
+                  <input 
+                    type="text" 
+                    id="hospitalName" 
+                    v-model="form.hospitalName"
+                    required 
+                    class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm" 
+                  />
                 </div>
                 
-                <!-- Add email field -->
+                <!-- Email field -->
                 <div class="md:col-span-2">
                   <label for="contactEmail" class="block text-text-dark font-semibold mb-2">E-Mail-Adresse *</label>
                   <input 
@@ -37,6 +43,35 @@
                     placeholder="Ihre E-Mail-Adresse für Rückmeldungen"
                   />
                 </div>
+
+                <!-- Federal State field -->
+                <div class="md:col-span-2">
+                  <label for="federalState" class="block text-text-dark font-semibold mb-2">Bundesland *</label>
+                  <select 
+                    id="federalState" 
+                    v-model="form.federalState" 
+                    required
+                    class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm"
+                  >
+                    <option value="">Bitte wählen Sie</option>
+                    <option value="Baden-Württemberg">Baden-Württemberg</option>
+                    <option value="Bayern">Bayern</option>
+                    <option value="Berlin">Berlin</option>
+                    <option value="Brandenburg">Brandenburg</option>
+                    <option value="Bremen">Bremen</option>
+                    <option value="Hamburg">Hamburg</option>
+                    <option value="Hessen">Hessen</option>
+                    <option value="Mecklenburg-Vorpommern">Mecklenburg-Vorpommern</option>
+                    <option value="Niedersachsen">Niedersachsen</option>
+                    <option value="Nordrhein-Westfalen">Nordrhein-Westfalen</option>
+                    <option value="Rheinland-Pfalz">Rheinland-Pfalz</option>
+                    <option value="Saarland">Saarland</option>
+                    <option value="Sachsen">Sachsen</option>
+                    <option value="Sachsen-Anhalt">Sachsen-Anhalt</option>
+                    <option value="Schleswig-Holstein">Schleswig-Holstein</option>
+                    <option value="Thüringen">Thüringen</option>
+                  </select>
+                </div>
               </div>
             </div>
             
@@ -45,8 +80,15 @@
               <h3 class="text-xl font-bold mb-6 pb-2 border-b-2 border-accent text-heading">Informationen zur Stellenanfrage</h3>
               <div class="space-y-6">
                 <div>
-                  <label for="specialty" class="block text-text-dark font-semibold mb-2">Gesuchte Fachrichtung</label>
-                  <input type="text" id="specialty" v-model="form.specialty" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm" placeholder="Gewünschte Fachrichtung des Arztes" />
+                  <label for="specialty" class="block text-text-dark font-semibold mb-2">Gesuchte Fachrichtung *</label>
+                  <input 
+                    type="text" 
+                    id="specialty" 
+                    v-model="form.specialty"
+                    required
+                    class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm" 
+                    placeholder="Gewünschte Fachrichtung des Arztes" 
+                  />
                 </div>
                 
                 <div>
@@ -55,14 +97,26 @@
                 </div>
                 
                 <div>
-                  <label for="jobDescription" class="block text-text-dark font-semibold mb-2">Stellenbeschreibung</label>
-                  <textarea id="jobDescription" v-model="form.jobDescription" rows="4" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm"></textarea>
+                  <label for="jobDescription" class="block text-text-dark font-semibold mb-2">Stellenbeschreibung *</label>
+                  <textarea 
+                    id="jobDescription" 
+                    v-model="form.jobDescription"
+                    required
+                    rows="4" 
+                    class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm"
+                  ></textarea>
                 </div>
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label for="startDate" class="block text-text-dark font-semibold mb-2">Startdatum</label>
-                    <input type="date" id="startDate" v-model="form.startDate" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm" />
+                    <label for="startDate" class="block text-text-dark font-semibold mb-2">Startdatum *</label>
+                    <input 
+                      type="date" 
+                      id="startDate" 
+                      v-model="form.startDate"
+                      required
+                      class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm" 
+                    />
                   </div>
                   
                   <div>
@@ -125,20 +179,12 @@ import bulletinService from '@/services/bulletin.service'
 
 const form = reactive({
   hospitalName: '',
-  street: '',
-  zip: '',
-  city: '',
-  website: '',
-  contactFirstName: '',
-  contactLastName: '',
-  position: '',
-  department: '',
   contactEmail: '',
-  contactPhone: '',
+  federalState: '',
   specialty: '',
   requiredQualifications: '',
   jobDescription: '',
-  startDate: '',
+  startDate: new Date().toISOString().split('T')[0], // Heutiges Datum als Standard
   salary: '',
   privacyPolicyAccepted: false,
   termsAccepted: false
@@ -154,13 +200,15 @@ async function submitForm() {
   
   try {
     // Check required fields
-    if (!form.hospitalName || !form.contactEmail || !form.jobDescription) {
+    if (!form.hospitalName || !form.contactEmail || !form.jobDescription || !form.specialty || !form.federalState || !form.startDate) {
       submitError.value = 'Bitte füllen Sie alle erforderlichen Felder aus.'
+      isSubmitting.value = false
       return
     }
     
     if (!form.privacyPolicyAccepted) {
       submitError.value = 'Bitte akzeptieren Sie die Datenschutzerklärung, um fortzufahren.'
+      isSubmitting.value = false
       return
     }
     
@@ -178,16 +226,16 @@ async function submitForm() {
       title: generatedTitle,
       name: form.hospitalName,
       email: form.contactEmail,
-      content: form.jobDescription || 'Keine Beschreibung angegeben',
-      specialty: form.specialty || '',
+      content: form.jobDescription,
+      specialty: form.specialty,
       userType: 'Klinik',
       messageType: 'Angebot',
-      startDate: form.startDate || new Date().toISOString().split('T')[0],
-      federalState: '',
+      startDate: form.startDate,
+      federalState: form.federalState,
       phone: '',
       requiredQualifications: form.requiredQualifications || '',
       salary: form.salary || '',
-      privacyPolicyAccepted: true,
+      privacyPolicyAccepted: form.privacyPolicyAccepted,
       status: 'pending',
       timestamp: new Date()
     }
@@ -205,13 +253,12 @@ async function submitForm() {
     Object.keys(form).forEach(key => {
       if (typeof form[key] === 'boolean') {
         form[key] = false
+      } else if (key === 'startDate') {
+        form[key] = new Date().toISOString().split('T')[0] // Reset to today's date
       } else {
         form[key] = ''
       }
     })
-    
-    // Set a default start date
-    form.startDate = new Date().toISOString().split('T')[0]
     
   } catch (error) {
     console.error('Error submitting form:', error)

@@ -116,6 +116,8 @@ All notable changes to this project will be documented in this file.
 - Added missing email field to "Für Kliniken" form to ensure proper contact information collection
 - Fixed "Für Kliniken" form submissions not being saved to the database by connecting the form to the bulletin API
 - Fixed validation error in "Für Kliniken" form by ensuring all required fields are properly formatted
+- Implemented bulletin database integration for the "Für Ärzte" form, enabling doctors to submit job requests
+- Integrated the "Für Kliniken" and "Für Ärzte" forms with the Stellenbörse, ensuring submissions appear in the job listings
 
 ### Added
 - Created test scripts for MongoDB Atlas connection testing

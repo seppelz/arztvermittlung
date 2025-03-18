@@ -762,59 +762,24 @@ Die Implementierung eines vollständigen Kontaktformularsystems hat wichtige Erk
 
 Diese Erkenntnisse bilden eine solide Grundlage für die Implementierung ähnlicher Funktionen in anderen Teilen der Anwendung und können als Referenz für zukünftige Entwicklungen dienen. 
 
-## Form Field Consistency Across User Types
+## Form Integration Best Practices
 
-When designing forms for different user types (doctors, clinics, etc.), it's crucial to maintain consistency in essential fields:
+1. **Unified Data Model Approach**:
+   - Consistent data model is preferable to separate tables for similar data types (e.g., using Bulletin model for both job listings and contact forms)
+   - Using discriminator fields like `userType` and `messageType` allows filtering different types of entries from the same collection
+   - Common status field (`active`, `pending`, `archived`) enables unified moderation workflow across different entry types
 
-### Essential Contact Fields
+2. **Bulletins as a Versatile Content Type**:
+   - The flexible Bulletin schema can be repurposed for various content types beyond just announcements
+   - By adapting the messageType field, the same model can serve multiple use cases (job offers, job requests, general information)
+   - This approach reduces database complexity while maintaining separation of concerns in the UI
 
-1. **Email Address**: 
-   - Required for all user types as the primary communication channel
-   - Should be validated with proper email format
-   - Must be prominently placed in forms to ensure visibility
+3. **Field Validation Consistency**:
+   - Frontend validation should closely mirror backend schema requirements to prevent failed API calls
+   - Required fields should be marked consistently in both UI and database models
+   - Custom validators in frontend forms can reduce server load by catching errors early
 
-2. **Contact Information Symmetry**:
-   - Forms for doctors and forms for clinics should collect equivalent information
-   - This ensures balanced communication capabilities between parties
-   - Helps maintain data consistency across the platform
-
-3. **Common Required Fields Across Forms**:
-   - Email address
-   - User/entity name
-   - Privacy policy acceptance
-   - Terms of service acceptance
-
-This approach ensures that regardless of which side of the platform a user engages with, we always have sufficient information to facilitate meaningful connections and communications. 
-
-## Frontend-Backend Connectivity
-
-### Best Practices for Form Submissions
-
-1. **Complete API Integration**:
-   - All user-facing forms should be connected to backend APIs to persist data
-   - Demo or placeholder submission handlers should be replaced with actual API calls before deployment
-   - Visual success indicators should always correspond to actual successful database operations
-
-2. **Form Validation Flow**:
-   - Frontend validation should match backend validation requirements
-   - Success messages should only be displayed after confirmed backend success responses
-   - Error states should provide actionable information to users
-
-3. **Data Transformation Patterns**:
-   - Forms often need to transform user input before API submission (date formatting, etc.)
-   - Consistent data transformation should occur at the service layer, not in components
-   - Generated content (like automatic titles) should follow consistent patterns across all forms
-
-4. **Status Tracking for User Experience**:
-   - Loading states should be clearly indicated during form submission
-   - Disabling submit buttons during processing prevents duplicate submissions
-   - Error messages should be specific about the nature of the failure when possible
-
-By following these patterns, we ensure that all user data is properly captured and no forms become "black holes" where data is lost between the frontend and backend systems. 
-
-## Validation Requirements for Backend API
-
-- To minimize circular dependencies in Vue Router and authentication services, use dynamic imports and ensure the initialization sequence is properly managed
-- For better error tracking, add global error handlers for uncaught errors and unhandled promise rejections
-- When submitting data to the backend API, ensure all required fields are included and properly formatted with appropriate fallback values
-- Backend API validation may require specific formats for data fields like dates (as Date objects) and boolean flags (explicitly set to true/false) 
+4. **Form to Database Mapping**:
+   - Form field names should ideally match database field names for clearer code and easier debugging
+   - When form structure differs from database structure, clear transformation functions should be used
+   - Automated title generation based on key form fields creates more consistent database entries 
