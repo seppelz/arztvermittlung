@@ -1,33 +1,47 @@
 import api from './api';
-import { useAuthStore } from '@/stores/auth';
 
-// Create a memoization cache to prevent redundant Pinia store access
-let memoizedStoreInstance = null;
+// Lokaler Cache für den Auth-Zustand, der vom Router und anderen Komponenten verwendet werden kann
+// ohne direkt auf den Store zuzugreifen
+let cachedAuthState = {
+  user: null,
+  token: null,
+  isAuthenticated: false,
+  lastUpdated: 0
+};
 
-/**
- * Gets the auth store instance with memoization to prevent redundant calls
- * @returns {Object} The auth store instance
- */
-const getAuthStore = () => {
-  if (!memoizedStoreInstance) {
-    try {
-      memoizedStoreInstance = useAuthStore();
-    } catch (error) {
-      console.error('Error getting auth store:', error);
-      // Return a fallback minimal store to prevent crashes
-      return {
-        user: null,
-        token: null,
-        isAuthenticated: false,
-        isAdmin: false,
-        setAuth: () => {},
-        clearAuth: () => {},
-        updateUser: () => {}
+// Versuchen, Pinia nur bei Bedarf zu importieren
+const getAuthStore = async () => {
+  try {
+    const { useAuthStore } = await import('@/stores/auth');
+    return useAuthStore();
+  } catch (error) {
+    console.error('Error importing auth store:', error);
+    // Fallback-Funktion ohne Store
+    return null;
+  }
+};
+
+// Initialen Zustand aus dem localStorage holen
+const initFromLocalStorage = () => {
+  try {
+    const userJson = localStorage.getItem('user');
+    const token = localStorage.getItem('token');
+    if (userJson && token) {
+      const user = JSON.parse(userJson);
+      cachedAuthState = {
+        user,
+        token,
+        isAuthenticated: true,
+        lastUpdated: Date.now()
       };
     }
+  } catch (error) {
+    console.error('Error initializing auth state from localStorage:', error);
   }
-  return memoizedStoreInstance;
 };
+
+// Initialisierung beim Import des Service
+initFromLocalStorage();
 
 /**
  * Service for authentication related API calls
@@ -42,9 +56,28 @@ class AuthService {
     try {
       const response = await api.post('/auth/login', credentials);
       if (response.data && response.data.token) {
-        // Update Pinia store instead of directly manipulating localStorage
-        const authStore = getAuthStore();
-        authStore.setAuth(response.data);
+        // Update local cache
+        cachedAuthState = {
+          user: response.data.user,
+          token: response.data.token,
+          isAuthenticated: true,
+          lastUpdated: Date.now()
+        };
+        
+        // Save to localStorage
+        localStorage.setItem('user', JSON.stringify(response.data.user));
+        localStorage.setItem('token', response.data.token);
+        
+        // Try to update Pinia store if available
+        try {
+          const authStore = await getAuthStore();
+          if (authStore) {
+            authStore.setAuth(response.data);
+          }
+        } catch (storeError) {
+          console.error('Error updating auth store after login:', storeError);
+          // Continue anyway since we've updated localStorage and cache
+        }
       }
       return response;
     } catch (error) {
@@ -71,18 +104,34 @@ class AuthService {
   /**
    * Logout the current user
    */
-  logout() {
+  async logout() {
     try {
-      const authStore = getAuthStore();
-      authStore.clearAuth();
-      // Reset the memoized store after logout
-      memoizedStoreInstance = null;
+      // Clear local cache
+      cachedAuthState = {
+        user: null,
+        token: null,
+        isAuthenticated: false,
+        lastUpdated: Date.now()
+      };
+      
+      // Clear localStorage
+      localStorage.removeItem('user');
+      localStorage.removeItem('token');
+      
+      // Try to update Pinia store if available
+      try {
+        const authStore = await getAuthStore();
+        if (authStore) {
+          authStore.clearAuth();
+        }
+      } catch (storeError) {
+        console.error('Error updating auth store after logout:', storeError);
+        // Continue anyway since we've updated localStorage and cache
+      }
+      
       return Promise.resolve();
     } catch (error) {
       console.error('Logout error:', error);
-      // Still need to clear localStorage in case store access failed
-      localStorage.removeItem('user');
-      localStorage.removeItem('token');
       return Promise.reject(error);
     }
   }
@@ -92,14 +141,18 @@ class AuthService {
    * @returns {Object|null} - Current user or null
    */
   getCurrentUser() {
+    // Use cachedAuthState for faster access without store dependencies
+    if (cachedAuthState.user) {
+      return cachedAuthState.user;
+    }
+    
+    // Fall back to localStorage
     try {
-      const authStore = getAuthStore();
-      return authStore.user;
-    } catch (error) {
-      console.error('Error getting current user:', error);
-      // Fallback to localStorage if Pinia store access fails
       const userJson = localStorage.getItem('user');
       return userJson ? JSON.parse(userJson) : null;
+    } catch (error) {
+      console.error('Error getting user from localStorage:', error);
+      return null;
     }
   }
 
@@ -108,13 +161,17 @@ class AuthService {
    * @returns {Boolean} - True if authenticated
    */
   isAuthenticated() {
+    // Use cachedAuthState for faster access without store dependencies
+    if (cachedAuthState.isAuthenticated) {
+      return true;
+    }
+    
+    // Fall back to localStorage
     try {
-      const authStore = getAuthStore();
-      return !!authStore.isAuthenticated;
-    } catch (error) {
-      console.error('Error checking authentication status:', error);
-      // Fallback to localStorage if Pinia store access fails
       return !!localStorage.getItem('token');
+    } catch (error) {
+      console.error('Error checking auth status from localStorage:', error);
+      return false;
     }
   }
 
@@ -123,24 +180,21 @@ class AuthService {
    * @returns {Boolean} - True if admin
    */
   isAdmin() {
+    // Use cachedAuthState for faster access without store dependencies
+    if (cachedAuthState.user && cachedAuthState.user.role === 'admin') {
+      return true;
+    }
+    
+    // Fall back to localStorage
     try {
-      const authStore = getAuthStore();
-      if (authStore.isAdmin !== undefined) {
-        return !!authStore.isAdmin;
-      }
-      // If isAdmin getter is not available, check user role directly
-      return !!(authStore.user && authStore.user.role === 'admin');
+      const userJson = localStorage.getItem('user');
+      if (!userJson) return false;
+      
+      const user = JSON.parse(userJson);
+      return user && user.role === 'admin';
     } catch (error) {
-      console.error('Error checking admin status:', error);
-      // Fallback to localStorage if Pinia store access fails
-      try {
-        const userJson = localStorage.getItem('user');
-        const user = userJson ? JSON.parse(userJson) : null;
-        return !!(user && user.role === 'admin');
-      } catch (localStorageError) {
-        console.error('Error reading from localStorage:', localStorageError);
-        return false;
-      }
+      console.error('Error checking admin status from localStorage:', error);
+      return false;
     }
   }
   
@@ -153,16 +207,26 @@ class AuthService {
     try {
       const response = await api.put('/users/profile', userData);
       if (response.data && response.data.user) {
+        // Update cachedAuthState
+        const currentUser = cachedAuthState.user || {};
+        cachedAuthState.user = { ...currentUser, ...response.data.user };
+        cachedAuthState.lastUpdated = Date.now();
+        
+        // Update localStorage
+        const userJson = localStorage.getItem('user');
+        const storedUser = userJson ? JSON.parse(userJson) : {};
+        const updatedUser = { ...storedUser, ...response.data.user };
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+        
+        // Try to update Pinia store if available
         try {
-          const authStore = getAuthStore();
-          authStore.updateUser(response.data.user);
+          const authStore = await getAuthStore();
+          if (authStore) {
+            authStore.updateUser(response.data.user);
+          }
         } catch (storeError) {
-          console.error('Error updating store with user data:', storeError);
-          // Fallback to localStorage if Pinia store access fails
-          const currentUserJson = localStorage.getItem('user');
-          const currentUser = currentUserJson ? JSON.parse(currentUserJson) : {};
-          const updatedUser = { ...currentUser, ...response.data.user };
-          localStorage.setItem('user', JSON.stringify(updatedUser));
+          console.error('Error updating auth store after profile update:', storeError);
+          // Continue anyway since we've updated localStorage and cache
         }
       }
       return response;
@@ -173,4 +237,5 @@ class AuthService {
   }
 }
 
+// Singleton-Instanz exportieren
 export default new AuthService(); 

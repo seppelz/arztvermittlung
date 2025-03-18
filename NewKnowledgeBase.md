@@ -783,3 +783,34 @@ Diese Erkenntnisse bilden eine solide Grundlage für die Implementierung ähnlic
    - Form field names should ideally match database field names for clearer code and easier debugging
    - When form structure differs from database structure, clear transformation functions should be used
    - Automated title generation based on key form fields creates more consistent database entries 
+
+## Verbesserte Strategien gegen zirkuläre Abhängigkeiten
+
+Wir haben neue, vertiefte Erkenntnisse über zirkuläre Abhängigkeiten in Vue-Anwendungen gewonnen und folgende Lösungsansätze identifiziert:
+
+1. **Multi-Stage State Management**: 
+   - Lokale Zustandscaches zur Vermeidung direkter Store-Abhängigkeiten
+   - Progressive Ladestrategie: Zuerst lokale Caches → localStorage → Pinia Stores
+   - Vermeidung von synchronen Imports zwischen voneinander abhängigen Modulen
+
+2. **Hierarchisches Caching für Auth-State**:
+   - Implementierung eines zeitbasierten Caching-Systems für Auth-Checks (TTL)
+   - Schichtenmodell mit zunehmendem Aufwand: Memory-Cache → localStorage → API-Calls
+   - Cache-Invalidierung bei signifikanten App-Ereignissen (Login/Logout)
+
+3. **Router Navigation-Guards mit Timeout-Schutz**:
+   - Implementierung von Timeouts für Navigation-Guards zur Vermeidung von Endlosschleifen
+   - Parallelisierung von Auth-Checks mittels Promise.race() gegen Timeout-Promise
+   - Klare Fallback-Strategien bei Verzögerungen oder Fehlern
+
+4. **Performance durch Minimierung teurer Operationen**:
+   - Vermeidung wiederholter Store-Zugriffe in schnellen Navigationsketten
+   - Direkte localStorage-Checks für kritische, häufig benötigte Informationen
+   - Kombination von lokalem und persistentem Caching zur Optimierung von wiederholten Auth-Prüfungen
+
+5. **Verbesserte Debugging-Strategien**:
+   - Stack-Trace-Analyse zur automatischen Erkennung rekursiver Muster
+   - Identifikation wiederholter Funktionsaufrufe durch Häufigkeitsanalyse des Stacks
+   - Timeout-basierte Erkennung von Deadlocks während der App-Initialisierung
+
+Diese Erkenntnisse haben uns ermöglicht, die Router-Navigation erheblich stabiler und performanter zu gestalten und gleichzeitig die Debugging-Fähigkeiten für komplexe asynchrone Prozesse zu verbessern. 

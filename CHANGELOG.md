@@ -118,6 +118,10 @@ All notable changes to this project will be documented in this file.
 - Fixed validation error in "Für Kliniken" form by ensuring all required fields are properly formatted
 - Implemented bulletin database integration for the "Für Ärzte" form, enabling doctors to submit job requests
 - Integrated the "Für Kliniken" and "Für Ärzte" forms with the Stellenbörse, ensuring submissions appear in the job listings
+- Weitere Verbesserung der Vue Router Fehlerbehandlung, um rekursive Fehler bei der Navigation zu vermeiden
+- Optimierung der Authentifizierungs-Überprüfung mit Cache-Implementierung für bessere Performance
+- Umbau des Auth-Service, um direkte zirkuläre Abhängigkeiten zum Router und Pinia zu vermeiden
+- Verbessertes Fehlerlogging mit tiefgreifender Analyse von Stacktraces zur Erkennung zirkulärer Abhängigkeiten
 
 ### Added
 - Created test scripts for MongoDB Atlas connection testing

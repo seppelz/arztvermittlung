@@ -4,27 +4,107 @@ import HomePage from '@/views/HomePage.vue'
 // Lazy load the auth service to prevent circular dependencies
 const getAuthService = () => import('@/services/auth.service').then(module => module.default)
 
-// Admin role check - use lazy loading to avoid circular dependencies
-const isAdmin = async () => {
-  try {
-    const authService = await getAuthService()
-    return authService.isAdmin()
-  } catch (error) {
-    console.error('Error checking admin status:', error)
-    return false
-  }
-}
+// Verbesserte Implementierung der Authentifizierungsprüfung
+// Cache für Auth-Status, um redundante Prüfungen in schnellen Navigationsketten zu vermeiden
+let authCache = {
+  isAuthenticated: null,
+  isAdmin: null,
+  timestamp: 0
+};
 
-// Authentication check - use lazy loading to avoid circular dependencies
+// Cache-Gültigkeitsdauer in Millisekunden (5 Sekunden)
+const CACHE_TTL = 5000; 
+
+// Verbesserte Authentifizierungsprüfung
 const isAuthenticated = async () => {
   try {
-    const authService = await getAuthService()
-    return authService.isAuthenticated()
+    // Cache verwenden, wenn vorhanden und noch gültig
+    const now = Date.now();
+    if (authCache.isAuthenticated !== null && (now - authCache.timestamp) < CACHE_TTL) {
+      return authCache.isAuthenticated;
+    }
+
+    // Wenn kein gültiger Cache, lokale Speicher direkt prüfen, um schneller zu sein
+    const token = localStorage.getItem('token');
+    if (!token) {
+      authCache.isAuthenticated = false;
+      authCache.timestamp = now;
+      return false;
+    }
+    
+    // Nur bei gültigem Token den Service laden
+    const authService = await getAuthService();
+    const authenticated = authService.isAuthenticated();
+    
+    // Cache aktualisieren
+    authCache.isAuthenticated = authenticated;
+    authCache.timestamp = now;
+    
+    return authenticated;
   } catch (error) {
-    console.error('Error checking authentication status:', error)
-    return false
+    console.error('Error in isAuthenticated check:', error);
+    // Im Fehlerfall sicherheitshalber als nicht authentifiziert behandeln
+    return false;
   }
-}
+};
+
+// Verbesserte Admin-Prüfung
+const isAdmin = async () => {
+  try {
+    // Cache verwenden, wenn vorhanden und noch gültig
+    const now = Date.now();
+    if (authCache.isAdmin !== null && (now - authCache.timestamp) < CACHE_TTL) {
+      return authCache.isAdmin;
+    }
+
+    // Wenn kein gültiger Cache, lokale Speicher direkt prüfen, um schneller zu sein
+    const userJson = localStorage.getItem('user');
+    if (!userJson) {
+      authCache.isAdmin = false;
+      authCache.timestamp = now;
+      return false;
+    }
+    
+    try {
+      const user = JSON.parse(userJson);
+      if (user && user.role === 'admin') {
+        authCache.isAdmin = true;
+        authCache.timestamp = now;
+        return true;
+      }
+    } catch (parseError) {
+      console.error('Error parsing user data:', parseError);
+    }
+    
+    // Nur im Zweifelsfall den Service laden
+    const authService = await getAuthService();
+    const admin = authService.isAdmin();
+    
+    // Cache aktualisieren
+    authCache.isAdmin = admin;
+    authCache.timestamp = now;
+    
+    return admin;
+  } catch (error) {
+    console.error('Error in isAdmin check:', error);
+    // Im Fehlerfall sicherheitshalber als kein Admin behandeln
+    return false;
+  }
+};
+
+// Möglichkeit, den Cache manuell zu invalidieren (z.B. nach Login/Logout)
+const clearAuthCache = () => {
+  authCache.isAuthenticated = null;
+  authCache.isAdmin = null;
+  authCache.timestamp = 0;
+};
+
+// Event-Listener für Änderungen am localStorage hinzufügen, um den Cache zu invalidieren
+window.addEventListener('storage', (event) => {
+  if (event.key === 'token' || event.key === 'user') {
+    clearAuthCache();
+  }
+});
 
 const routes = [
   {
@@ -207,41 +287,60 @@ const router = createRouter({
   }
 })
 
-// Navigation Guards - use async/await with proper error handling
+// Navigation Guards - verbessert mit robusterer Fehlerbehandlung
 router.beforeEach(async (to, from, next) => {
   try {
-    // Check if the route requires authentication
-    if (to.matched.some(record => record.meta.requiresAuth)) {
-      const authenticated = await isAuthenticated()
-      
-      if (!authenticated) {
-        // Not logged in -> Redirect to login page
-        return next({
-          name: 'AdminLogin',
-          query: { redirect: to.fullPath }
-        })
-      } 
-      
-      if (to.path.startsWith('/admin')) {
-        const admin = await isAdmin()
-        if (!admin) {
-          // Trying to access admin area but not an admin
-          return next({ name: 'Home' })
+    // Maximale Ausführungszeit für die Navigation setzen, um Endlosschleifen zu verhindern
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error('Navigation guard timeout exceeded')), 2000);
+    });
+    
+    // Navigation Guard Logik mit Timeout-Schutz
+    const navigationCheck = async () => {
+      // Prüfen, ob die Route Authentifizierung erfordert
+      if (to.matched.some(record => record.meta.requiresAuth)) {
+        const authenticated = await isAuthenticated();
+        
+        if (!authenticated) {
+          // Nicht eingeloggt -> Zur Login-Seite umleiten
+          return {
+            name: 'AdminLogin',
+            query: { redirect: to.fullPath }
+          };
+        } 
+        
+        if (to.path.startsWith('/admin')) {
+          const admin = await isAdmin();
+          if (!admin) {
+            // Versucht, auf Admin-Bereich zuzugreifen, ist aber kein Admin
+            return { name: 'Home' };
+          }
         }
+        
+        // Authentifiziert und autorisiert -> Zugriff erlauben
+        return true;
+      } else {
+        // Keine Authentifizierung erforderlich -> Zugriff erlauben
+        return true;
       }
-      
-      // Authenticated and authorized -> Allow access
-      return next()
+    };
+    
+    // Promise.race, um entweder die Navigation abzuschließen oder Timeout auszulösen
+    const result = await Promise.race([navigationCheck(), timeoutPromise]);
+    
+    // Wenn das Ergebnis ein Weiterleitungsobjekt ist
+    if (result !== true && typeof result === 'object') {
+      next(result);
     } else {
-      // No authentication required -> Allow access
-      return next()
+      next();
     }
   } catch (error) {
-    console.error('Navigation guard error:', error)
-    // In case of error, redirect to home for safety
-    return next({ name: 'Home' })
+    console.error('Navigation guard error:', error);
+    // Bei Fehler zur Startseite umleiten
+    clearAuthCache(); // Cache im Fehlerfall zurücksetzen
+    next({ name: 'Home' });
   }
-})
+});
 
 // Enhanced error handling for navigation failures
 router.onError((error) => {

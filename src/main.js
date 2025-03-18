@@ -4,94 +4,132 @@ import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import App from './App.vue'
 
-// Global error handler
+// Global error handler mit verbessertem Stack-Logging
 window.addEventListener('error', function(event) {
   console.error('Global error caught:', event.error);
-  // Log additional details about the error
+  // Stack Trace strukturiert als Array aufteilen für bessere Lesbarkeit
   if (event.error && event.error.stack) {
-    console.error('Error stack:', event.error.stack);
+    const stackLines = event.error.stack.split('\n');
+    console.error('Error stack:', stackLines);
   }
 });
 
-// Unhandled promise rejections
+// Unhandled promise rejections mit verbessertem Stack-Logging
 window.addEventListener('unhandledrejection', function(event) {
   console.error('Unhandled Promise Rejection:', event.reason);
   if (event.reason && event.reason.stack) {
-    console.error('Promise rejection stack:', event.reason.stack);
+    const stackLines = event.reason.stack.split('\n');
+    console.error('Promise rejection stack:', stackLines);
   }
 });
 
-// Create app with error handler
+// Timeout-Schutz für Initialisierung, um Deadlocks zu vermeiden
+const initTimeout = setTimeout(() => {
+  document.body.innerHTML = `
+    <div style="padding: 20px; text-align: center;">
+      <h1>Initialisierungsfehler</h1>
+      <p>Die Anwendung konnte nicht innerhalb der erwarteten Zeit gestartet werden.</p>
+      <p>Bitte aktualisieren Sie die Seite oder löschen Sie den Browser-Cache.</p>
+    </div>
+  `;
+  console.error('Application initialization timeout - possible deadlock detected');
+}, 10000);
+
+// Create app with enhanced error handler
 const app = createApp(App)
 app.config.errorHandler = (err, vm, info) => {
   console.error('Vue Error Handler:', err);
   console.error('Error Info:', info);
   
-  // Additional logging for specific error types
+  // Zusätzliches Logging für spezifische Fehlertypen
   if (err && err.name === 'NavigationFailure') {
     console.error('Navigation Failure Details:', {
-      from: err.from,
-      to: err.to,
+      from: err.from && err.from.fullPath,
+      to: err.to && err.to.fullPath,
       type: err.type
     });
   }
+  
+  // Stack-Analyse für Erkennung von zirkulären Abhängigkeiten
+  if (err && err.stack) {
+    const stackLines = err.stack.split('\n');
+    
+    // Suche nach häufig wiederholten Funktionsnamen als Indikator für Rekursion
+    const functionCalls = stackLines
+      .filter(line => line.includes('at '))
+      .map(line => line.trim());
+    
+    const duplicates = functionCalls.filter((call, index, arr) => 
+      arr.indexOf(call) !== index
+    );
+    
+    if (duplicates.length > 5) {
+      console.error('Possible circular dependency detected!', {
+        repeatedCalls: [...new Set(duplicates)].slice(0, 5),
+        totalDuplicates: duplicates.length
+      });
+    }
+  }
 };
 
-// Create Pinia and use it before importing any store-dependent modules
-const pinia = createPinia()
-app.use(pinia)
+// App-Objekt exportieren für explizite Importierung in anderen Modulen
+// Dies verhindert implizite zirkuläre Abhängigkeiten
+export { app };
 
-// Use a function to load the router asynchronously to prevent circular dependencies
-const setupRouter = async () => {
-  try {
-    // Dynamically import router to ensure Pinia is initialized first
-    const routerModule = await import('./router')
-    const router = routerModule.default
-    
-    // Mount app only after both Pinia and Router are initialized
-    app.use(router)
-    
-    return router
-  } catch (error) {
-    console.error('Fatal error setting up router:', error)
-    document.body.innerHTML = `
-      <div style="padding: 20px; text-align: center;">
-        <h1>Sorry, an error occurred while initializing the application</h1>
-        <p>Please try refreshing the page or clearing your browser cache.</p>
-        <p>Error details: ${error.message}</p>
-      </div>
-    `
-    throw error
-  }
-}
-
-// Initialize auth state and mount the app with proper error handling
+// Optimierte Initialisierungssequenz
 const initializeApp = async () => {
   try {
-    // Initialize router first before using stores that might depend on router
-    const router = await setupRouter()
+    console.log('Starting application initialization...');
     
-    // Initialize auth after router is set up
-    const { useAuthStore } = await import('./stores/auth')
-    const authStore = useAuthStore()
-    authStore.initAuth()
+    // 1. Pinia vor allem anderen initialisieren
+    const pinia = createPinia();
+    app.use(pinia);
+    console.log('Pinia initialized');
     
-    // Only mount the app when everything is properly initialized
-    app.mount('#app')
+    // 2. Versuchen, den Router zu importieren
+    console.log('Loading router...');
+    const routerModule = await import('./router');
+    const router = routerModule.default;
     
-    console.log('Application successfully initialized')
+    // 3. Router an die App anhängen
+    app.use(router);
+    console.log('Router initialized');
+    
+    // 4. Auth-Status initialisieren (benutzt jetzt lokalen Cache)
+    console.log('Initializing auth state...');
+    
+    // 5. App mounten
+    app.mount('#app');
+    console.log('Application successfully initialized');
+    
+    // Initialisierungs-Timeout löschen
+    clearTimeout(initTimeout);
   } catch (error) {
-    console.error('Error during app initialization:', error)
-    // Display a fallback error message to the user
+    console.error('Fatal error during app initialization:', error);
+    
+    // Detaillierte Fehlerinformationen für den Nutzer anzeigen
+    let errorDetails = error.message || 'Unknown error';
+    if (error.stack) {
+      const stackLines = error.stack.split('\n').slice(0, 3);
+      errorDetails += `\n\nStack: ${stackLines.join('\n')}`;
+    }
+    
     document.body.innerHTML = `
       <div style="padding: 20px; text-align: center;">
-        <h1>Sorry, an error occurred</h1>
-        <p>Please try refreshing the page or clearing your browser cache.</p>
-        <p>Error details: ${error.message}</p>
+        <h1>Anwendungsfehler</h1>
+        <p>Bei der Initialisierung der Anwendung ist ein Fehler aufgetreten.</p>
+        <p>Bitte aktualisieren Sie die Seite oder löschen Sie den Browser-Cache.</p>
+        <details style="margin-top: 20px; text-align: left;">
+          <summary>Technische Details</summary>
+          <pre style="background: #f5f5f5; padding: 10px; border-radius: 4px; overflow: auto; margin-top: 10px;">${errorDetails}</pre>
+        </details>
       </div>
-    `
+    `;
+    
+    // Initialisierungs-Timeout löschen
+    clearTimeout(initTimeout);
   }
-}
+};
 
-// Start app initialization
-initializeApp()
+// Kurze Verzögerung, um sicherzustellen, dass das DOM bereit ist
+setTimeout(initializeApp, 0);
