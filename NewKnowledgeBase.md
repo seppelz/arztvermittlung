@@ -453,3 +453,9 @@ This document tracks key insights and lessons learned about the codebase to impr
 - Form validations must be consistent with database model validations to avoid confusing error messages
 - Conditional field requirements based on other fields (e.g., federalState required only for Klinik Angebot types) should be synchronized between frontend forms and backend models
 - Controllers should provide detailed validation error messages to help users understand what went wrong with form submissions 
+
+## Node.js Backend Architecture
+- Pay close attention to import paths in Node.js applications, especially between singular and plural folder names like "middleware" vs "middlewares" which can cause module resolution errors in production
+- Vercel serverless functions are especially sensitive to path inconsistencies that might work locally but fail in production
+- Using consistent naming conventions for folders (all singular or all plural) helps prevent path-related errors
+- Import errors often manifest as 500 status codes in production while working fine in development 

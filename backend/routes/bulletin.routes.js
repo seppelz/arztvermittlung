@@ -1,6 +1,6 @@
 const express = require('express');
 const bulletinController = require('../controllers/bulletin.controller');
-const authMiddleware = require('../middleware/auth.middleware');
+const authMiddleware = require('../middlewares/auth.middleware');
 const { sendEmail } = require('../utils/email');
 
 const router = express.Router();

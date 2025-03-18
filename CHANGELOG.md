@@ -78,6 +78,7 @@ All notable changes to this project will be documented in this file.
 - Enhanced MongoDB connection options to fix SSL-related issues in production
 - Improved error handling and diagnostics in server.js for better troubleshooting
 - Added detailed logging in bulletin controller and auth controller for better error diagnostics
+- Fixed import path in bulletin.routes.js to correctly reference auth.middleware from middlewares directory
 
 ### Added
 - Created test scripts for MongoDB Atlas connection testing
