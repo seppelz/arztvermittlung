@@ -91,8 +91,12 @@
             </div>
             
             <div class="text-center">
-              <button type="submit" class="bg-dark hover:bg-primary-dark text-white font-bold py-3 px-10 rounded-lg shadow-strong transition-colors duration-300 text-lg transform hover:scale-105">
-                Anfrage absenden
+              <button 
+                type="submit" 
+                class="bg-dark hover:bg-primary-dark text-white font-bold py-3 px-10 rounded-lg shadow-strong transition-colors duration-300 text-lg transform hover:scale-105"
+                :disabled="isSubmitting"
+              >
+                {{ isSubmitting ? 'Wird gesendet...' : 'Anfrage absenden' }}
               </button>
             </div>
             
@@ -103,6 +107,12 @@
             <p class="font-semibold text-lg">Vielen Dank für Ihre Anfrage!</p>
             <p>Wir haben Ihre Daten erhalten und werden uns umgehend um Ihre Anfrage kümmern.</p>
           </div>
+          
+          <div v-if="submitError" class="mt-8 p-6 bg-red-100 text-red-700 rounded-lg border-2 border-red-300">
+            <p class="font-semibold text-lg">Fehler bei der Übermittlung</p>
+            <p>{{ submitError }}</p>
+            <p class="mt-2 text-sm">Bitte versuchen Sie es später erneut oder kontaktieren Sie unseren Support.</p>
+          </div>
         </div>
       </div>
     </section>
@@ -111,6 +121,7 @@
 
 <script setup>
 import { ref, reactive } from 'vue'
+import bulletinService from '@/services/bulletin.service'
 
 const form = reactive({
   hospitalName: '',
@@ -134,21 +145,64 @@ const form = reactive({
 })
 
 const formSubmitted = ref(false)
+const submitError = ref(null)
+const isSubmitting = ref(false)
 
-const submitForm = () => {
-  // Here you would normally send the form data to your backend
-  console.log('Form submitted:', form)
+async function submitForm() {
+  isSubmitting.value = true
+  submitError.value = null
   
-  // For demo purposes, we'll just show a success message
-  formSubmitted.value = true
-  
-  // Reset form after submission (optional)
-  // Object.keys(form).forEach(key => {
-  //   if (typeof form[key] === 'boolean') {
-  //     form[key] = false
-  //   } else {
-  //     form[key] = ''
-  //   }
-  // })
+  try {
+    // Generate a title based on specialty and start date
+    const formattedDate = form.startDate ? new Date(form.startDate).toLocaleDateString('de-DE', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    }) : 'flexibel'
+    
+    const generatedTitle = `Klinik sucht ab ${formattedDate}${form.specialty ? ' Arzt der Fachrichtung ' + form.specialty : ' Arzt'}`
+    
+    // Prepare the bulletin data
+    const bulletinData = {
+      title: generatedTitle,
+      name: form.hospitalName,
+      email: form.contactEmail,
+      content: form.jobDescription,
+      specialty: form.specialty,
+      userType: 'Klinik',
+      messageType: 'Angebot',
+      startDate: form.startDate || new Date().toISOString().split('T')[0],
+      federalState: '', // Optional field
+      requiredQualifications: form.requiredQualifications,
+      salary: form.salary,
+      privacyPolicyAccepted: form.privacyPolicyAccepted,
+      status: 'pending', // New entries start as pending for moderation
+      timestamp: new Date()
+    }
+    
+    // Send the data to the backend
+    await bulletinService.createBulletin(bulletinData)
+    
+    // Show success message
+    formSubmitted.value = true
+    
+    // Optional: Reset form after submission
+    Object.keys(form).forEach(key => {
+      if (typeof form[key] === 'boolean') {
+        form[key] = false
+      } else {
+        form[key] = ''
+      }
+    })
+    
+    // Set a default start date
+    form.startDate = new Date().toISOString().split('T')[0]
+    
+  } catch (error) {
+    console.error('Error submitting form:', error)
+    submitError.value = 'Fehler beim Speichern Ihrer Anfrage. Bitte versuchen Sie es später erneut.'
+  } finally {
+    isSubmitting.value = false
+  }
 }
 </script> 

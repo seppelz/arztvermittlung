@@ -785,3 +785,29 @@ When designing forms for different user types (doctors, clinics, etc.), it's cru
    - Terms of service acceptance
 
 This approach ensures that regardless of which side of the platform a user engages with, we always have sufficient information to facilitate meaningful connections and communications. 
+
+## Frontend-Backend Connectivity
+
+### Best Practices for Form Submissions
+
+1. **Complete API Integration**:
+   - All user-facing forms should be connected to backend APIs to persist data
+   - Demo or placeholder submission handlers should be replaced with actual API calls before deployment
+   - Visual success indicators should always correspond to actual successful database operations
+
+2. **Form Validation Flow**:
+   - Frontend validation should match backend validation requirements
+   - Success messages should only be displayed after confirmed backend success responses
+   - Error states should provide actionable information to users
+
+3. **Data Transformation Patterns**:
+   - Forms often need to transform user input before API submission (date formatting, etc.)
+   - Consistent data transformation should occur at the service layer, not in components
+   - Generated content (like automatic titles) should follow consistent patterns across all forms
+
+4. **Status Tracking for User Experience**:
+   - Loading states should be clearly indicated during form submission
+   - Disabling submit buttons during processing prevents duplicate submissions
+   - Error messages should be specific about the nature of the failure when possible
+
+By following these patterns, we ensure that all user data is properly captured and no forms become "black holes" where data is lost between the frontend and backend systems. 

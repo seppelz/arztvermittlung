@@ -114,6 +114,7 @@ All notable changes to this project will be documented in this file.
 - Improved app initialization sequence to prevent race conditions in component loading
 - Enhanced error fallbacks with better user feedback for navigation issues
 - Added missing email field to "Für Kliniken" form to ensure proper contact information collection
+- Fixed "Für Kliniken" form submissions not being saved to the database by connecting the form to the bulletin API
 
 ### Added
 - Created test scripts for MongoDB Atlas connection testing
