@@ -1,10 +1,29 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomePage from '@/views/HomePage.vue'
-import authService from '@/services/auth.service'
 
-// Admin role check
-const isAdmin = () => {
-  return authService.isAdmin()
+// Lazy load the auth service to prevent circular dependencies
+const getAuthService = () => import('@/services/auth.service').then(module => module.default)
+
+// Admin role check - use lazy loading to avoid circular dependencies
+const isAdmin = async () => {
+  try {
+    const authService = await getAuthService()
+    return authService.isAdmin()
+  } catch (error) {
+    console.error('Error checking admin status:', error)
+    return false
+  }
+}
+
+// Authentication check - use lazy loading to avoid circular dependencies
+const isAuthenticated = async () => {
+  try {
+    const authService = await getAuthService()
+    return authService.isAuthenticated()
+  } catch (error) {
+    console.error('Error checking authentication status:', error)
+    return false
+  }
 }
 
 const routes = [
@@ -133,13 +152,20 @@ const routes = [
   }
 ]
 
-// Wrap dynamic imports with error handling
+// Wrap dynamic imports with error handling - improve error handling
 routes.forEach(route => {
   if (typeof route.component === 'function') {
     const originalComponent = route.component;
     route.component = () => {
       return originalComponent().catch(err => {
         console.error(`Error loading component for route ${route.path}:`, err);
+        // Log additional details about the error
+        if (err.stack) {
+          console.error('Stack trace:', err.stack);
+        }
+        if (err.cause) {
+          console.error('Cause:', err.cause);
+        }
         // Return a fallback component
         return import('@/views/NotFoundPage.vue');
       });
@@ -153,6 +179,13 @@ routes.forEach(route => {
         childRoute.component = () => {
           return originalChildComponent().catch(err => {
             console.error(`Error loading component for child route ${route.path}/${childRoute.path}:`, err);
+            // Log additional details about the error
+            if (err.stack) {
+              console.error('Stack trace:', err.stack);
+            }
+            if (err.cause) {
+              console.error('Cause:', err.cause);
+            }
             // Return a fallback component
             return import('@/views/NotFoundPage.vue');
           });
@@ -174,49 +207,83 @@ const router = createRouter({
   }
 })
 
-// Navigation Guards
-router.beforeEach((to, from, next) => {
-  // Prüfen, ob die Route eine Authentifizierung erfordert
-  if (to.matched.some(record => record.meta.requiresAuth)) {
-    if (!authService.isAuthenticated()) {
-      // Nicht eingeloggt -> Weiterleitung zur Login-Seite
-      next({
-        name: 'AdminLogin',
-        query: { redirect: to.fullPath }
-      })
-    } else if (to.path.startsWith('/admin') && !isAdmin()) {
-      // Versucht auf Admin-Bereich zuzugreifen, ist aber kein Admin
-      next({ name: 'Home' })
+// Navigation Guards - use async/await with proper error handling
+router.beforeEach(async (to, from, next) => {
+  try {
+    // Check if the route requires authentication
+    if (to.matched.some(record => record.meta.requiresAuth)) {
+      const authenticated = await isAuthenticated()
+      
+      if (!authenticated) {
+        // Not logged in -> Redirect to login page
+        return next({
+          name: 'AdminLogin',
+          query: { redirect: to.fullPath }
+        })
+      } 
+      
+      if (to.path.startsWith('/admin')) {
+        const admin = await isAdmin()
+        if (!admin) {
+          // Trying to access admin area but not an admin
+          return next({ name: 'Home' })
+        }
+      }
+      
+      // Authenticated and authorized -> Allow access
+      return next()
     } else {
-      // Eingeloggt -> Zugriff erlauben
-      next()
+      // No authentication required -> Allow access
+      return next()
     }
-  } else {
-    // Keine Authentifizierung erforderlich -> Zugriff erlauben
-    next()
+  } catch (error) {
+    console.error('Navigation guard error:', error)
+    // In case of error, redirect to home for safety
+    return next({ name: 'Home' })
   }
 })
 
-// Error handling for navigation failures
+// Enhanced error handling for navigation failures
 router.onError((error) => {
   console.error('Router error:', error);
-  if (error.message.includes('Failed to fetch dynamically imported module')) {
+  
+  // Log error details to help with debugging
+  if (error.stack) {
+    console.error('Error stack:', error.stack);
+  }
+  
+  if (error.message && error.message.includes('Failed to fetch dynamically imported module')) {
     console.error('Module loading error - this might be caused by a network issue or incorrect build configuration');
-  } else if (error.message.includes('expected expression, got')) {
+    console.error('Module path:', error.message.split('Failed to fetch dynamically imported module')[1]);
+  } else if (error.message && error.message.includes('expected expression, got')) {
     console.error('Parsing error - this might be caused by invalid JavaScript being returned from the server');
+    console.error('Syntax error details:', error.message);
   } else if (error.name === 'TypeError' || error.name === 'ReferenceError') {
     console.error('JavaScript error during routing:', error.message);
   } else if (error.name === 'ChunkLoadError') {
     console.error('Failed to load chunk - try clearing your browser cache');
+  } else if (error.type && error.type === 4) { // Navigation aborted
+    console.error('Navigation aborted - likely caused by a navigation guard or redirects');
+  } else if (error.type && error.type === 8) { // Navigation cancelled
+    console.error('Navigation cancelled - likely caused by a new navigation occurring before the current one completed');
   }
 });
 
-// Add global catch for Promises in Vue Router
+// Enhanced global catch for Promises in Vue Router with better error reporting
 const originalPush = router.push;
 router.push = function push(location) {
   return originalPush.call(this, location).catch(err => {
     if (err.name !== 'NavigationDuplicated') {
       console.error('Navigation error:', err);
+      console.error('Failed navigation to:', location);
+      console.error('Error type:', err.type);
+      
+      if (err.from && err.to) {
+        console.error('Navigation details:', {
+          from: err.from.fullPath,
+          to: err.to.fullPath
+        });
+      }
     }
     return Promise.reject(err);
   });

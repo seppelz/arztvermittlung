@@ -3,8 +3,6 @@ import './assets/main.css'
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import App from './App.vue'
-import router from './router'
-import { useAuthStore } from './stores/auth'
 
 // Global error handler
 window.addEventListener('error', function(event) {
@@ -39,30 +37,61 @@ app.config.errorHandler = (err, vm, info) => {
   }
 };
 
+// Create Pinia and use it before importing any store-dependent modules
 const pinia = createPinia()
-
 app.use(pinia)
 
-// Add router after Pinia to ensure store is available
-try {
-  app.use(router)
-} catch (error) {
-  console.error('Error setting up router:', error);
+// Use a function to load the router asynchronously to prevent circular dependencies
+const setupRouter = async () => {
+  try {
+    // Dynamically import router to ensure Pinia is initialized first
+    const routerModule = await import('./router')
+    const router = routerModule.default
+    
+    // Mount app only after both Pinia and Router are initialized
+    app.use(router)
+    
+    return router
+  } catch (error) {
+    console.error('Fatal error setting up router:', error)
+    document.body.innerHTML = `
+      <div style="padding: 20px; text-align: center;">
+        <h1>Sorry, an error occurred while initializing the application</h1>
+        <p>Please try refreshing the page or clearing your browser cache.</p>
+        <p>Error details: ${error.message}</p>
+      </div>
+    `
+    throw error
+  }
 }
 
-// Initialize auth state before mounting the app
-try {
-  const authStore = useAuthStore()
-  authStore.initAuth()
-  app.mount('#app')
-} catch (error) {
-  console.error('Error during app initialization:', error);
-  // Display a fallback error message to the user
-  document.body.innerHTML = `
-    <div style="padding: 20px; text-align: center;">
-      <h1>Sorry, an error occurred</h1>
-      <p>Please try refreshing the page or clearing your browser cache.</p>
-      <p>Error details: ${error.message}</p>
-    </div>
-  `;
+// Initialize auth state and mount the app with proper error handling
+const initializeApp = async () => {
+  try {
+    // Initialize router first before using stores that might depend on router
+    const router = await setupRouter()
+    
+    // Initialize auth after router is set up
+    const { useAuthStore } = await import('./stores/auth')
+    const authStore = useAuthStore()
+    authStore.initAuth()
+    
+    // Only mount the app when everything is properly initialized
+    app.mount('#app')
+    
+    console.log('Application successfully initialized')
+  } catch (error) {
+    console.error('Error during app initialization:', error)
+    // Display a fallback error message to the user
+    document.body.innerHTML = `
+      <div style="padding: 20px; text-align: center;">
+        <h1>Sorry, an error occurred</h1>
+        <p>Please try refreshing the page or clearing your browser cache.</p>
+        <p>Error details: ${error.message}</p>
+      </div>
+    `
+  }
 }
+
+// Start app initialization
+initializeApp()

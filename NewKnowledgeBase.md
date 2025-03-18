@@ -432,6 +432,46 @@ Dieses Dokument enthält wichtige Lernpunkte, die während der Entwicklung der M
 - **Deployment-Tests**: Testskripte vor dem Deployment helfen, häufige Probleme zu identifizieren und zu beheben, bevor sie in Produktion gehen.
 - **Kontinuierliche Integration**: Der Deployment-Prozess kann in CI/CD-Pipelines integriert werden, um Tests und Qualitätschecks vor dem Deployment auszuführen. 
 
+## Managing Circular Dependencies in Vue Router and Auth Services
+
+Circular dependencies can cause subtle but serious issues in Vue applications, particularly when the router and authentication services depend on each other. Here are key insights from resolving these issues:
+
+### Root Causes of Circular Dependencies
+
+1. **Direct Imports**: When router imports auth service and auth service (or components that use it) imports router
+2. **Indirect Circular Paths**: When multiple modules form a dependency circle (A → B → C → A)
+3. **Early Access**: Accessing services before they're fully initialized
+
+### Effective Solutions
+
+1. **Lazy Loading with Dynamic Imports**:
+   - Use `import()` for lazy loading instead of static imports for services that may cause circular dependencies
+   - Wrap async imports in try/catch blocks with fallbacks
+
+2. **Memoization for Service Instances**:
+   - Cache service instances to prevent redundant initializations
+   - Provide fallback objects when services can't be instantiated
+
+3. **Proper Initialization Order**:
+   - Initialize Pinia before any services that might use stores
+   - Mount the Vue app only after all critical services are properly initialized
+   - Use async/await patterns for sequential initialization
+
+4. **Enhanced Error Handling**:
+   - Add specific error handlers for different types of failures
+   - Provide user-friendly error messages when critical services fail
+   - Log detailed debugging information in the console
+
+### Symptoms of Circular Dependencies
+
+- Infinite recursion errors
+- "Maximum call stack size exceeded" errors
+- Components that partially render or don't render at all
+- Unexplained navigation failures
+- Authentication status that seems to "forget" itself
+
+By implementing these patterns, we've been able to resolve deep-seated issues with Vue Router that were causing unpredictable behavior and error messages. 
+
 # New Knowledge Base
 
 This document tracks key insights and lessons learned about the codebase to improve our productivity.
