@@ -1,25 +1,25 @@
 <template>
-  <div v-if="showBanner" class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 md:p-6 z-50 shadow-lg">
+  <div v-if="showBanner" class="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-dark p-4 md:p-6 z-50 shadow-xl">
     <div class="container mx-auto">
       <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div class="flex-1">
-          <h3 class="text-lg font-bold text-heading mb-2">Datenschutzhinweis</h3>
-          <p class="text-sm text-gray-600 mb-2">
+          <h3 class="text-lg font-bold text-dark mb-2">Datenschutzhinweis</h3>
+          <p class="text-sm text-gray-700 mb-2 leading-relaxed">
             Wir verwenden Cookies, um Ihre Erfahrung auf unserer Website zu verbessern.
             Mit der Nutzung dieser Website stimmen Sie unserer Verwendung von Cookies gemäß unserer
-            <router-link to="/privacy" class="text-primary hover:underline">Datenschutzerklärung</router-link> zu.
+            <router-link to="/privacy" class="text-primary font-medium hover:underline">Datenschutzerklärung</router-link> zu.
           </p>
         </div>
-        <div class="flex flex-col sm:flex-row gap-2">
+        <div class="flex flex-col sm:flex-row gap-3">
           <button 
             @click="acceptCookies" 
-            class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-colors"
+            class="px-5 py-2.5 bg-dark text-white rounded-lg hover:bg-dark/80 focus:outline-none focus:ring-2 focus:ring-dark focus:ring-offset-2 transition-colors font-bold shadow-md"
           >
             Akzeptieren
           </button>
           <button 
             @click="rejectCookies" 
-            class="px-4 py-2 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors"
+            class="px-5 py-2.5 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors font-medium border border-gray-300 shadow-sm"
           >
             Ablehnen
           </button>

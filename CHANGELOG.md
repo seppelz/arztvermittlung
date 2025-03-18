@@ -346,3 +346,4 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 - Implementierung eines datenschutzkonformen Cookie-Banners zur Einholung der Einwilligung der Nutzer gemäß DSGVO
+- Verbessertes Design des Cookie-Banners mit höherem Kontrast für bessere Sichtbarkeit und Zugänglichkeit
