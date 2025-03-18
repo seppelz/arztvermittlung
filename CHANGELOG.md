@@ -84,6 +84,7 @@ All notable changes to this project will be documented in this file.
 - Fixed import path in bulletin.routes.js to correctly reference auth.middleware from middlewares directory
 - Fixed admin dashboard bulletin display by updating API URL configuration to point to production server
 - Enhanced bulletin service to handle different API response formats
+- Fixed bulletin service API endpoints to correctly use '/bulletin' instead of '/bulletins' to match backend routes
 
 ### Added
 - Created test scripts for MongoDB Atlas connection testing

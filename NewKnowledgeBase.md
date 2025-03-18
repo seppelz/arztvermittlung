@@ -467,6 +467,7 @@ This document tracks key insights and lessons learned about the codebase to impr
 - **Response Transformation**: Frontend services should transform API responses into consistent formats that components can reliably consume regardless of the data source
 - **Error Handling for Production**: Enhance error logging in production environments to provide detailed diagnostic information for troubleshooting API communication issues
 - **Cross-Origin Considerations**: Production deployments often involve different domains for frontend and API, requiring proper CORS configuration
+- **API Endpoint Naming Consistency**: Ensure that frontend service endpoint paths (e.g., '/bulletin' vs '/bulletins') exactly match the backend route definitions, as even small discrepancies will cause 404 errors in production while potentially working in development due to different error handling
 
 ## Node.js Backend Architecture
 - Pay close attention to import paths in Node.js applications, especially between singular and plural folder names like "middleware" vs "middlewares" which can cause module resolution errors in production

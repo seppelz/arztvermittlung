@@ -14,7 +14,7 @@ class BulletinService {
       console.log('BulletinService: Fetching all bulletins with params:', params);
       console.log('BulletinService: Using API URL:', api.defaults.baseURL);
       
-      const response = await api.get('/bulletins', { params });
+      const response = await api.get('/bulletin', { params });
       console.log('BulletinService: Response received:', response);
       
       if (!response.data) {
@@ -45,7 +45,7 @@ class BulletinService {
    */
   async getBulletinById(id) {
     try {
-      const response = await api.get(`/bulletins/${id}`);
+      const response = await api.get(`/bulletin/${id}`);
       return response.data;
     } catch (error) {
       throw error;
@@ -59,7 +59,7 @@ class BulletinService {
    */
   async createBulletin(bulletinData) {
     try {
-      const response = await api.post('/bulletins', bulletinData);
+      const response = await api.post('/bulletin', bulletinData);
       return response.data;
     } catch (error) {
       throw error;
@@ -74,7 +74,7 @@ class BulletinService {
    */
   async updateBulletin(id, bulletinData) {
     try {
-      const response = await api.patch(`/bulletins/${id}`, bulletinData);
+      const response = await api.patch(`/bulletin/${id}`, bulletinData);
       return response.data;
     } catch (error) {
       throw error;
@@ -88,7 +88,7 @@ class BulletinService {
    */
   async deleteBulletin(id) {
     try {
-      const response = await api.delete(`/bulletins/${id}`);
+      const response = await api.delete(`/bulletin/${id}`);
       return response.data;
     } catch (error) {
       throw error;
