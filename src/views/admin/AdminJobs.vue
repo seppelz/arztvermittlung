@@ -629,24 +629,49 @@ const fetchJobs = async () => {
   error.value = null;
   
   try {
+    console.log('AdminJobs: Fetching job listings from server...');
+    
     // Verwende den vorhandenen bulletin-Service und filtere clientseitig nach Angeboten/Gesuchen
     const response = await bulletinService.getAllBulletins();
     
+    console.log('AdminJobs: Response received:', response);
+    
     if (!response || !response.data) {
+      console.warn('AdminJobs: No data in response');
       throw new Error('Keine Daten vom Server erhalten');
     }
     
+    // Log data stats before filtering
+    console.log('AdminJobs: Total bulletins before filtering:', response.data.length);
+    
     // Nur Angebote und Gesuche auswählen (keine Informationen)
-    jobs.value = response.data
-      .filter(item => item.messageType === 'Angebot' || item.messageType === 'Gesuch')
-      .map(item => ({
-        ...item,
-        id: item._id || item.id, // MongoDB verwendet _id, wir verwenden id für Konsistenz in der UI
-        timestamp: new Date(item.timestamp)
-      }));
+    const jobListings = response.data
+      .filter(item => item.messageType === 'Angebot' || item.messageType === 'Gesuch');
+    
+    console.log('AdminJobs: Job listings after filtering:', jobListings.length);
+    
+    // Log first item as sample
+    if (jobListings.length > 0) {
+      console.log('AdminJobs: Sample job listing:', jobListings[0]);
+    }
+    
+    jobs.value = jobListings.map(item => ({
+      ...item,
+      id: item._id || item.id, // MongoDB verwendet _id, wir verwenden id für Konsistenz in der UI
+      timestamp: new Date(item.timestamp || item.createdAt || Date.now())
+    }));
+    
+    // Log stats about different message types
+    const angebotCount = jobs.value.filter(job => job.messageType === 'Angebot').length;
+    const gesuchCount = jobs.value.filter(job => job.messageType === 'Gesuch').length;
+    
+    console.log('AdminJobs: Message type stats - Angebot:', angebotCount, 'Gesuch:', gesuchCount);
+    console.log('AdminJobs: Total job listings loaded:', jobs.value.length);
   } catch (err) {
-    console.error('Error fetching jobs:', err);
+    console.error('AdminJobs: Error fetching jobs:', err);
+    console.error('AdminJobs: Error details:', err.response || err.message);
     error.value = 'Fehler beim Laden der Stellenangebote und -gesuche. Bitte versuchen Sie es später erneut.';
+    jobs.value = [];
   } finally {
     isLoading.value = false;
   }

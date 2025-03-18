@@ -71,12 +71,12 @@
             <p class="text-gray-500">Erstellen Sie ein neues Angebot oder Gesuch mit dem Formular unten.</p>
           </div>
           
-          <!-- Messages list -->
-          <div v-else class="space-y-6">
+          <!-- Messages Grid -->
+          <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <div 
               v-for="message in filteredMessages" 
               :key="message.id" 
-              class="relative p-5 border rounded-lg border-gray-200 shadow-sm hover:shadow-md transition-shadow"
+              class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-strong transition-shadow duration-300 flex flex-col border border-gray-200"
             >
               <div 
                 class="h-2 w-full" 
@@ -350,72 +350,8 @@ function getApiUrl(endpoint) {
   return `${baseUrl}/${endpoint}`;
 }
 
-// Beispieldaten für die Demonstration - nur Angebote und Gesuche
-const demoMessages = [
-  {
-    id: 1,
-    name: 'Klinikum München',
-    email: 'personal@klinikum-muenchen.de',
-    userType: 'Klinik',
-    messageType: 'Angebot',
-    title: 'Vertretung Notfallmedizin (2 Wochen) - übertarifliche Vergütung',
-    content: 'Suchen dringend Vertretung für unsere Notfallstation vom 15.-29.06.2025. Erfahrung in Notfallmedizin erforderlich. Übertarifliche Vergütung, Unterkunft wird gestellt.',
-    timestamp: new Date('2025-05-15T10:30:00'),
-    startDate: new Date('2025-06-15T00:00:00'), // Start date for the job
-    privacyPolicyAccepted: true
-  },
-  {
-    id: 2,
-    name: 'Dr. Julia Weber',
-    email: 'j.weber@arztpraxis.de',
-    userType: 'Arzt',
-    messageType: 'Gesuch',
-    title: 'Anästhesist verfügbar für Kurzeinsätze bis 4 Wochen',
-    content: 'Facharzt für Anästhesie mit 8 Jahren Erfahrung sucht Kurzeinsätze (1-4 Wochen) im Raum Köln ab sofort. Flexibel und kurzfristig verfügbar, auch Wochenenddienste möglich.',
-    timestamp: new Date('2025-05-12T15:45:00'),
-    startDate: new Date('2025-05-20T00:00:00'), // Start date for availability
-    privacyPolicyAccepted: true
-  },
-  {
-    id: 3,
-    name: 'Universitätsklinikum Hamburg',
-    email: 'karriere@uk-hamburg.de',
-    userType: 'Klinik',
-    messageType: 'Angebot',
-    title: 'Kardiologie - 3-Monats-Vertretung (übertariflich)',
-    content: 'Suchen für den Zeitraum 01.07.-30.09.2025 Facharzt (m/w/d) für unsere kardiologische Abteilung. Übertarifliche Vergütung, Dienstwohnung möglich, flexible Dienstplangestaltung.',
-    timestamp: new Date('2025-05-10T09:15:00'),
-    startDate: new Date('2025-07-01T00:00:00'), // Start date for the job
-    privacyPolicyAccepted: true
-  },
-  {
-    id: 5,
-    name: 'Rehaklinik Schwarzwald',
-    email: 'personal@rehaklinik-schwarzwald.de',
-    userType: 'Klinik',
-    messageType: 'Angebot',
-    title: 'Honorarärzte für Wochenenddienste (übertariflich)',
-    content: 'Suchen regelmäßig Honorarärzte für Wochenenddienste (Fr-So). Attraktives Honorar, Unterkunft inklusive. Fachrichtung: Innere Medizin, Allgemeinmedizin.',
-    timestamp: new Date('2025-05-05T14:10:00'),
-    startDate: new Date('2025-06-01T00:00:00'), // Start date for the job
-    privacyPolicyAccepted: true
-  },
-  {
-    id: 6,
-    name: 'Dr. Sarah Müller',
-    email: 's.mueller@gmail.com',
-    userType: 'Arzt',
-    messageType: 'Gesuch',
-    title: 'Kinderärztin für 3-Monats-Einsätze verfügbar',
-    content: 'Fachärztin für Pädiatrie mit 12 Jahren Berufserfahrung sucht Vertretungsstellen oder Projekteinsätze für 1-3 Monate im Raum Berlin/Brandenburg. Flexible Zeiteinteilung, auch kurzfristig verfügbar.',
-    timestamp: new Date('2025-05-03T16:30:00'),
-    startDate: new Date('2025-05-15T00:00:00'), // Start date for availability
-    privacyPolicyAccepted: true
-  }
-];
-
 // Zustandsvariablen
-const messages = ref([...demoMessages]);
+const messages = ref([]);
 const currentFilter = ref('all');
 const sortOrder = ref('newest');
 const currentPage = ref(1);
@@ -630,6 +566,7 @@ onMounted(async () => {
 
 async function fetchMessages() {
   isLoading.value = true;
+  loadError.value = null;
   
   try {
     // Get bulletins with messageType 'Angebot' or 'Gesuch'
@@ -644,13 +581,17 @@ async function fetchMessages() {
         id: item._id || item.id
       }));
       
-      // Merge with demo data initially, later can remove demo data completely
-      messages.value = [...formattedData, ...demoMessages];
+      // Use only real data from database
+      messages.value = formattedData;
+      console.log('Loaded', messages.value.length, 'job listings from API');
+    } else {
+      messages.value = [];
+      console.warn('No job listings found or empty response');
     }
   } catch (error) {
     console.error('Error loading job listings:', error);
     loadError.value = 'Fehler beim Laden der Daten. Bitte versuchen Sie es später erneut.';
-    // Keep demo data as fallback
+    messages.value = []; // Reset to empty array on error
   } finally {
     isLoading.value = false;
   }

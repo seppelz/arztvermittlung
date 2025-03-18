@@ -529,12 +529,20 @@ const fetchBulletins = async () => {
     console.log('AdminBulletin: Fetching bulletins from server...');
     console.log('AdminBulletin: Using API URL:', api.defaults.baseURL);
     
+    // Log the request parameters
+    console.log('AdminBulletin: Request parameters:', {});
+    
     const response = await bulletinService.getAllBulletins();
     console.log('AdminBulletin: Response received:', response);
     
     // Check if response has the expected structure
     if (response && response.data) {
       console.log('AdminBulletin: Processing data array with', response.data.length, 'items');
+      
+      // Log the first few items for debugging
+      if (response.data.length > 0) {
+        console.log('AdminBulletin: First item sample:', response.data[0]);
+      }
       
       bulletins.value = response.data.map(item => ({
         ...item,
@@ -543,6 +551,13 @@ const fetchBulletins = async () => {
       }));
       
       console.log('AdminBulletin: Processed', bulletins.value.length, 'bulletins');
+      
+      // Log stats about different message types
+      const infoCount = bulletins.value.filter(b => b.messageType === 'Information').length;
+      const angebotCount = bulletins.value.filter(b => b.messageType === 'Angebot').length;
+      const gesuchCount = bulletins.value.filter(b => b.messageType === 'Gesuch').length;
+      
+      console.log('AdminBulletin: Message type stats - Information:', infoCount, 'Angebot:', angebotCount, 'Gesuch:', gesuchCount);
     } else {
       console.warn('AdminBulletin: Response format unexpected:', response);
       bulletins.value = [];

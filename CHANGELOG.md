@@ -66,6 +66,9 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 - Fixed issue with job listings in Stellenbörse not being saved to the database by connecting the form to the bulletin API
+- Fixed grid layout in Stellenbörse to display job listings in cards next to each other (3 columns on large screens)
+- Removed demo data from Stellenbörse and Admin components to ensure only real database entries are displayed
+- Enhanced logging in AdminBulletin and AdminJobs components for better troubleshooting of data loading issues
 - Fixed MongoDB Atlas connection issues by disabling SSL validation
 - Added test users to MongoDB Atlas database for guest login functionality
 - Fixed CORS issues with Vercel deployment by updating API URL configuration

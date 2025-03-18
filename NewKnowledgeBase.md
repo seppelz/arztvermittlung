@@ -509,3 +509,12 @@ This document tracks key insights and lessons learned about the codebase to impr
 - **Form-to-API Consistency**: Forms must be directly connected to appropriate API service methods to ensure data persistence; simulated API calls with setTimeout are suitable for prototyping but inadequate for production.
 - **Database Schema-Frontend Alignment**: Ensure that form field models in frontend components exactly match database schema requirements to prevent validation errors or missing data issues.
 - **State Management During API Transitions**: Implement clear loading, error, and empty states when connecting components to live APIs to handle all possible response scenarios gracefully. 
+
+## Data Management in Production
+
+- **Demo Data vs. Production Data**: While demo data is useful during development, it should be completely removed in production environments to prevent confusion between real and fake entries.
+- **Layout Consistency**: Grid layouts should be consistent across related views to maintain user expectations - inconsistent layouts between similar components lead to disjointed user experience.
+- **Comprehensive Logging for Troubleshooting**: Enhanced logging in data-loading functions is crucial for diagnosing issues in production environments, including request parameters, response structures, and statistics about loaded data.
+- **Data Flow Traceability**: Maintaining clear visibility of data flow from API to components ensures that issues with missing or incorrect data can be quickly diagnosed and fixed.
+- **Admin vs. Frontend Data Consistency**: Administrator interfaces must display the same data source as frontend components to ensure proper moderation and management capabilities.
+- **Production Debugging Best Practices**: When troubleshooting production data issues, adding temporary detailed logging is preferable to hard-coded demo data, as it provides real insights without confusing real and fake entries. 
