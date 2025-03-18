@@ -96,6 +96,7 @@ All notable changes to this project will be documented in this file.
 - Fixed dynamic import issues by adding fallback routes when component loading fails
 - Fixed date display in Stellenbörse job listings to correctly use the selected startDate instead of the publication date
 - Fixed Admin Dashboard to display real activity data from database instead of dummy entries
+- Fixed rendering of HTML tags in specialty fields of job listings by using v-html directive
 
 ### Added
 - Created test scripts for MongoDB Atlas connection testing

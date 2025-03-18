@@ -517,7 +517,17 @@ This document tracks key insights and lessons learned about the codebase to impr
 - **Comprehensive Logging for Troubleshooting**: Enhanced logging in data-loading functions is crucial for diagnosing issues in production environments, including request parameters, response structures, and statistics about loaded data.
 - **Data Flow Traceability**: Maintaining clear visibility of data flow from API to components ensures that issues with missing or incorrect data can be quickly diagnosed and fixed.
 - **Admin vs. Frontend Data Consistency**: Administrator interfaces must display the same data source as frontend components to ensure proper moderation and management capabilities.
-- **Production Debugging Best Practices**: When troubleshooting production data issues, adding temporary detailed logging is preferable to hard-coded demo data, as it provides real insights without confusing real and fake entries. 
+- **Production Debugging Best Practices**: When troubleshooting production data issues, adding temporary detailed logging is preferable to hard-coded demo data, as it provides real insights without confusing real and fake entries.
+
+## Secure HTML Rendering in Vue.js
+
+- **Text Interpolation vs. HTML Rendering**: Vue's default text interpolation (`{{ }}`) escapes HTML for security, rendering HTML tags as text; use `v-html` directive when intentionally rendering HTML content.
+- **HTML Content Security**: When using `v-html`, be aware that the content is inserted as raw HTML, which could lead to XSS vulnerabilities if user-provided content is rendered; only use for trusted content.
+- **Nested Rendering Strategy**: For conditional HTML rendering, use nested spans with `v-if` and `v-html` together to properly structure conditional HTML content.
+- **String Concatenation with HTML**: When concatenating strings containing HTML tags, prefer to use `v-html` on the complete string rather than mixing text interpolation and HTML.
+- **Dynamic Content Styling**: For dynamic styling without security risks, consider alternatives to HTML injection such as class binding or computed properties.
+- **Interface Consistency**: Ensure that HTML rendering behavior is consistent across similar components and views for a unified user experience.
+- **Accessibility Considerations**: When rendering HTML elements like `<strong>`, ensure they serve semantic purposes rather than just visual styling, to maintain proper accessibility.
 
 ## Effektives Admin-Dashboard Design
 

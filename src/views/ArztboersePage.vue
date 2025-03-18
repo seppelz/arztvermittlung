@@ -99,8 +99,8 @@
                   <span class="text-sm text-gray-500">{{ formatDate(message.timestamp) }}</span>
                 </div>
                 <h3 class="text-xl font-bold mb-2 text-heading">
-                  <span v-if="message.userType === 'Arzt'">Arzt sucht ab {{ formatDate(message.startDate) }} {{ message.specialty ? 'Fachrichtung ' + message.specialty : '' }}</span>
-                  <span v-else-if="message.userType === 'Klinik'">Klinik sucht ab {{ formatDate(message.startDate) }} {{ message.specialty ? 'Arzt der Fachrichtung ' + message.specialty : 'Arzt' }}</span>
+                  <span v-if="message.userType === 'Arzt'">Arzt sucht ab {{ formatDate(message.startDate) }} <span v-if="message.specialty" v-html="'Fachrichtung ' + message.specialty"></span></span>
+                  <span v-else-if="message.userType === 'Klinik'">Klinik sucht ab {{ formatDate(message.startDate) }} <span v-if="message.specialty" v-html="'Arzt der Fachrichtung ' + message.specialty"></span><span v-else>Arzt</span></span>
                   <span v-else>{{ message.title }}</span>
                 </h3>
                 <p class="text-gray-700 mb-4">{{ message.content }}</p>
@@ -108,8 +108,8 @@
                   <div class="flex justify-between">
                     <div>
                       <p class="text-sm text-gray-600">
-                        <span v-if="message.userType === 'Arzt'">Ein Arzt {{ message.specialty ? 'der Fachrichtung <strong>' + message.specialty + '</strong>' : '' }} sucht ab <strong>{{ formatDate(message.startDate) }}</strong> eine Stelle.</span>
-                        <span v-if="message.userType === 'Klinik'">Eine Klinik aus <strong>{{ message.federalState || 'unbekannt' }}</strong> sucht ab <strong>{{ formatDate(message.startDate) }}</strong> einen Arzt {{ message.specialty ? 'der Fachrichtung <strong>' + message.specialty + '</strong>' : '' }}.</span>
+                        <span v-if="message.userType === 'Arzt'">Ein Arzt <span v-if="message.specialty" v-html="'der Fachrichtung <strong>' + message.specialty + '</strong>'"></span> sucht ab <strong>{{ formatDate(message.startDate) }}</strong> eine Stelle.</span>
+                        <span v-if="message.userType === 'Klinik'">Eine Klinik aus <strong>{{ message.federalState || 'unbekannt' }}</strong> sucht ab <strong>{{ formatDate(message.startDate) }}</strong> einen Arzt <span v-if="message.specialty" v-html="'der Fachrichtung <strong>' + message.specialty + '</strong>'"></span>.</span>
                       </p>
                     </div>
                     <button 
