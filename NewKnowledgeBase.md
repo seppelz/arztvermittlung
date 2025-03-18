@@ -520,6 +520,11 @@ This document tracks key insights and lessons learned about the codebase to impr
    - Farbübergänge von Desktop zu Mobil sollten konsistent bleiben, um ein einheitliches Markenerlebnis zu gewährleisten
    - Bei der Entwicklung von Styling-Änderungen müssen sowohl Desktop- als auch Mobile-Varianten berücksichtigt werden
 
+4. **Logo und Markenplatzierung**:
+   - Eine Mindestbreite für den Logo-Container (z.B. min-w-[200px]) gewährleistet ausreichend visuellen Raum für die Markenidentität
+   - Ein dedizierter rechter Abstand (z.B. pr-8) zwischen Logo und Navigation verhindert visuelle Überlappungen
+   - Die Balance zwischen Logo-Größe und verfügbarem Navigationsraum ist besonders wichtig bei mittleren Viewport-Größen
+
 ## Cross-Service Integration
 
 - **Demo vs. Real Data Integration**: When transitioning from demo data to real API data, it's critical to maintain both sources temporarily with a preference for real data to ensure smooth user experience without data gaps.
