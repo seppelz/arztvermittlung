@@ -97,6 +97,8 @@ All notable changes to this project will be documented in this file.
 - Fixed date display in Stellenbörse job listings to correctly use the selected startDate instead of the publication date
 - Fixed Admin Dashboard to display real activity data from database instead of dummy entries
 - Fixed rendering of HTML tags in specialty fields of job listings by using v-html directive
+- Fixed "TypeError: s.filter is not a function" in AdminDashboard by adding proper type checks before using array methods
+- Fixed "ReferenceError: api is not defined" in AdminBulletin by removing unnecessary api reference
 
 ### Added
 - Created test scripts for MongoDB Atlas connection testing

@@ -527,49 +527,38 @@ const fetchBulletins = async () => {
   
   try {
     console.log('AdminBulletin: Fetching bulletins from server...');
-    console.log('AdminBulletin: Using API URL:', api.defaults.baseURL);
     
     // Log the request parameters
     console.log('AdminBulletin: Request parameters:', {});
     
     const response = await bulletinService.getAllBulletins();
-    console.log('AdminBulletin: Response received:', response);
     
-    // Check if response has the expected structure
-    if (response && response.data) {
-      console.log('AdminBulletin: Processing data array with', response.data.length, 'items');
-      
-      // Log the first few items for debugging
-      if (response.data.length > 0) {
-        console.log('AdminBulletin: First item sample:', response.data[0]);
-      }
-      
-      bulletins.value = response.data.map(item => ({
+    if (response.data) {
+      // Format the data to use consistent id property (either id or _id)
+      const formattedData = response.data.map(item => ({
         ...item,
-        id: item._id || item.id, // MongoDB verwendet _id, wir verwenden id für Konsistenz in der UI
-        timestamp: new Date(item.timestamp || item.createdAt || Date.now())
+        id: item._id || item.id
       }));
       
-      console.log('AdminBulletin: Processed', bulletins.value.length, 'bulletins');
-      
-      // Log stats about different message types
-      const infoCount = bulletins.value.filter(b => b.messageType === 'Information').length;
-      const angebotCount = bulletins.value.filter(b => b.messageType === 'Angebot').length;
-      const gesuchCount = bulletins.value.filter(b => b.messageType === 'Gesuch').length;
-      
-      console.log('AdminBulletin: Message type stats - Information:', infoCount, 'Angebot:', angebotCount, 'Gesuch:', gesuchCount);
+      bulletins.value = formattedData;
+      console.log('AdminBulletin: Loading completed, bulletins count:', bulletins.value.length);
     } else {
-      console.warn('AdminBulletin: Response format unexpected:', response);
       bulletins.value = [];
+      console.warn('AdminBulletin: No bulletins found or empty response');
+      console.log('AdminBulletin: Loading completed, bulletins count: 0');
     }
-  } catch (err) {
-    console.error('AdminBulletin: Error fetching bulletins:', err);
-    console.error('AdminBulletin: Error details:', err.response || err.message);
-    error.value = 'Fehler beim Laden der Pinnwand-Einträge. Bitte versuchen Sie es später erneut.';
+  } catch (error) {
+    console.error('AdminBulletin: Error fetching bulletins:', error);
+    console.error('AdminBulletin: Error details:', error.response || error.message);
+    
+    // Set error message
+    error.value = 'Fehler beim Laden der Daten: ' + (error.message || 'Unbekannter Fehler');
+    
+    // Reset bulletins
     bulletins.value = [];
+    console.log('AdminBulletin: Loading completed, bulletins count: 0');
   } finally {
     isLoading.value = false;
-    console.log('AdminBulletin: Loading completed, bulletins count:', bulletins.value.length);
   }
 };
 
