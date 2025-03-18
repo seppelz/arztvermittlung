@@ -84,7 +84,26 @@
     <div class="bg-white rounded-lg shadow-md p-6 border border-gray-200 mb-8">
       <h2 class="text-lg font-semibold text-gray-800 mb-4">Letzte Aktivitäten</h2>
       
-      <div class="overflow-hidden">
+      <div v-if="loading" class="py-8 text-center">
+        <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-4"></div>
+        <p class="text-lg text-gray-600">Daten werden geladen...</p>
+      </div>
+      
+      <div v-else-if="error" class="p-6 bg-red-50 rounded-lg text-center mb-4">
+        <p class="text-red-600 mb-2 font-medium">{{ error }}</p>
+        <button 
+          @click="loadData" 
+          class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark text-sm"
+        >
+          Erneut versuchen
+        </button>
+      </div>
+      
+      <div v-else-if="recentActivities.length === 0" class="py-8 text-center">
+        <p class="text-lg text-gray-600">Keine Aktivitäten gefunden.</p>
+      </div>
+      
+      <div v-else class="overflow-hidden">
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-gray-50">
             <tr>
@@ -110,7 +129,9 @@
                   :class="{
                     'bg-primary-100 text-primary-800': activity.type === 'bulletin',
                     'bg-secondary-100 text-secondary-800': activity.type === 'user',
-                    'bg-accent-100 text-accent-800': activity.type === 'contact'
+                    'bg-accent-100 text-accent-800': activity.type === 'contact',
+                    'bg-green-100 text-green-800': activity.type === 'job_offer',
+                    'bg-blue-100 text-blue-800': activity.type === 'job_request'
                   }"
                 >
                   {{ getActivityTypeLabel(activity.type) }}
@@ -169,62 +190,32 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
+import dashboardService from '@/services/dashboard.service';
 
-// Mock-Daten für Statistiken
+// Zustandsvariablen
+const loading = ref(false);
+const error = ref(null);
 const stats = ref({
   bulletins: {
-    total: 23,
-    active: 18,
-    pending: 3,
-    archived: 2
+    total: 0,
+    active: 0,
+    pending: 0,
+    archived: 0
   },
   users: {
-    total: 42,
-    doctors: 28,
-    hospitals: 12,
-    admins: 2
+    total: 0,
+    doctors: 0,
+    hospitals: 0,
+    admins: 0
   },
   contacts: {
-    total: 15,
-    pending: 5,
-    viewed: 7,
-    responded: 3
+    total: 0,
+    pending: 0,
+    viewed: 0,
+    responded: 0
   }
 });
-
-// Mock-Daten für Aktivitäten
-const recentActivities = ref([
-  {
-    type: 'bulletin',
-    description: 'Neuer Pinnwand-Eintrag erstellt',
-    user: 'Dr. Julia Weber',
-    date: new Date('2025-05-18T14:30:00')
-  },
-  {
-    type: 'user',
-    description: 'Neuer Benutzer registriert',
-    user: 'Klinik Rheinland',
-    date: new Date('2025-05-17T10:15:00')
-  },
-  {
-    type: 'contact',
-    description: 'Neue Kontaktanfrage',
-    user: 'Uniklinik Frankfurt',
-    date: new Date('2025-05-16T09:45:00')
-  },
-  {
-    type: 'bulletin',
-    description: 'Pinnwand-Eintrag aktualisiert',
-    user: 'Dr. Thomas Müller',
-    date: new Date('2025-05-15T16:20:00')
-  },
-  {
-    type: 'contact',
-    description: 'Kontaktanfrage beantwortet',
-    user: 'Klinikum München',
-    date: new Date('2025-05-14T11:30:00')
-  }
-]);
+const recentActivities = ref([]);
 
 // Hilfsfunktion zum Formatieren des Datums
 const formatDate = (date) => {
@@ -246,15 +237,41 @@ const getActivityTypeLabel = (type) => {
       return 'Benutzer';
     case 'contact':
       return 'Kontakt';
+    case 'job_offer':
+      return 'Stellenangebot';
+    case 'job_request':
+      return 'Stellengesuch';
     default:
       return 'Unbekannt';
   }
 };
 
+// Daten laden
+const loadData = async () => {
+  loading.value = true;
+  error.value = null;
+  
+  try {
+    // Statistiken laden
+    const statsData = await dashboardService.getDashboardStats();
+    stats.value = statsData;
+    
+    // Letzte Aktivitäten laden
+    const activitiesData = await dashboardService.getRecentActivities(10);
+    recentActivities.value = activitiesData;
+    
+    console.log('Dashboard-Daten geladen:', { stats: stats.value, activities: recentActivities.value.length });
+  } catch (err) {
+    console.error('Fehler beim Laden der Dashboard-Daten:', err);
+    error.value = 'Fehler beim Laden der Daten. Bitte versuchen Sie es später erneut.';
+  } finally {
+    loading.value = false;
+  }
+};
+
 // Initialisierung
 onMounted(() => {
-  // Hier würden normalerweise API-Aufrufe erfolgen, um die Daten zu laden
-  console.log('Dashboard initialisiert');
+  loadData();
 });
 </script>
 

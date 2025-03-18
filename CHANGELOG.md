@@ -57,6 +57,7 @@ All notable changes to this project will be documented in this file.
 - Verbesserte Admin-Oberfläche für Pinnwand-Einträge mit vollständiger Unterstützung aller Datenbankfelder
 - Enhanced Admin UI with comprehensive bulletin edit form aligned with database model
 - Updated default API URL to point to production server for reliable data retrieval in the admin panel
+- Replaced dummy data in Admin Dashboard with real-time activity data from the database
 
 ### Security
 - Changed MongoDB Atlas password to improve database security
@@ -94,6 +95,7 @@ All notable changes to this project will be documented in this file.
 - Enhanced app initialization with proper error catching to provide better diagnostic information
 - Fixed dynamic import issues by adding fallback routes when component loading fails
 - Fixed date display in Stellenbörse job listings to correctly use the selected startDate instead of the publication date
+- Fixed Admin Dashboard to display real activity data from database instead of dummy entries
 
 ### Added
 - Created test scripts for MongoDB Atlas connection testing
@@ -119,6 +121,8 @@ All notable changes to this project will be documented in this file.
 - Added privacyPolicyAccepted field as required in bulletin model for GDPR compliance
 - Enhanced validation in bulletin controller for more robust form submissions
 - Added conditional validation for job listings requiring start date and federal state fields
+- Added dashboard.service.js to fetch and aggregate real-time activity data for Admin Dashboard
+- Added real-time activity tracking in Admin Dashboard showing latest user registrations and bulletin entries
 
 ### Hinzugefügt
 - Admin-Komponente für die Benutzerverwaltung mit Filter-, Such- und Paginierungsfunktionen
@@ -191,6 +195,7 @@ All notable changes to this project will be documented in this file.
 - Fehler bei der API-URL Konstruktion behoben, der zu doppelten `/api/` Pfaden führte
 - Fehlender API-Aufruf beim Speichern von Pinnwand-Einträgen implementiert, Daten werden nun korrekt in MongoDB gespeichert
 - CORS-Konfiguration für Produktionsumgebung verbessert, um Cross-Origin-Anfragen von der Vercel-Bereitstellung zu ermöglichen
+- Dummy-Daten im Admin-Dashboard durch echte Echtzeit-Aktivitätsdaten aus der Datenbank ersetzt
 
 ## [0.1.0] - 2025-03-13
 
