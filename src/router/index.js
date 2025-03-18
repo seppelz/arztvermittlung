@@ -204,7 +204,22 @@ router.onError((error) => {
     console.error('Module loading error - this might be caused by a network issue or incorrect build configuration');
   } else if (error.message.includes('expected expression, got')) {
     console.error('Parsing error - this might be caused by invalid JavaScript being returned from the server');
+  } else if (error.name === 'TypeError' || error.name === 'ReferenceError') {
+    console.error('JavaScript error during routing:', error.message);
+  } else if (error.name === 'ChunkLoadError') {
+    console.error('Failed to load chunk - try clearing your browser cache');
   }
 });
+
+// Add global catch for Promises in Vue Router
+const originalPush = router.push;
+router.push = function push(location) {
+  return originalPush.call(this, location).catch(err => {
+    if (err.name !== 'NavigationDuplicated') {
+      console.error('Navigation error:', err);
+    }
+    return Promise.reject(err);
+  });
+};
 
 export default router 

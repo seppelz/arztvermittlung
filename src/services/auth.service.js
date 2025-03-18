@@ -13,13 +13,14 @@ class AuthService {
   async login(credentials) {
     try {
       const response = await api.post('/auth/login', credentials);
-      if (response.data.token) {
+      if (response.data && response.data.token) {
         // Update Pinia store instead of directly manipulating localStorage
         const authStore = useAuthStore();
         authStore.setAuth(response.data);
       }
       return response;
     } catch (error) {
+      console.error('Login error:', error);
       throw error;
     }
   }
@@ -61,8 +62,13 @@ class AuthService {
    * @returns {Boolean} - True if authenticated
    */
   isAuthenticated() {
-    const authStore = useAuthStore();
-    return authStore.isAuthenticated;
+    try {
+      const authStore = useAuthStore();
+      return !!authStore.isAuthenticated;
+    } catch (error) {
+      console.error('Error checking authentication status:', error);
+      return false;
+    }
   }
 
   /**
@@ -70,8 +76,13 @@ class AuthService {
    * @returns {Boolean} - True if admin
    */
   isAdmin() {
-    const authStore = useAuthStore();
-    return authStore.isAdmin;
+    try {
+      const authStore = useAuthStore();
+      return !!authStore.isAdmin;
+    } catch (error) {
+      console.error('Error checking admin status:', error);
+      return false;
+    }
   }
   
   /**
