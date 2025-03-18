@@ -23,6 +23,10 @@ const bulletinSchema = new mongoose.Schema({
     trim: true,
     lowercase: true
   },
+  phone: {
+    type: String,
+    trim: true
+  },
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
@@ -79,6 +83,10 @@ const bulletinSchema = new mongoose.Schema({
   featured: {
     type: Boolean,
     default: false
+  },
+  privacyPolicyAccepted: {
+    type: Boolean,
+    required: [true, 'Bitte akzeptieren Sie die Datenschutzerklärung']
   }
 }, {
   timestamps: true

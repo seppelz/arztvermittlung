@@ -113,9 +113,36 @@ exports.createBulletin = async (req, res) => {
   try {
     const bulletinData = req.body;
     
-    // Validierung der Eingabedaten
-    if (!bulletinData.title || !bulletinData.content) {
-      return res.status(400).json({ message: 'Titel und Inhalt sind erforderlich' });
+    // Validierung der grundlegenden Eingabedaten
+    if (!bulletinData.title || !bulletinData.content || !bulletinData.email || !bulletinData.userType || !bulletinData.messageType) {
+      return res.status(400).json({ 
+        message: 'Unvollständige Daten', 
+        details: 'Titel, Inhalt, E-Mail, Benutzertyp und Nachrichtentyp sind erforderlich' 
+      });
+    }
+    
+    // Validierung für Angebote und Gesuche
+    if ((bulletinData.messageType === 'Angebot' || bulletinData.messageType === 'Gesuch') && !bulletinData.startDate) {
+      return res.status(400).json({ 
+        message: 'Unvollständige Daten', 
+        details: 'Für Angebote und Gesuche ist ein Startdatum erforderlich' 
+      });
+    }
+    
+    // Validierung für Klinik-Angebote
+    if (bulletinData.userType === 'Klinik' && bulletinData.messageType === 'Angebot' && !bulletinData.federalState) {
+      return res.status(400).json({ 
+        message: 'Unvollständige Daten', 
+        details: 'Für Klinik-Angebote ist ein Bundesland erforderlich' 
+      });
+    }
+    
+    // Datenschutzerklärung Validierung
+    if (!bulletinData.privacyPolicyAccepted) {
+      return res.status(400).json({ 
+        message: 'Unvollständige Daten', 
+        details: 'Die Datenschutzerklärung muss akzeptiert werden' 
+      });
     }
     
     const newBulletin = new Bulletin(bulletinData);
@@ -130,6 +157,16 @@ exports.createBulletin = async (req, res) => {
     return savedBulletin;
   } catch (error) {
     console.error('Error creating bulletin:', error);
+    
+    // Mongoose Validierungsfehler speziell behandeln
+    if (error.name === 'ValidationError') {
+      const validationErrors = Object.values(error.errors).map(err => err.message);
+      return res.status(400).json({ 
+        message: 'Validierungsfehler', 
+        details: validationErrors.join(', ') 
+      });
+    }
+    
     res.status(500).json({ message: 'Ein Fehler ist aufgetreten', error: error.message });
     return null;
   }

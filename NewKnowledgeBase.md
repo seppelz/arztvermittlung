@@ -449,4 +449,7 @@ This document tracks key insights and lessons learned about the codebase to impr
 - Axios configuration should be centralized in a single api.js file that sets up base URL and interceptors, then imported into service files rather than using raw axios imports
 - MongoDB Atlas in production environments often requires specific connection options including SSL settings and timeout configurations
 - Enhanced error logging in controllers provides crucial diagnostic information for troubleshooting 500 errors
-- Vercel serverless functions have specific requirements for MongoDB connections that may differ from local development 
+- Vercel serverless functions have specific requirements for MongoDB connections that may differ from local development
+- Form validations must be consistent with database model validations to avoid confusing error messages
+- Conditional field requirements based on other fields (e.g., federalState required only for Klinik Angebot types) should be synchronized between frontend forms and backend models
+- Controllers should provide detailed validation error messages to help users understand what went wrong with form submissions 

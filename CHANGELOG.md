@@ -99,6 +99,10 @@ All notable changes to this project will be documented in this file.
 - Test-Skripte für die Überprüfung der E-Mail-Funktionalität im Entwicklungsmodus
 - Unterstützung für Ethereal Test-Accounts zum E-Mail-Testing ohne echten SMTP-Server
 - Automatische Titel-Generierung für Stellenangebote/-gesuche basierend auf Benutzertyp, Datum und Fachrichtung
+- Added phone field to bulletin model for better contact information
+- Added privacyPolicyAccepted field as required in bulletin model for GDPR compliance
+- Enhanced validation in bulletin controller for more robust form submissions
+- Added conditional validation for job listings requiring start date and federal state fields
 
 ### Hinzugefügt
 - Admin-Komponente für die Benutzerverwaltung mit Filter-, Such- und Paginierungsfunktionen

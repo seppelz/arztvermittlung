@@ -144,6 +144,7 @@ const seedBulletinEntries = async () => {
       {
         name: 'Ärztekammer Berlin',
         email: 'fortbildung@aerztekammer-berlin.de',
+        phone: '+49 30 12345678',
         userType: 'Klinik',
         messageType: 'Information',
         title: 'Fortbildung: Aktuelle Entwicklungen in der Notfallmedizin',
