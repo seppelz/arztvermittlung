@@ -56,6 +56,7 @@ All notable changes to this project will be documented in this file.
 - Stellenbörse-Formular vereinfacht und fokussiert auf die wichtigsten Informationen
 - Verbesserte Admin-Oberfläche für Pinnwand-Einträge mit vollständiger Unterstützung aller Datenbankfelder
 - Enhanced Admin UI with comprehensive bulletin edit form aligned with database model
+- Updated default API URL to point to production server for reliable data retrieval in the admin panel
 
 ### Security
 - Changed MongoDB Atlas password to improve database security
@@ -81,6 +82,8 @@ All notable changes to this project will be documented in this file.
 - Improved error handling and diagnostics in server.js for better troubleshooting
 - Added detailed logging in bulletin controller and auth controller for better error diagnostics
 - Fixed import path in bulletin.routes.js to correctly reference auth.middleware from middlewares directory
+- Fixed admin dashboard bulletin display by updating API URL configuration to point to production server
+- Enhanced bulletin service to handle different API response formats
 
 ### Added
 - Created test scripts for MongoDB Atlas connection testing

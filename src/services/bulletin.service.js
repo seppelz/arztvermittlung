@@ -11,9 +11,29 @@ class BulletinService {
    */
   async getAllBulletins(params = {}) {
     try {
+      console.log('BulletinService: Fetching all bulletins with params:', params);
+      console.log('BulletinService: Using API URL:', api.defaults.baseURL);
+      
       const response = await api.get('/bulletins', { params });
-      return response.data;
+      console.log('BulletinService: Response received:', response);
+      
+      if (!response.data) {
+        console.warn('BulletinService: No data in response');
+        return { data: [] };
+      }
+      
+      if (response.data.data) {
+        // Handle response structure from backend (data property contains bulletins)
+        console.log('BulletinService: Found nested data structure with', response.data.data.length, 'items');
+        return response.data;
+      } else {
+        // Direct array response
+        console.log('BulletinService: Found direct data array with', response.data.length, 'items');
+        return { data: response.data };
+      }
     } catch (error) {
+      console.error('BulletinService: Error fetching bulletins:', error);
+      console.error('BulletinService: Error details:', error.response || error.message);
       throw error;
     }
   }

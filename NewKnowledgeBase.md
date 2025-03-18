@@ -458,6 +458,16 @@ This document tracks key insights and lessons learned about the codebase to impr
 - Conditional visibility of form fields based on other field values ensures that admin forms remain relevant and focused
 - Reusing validation logic across frontend forms and admin interfaces ensures consistency in data management
 
+## API Configuration for Production Deployments
+
+- **Default API URL Configuration**: When deploying to production, always set the default API URL in the api.js service to point to the production endpoint (e.g., `https://med-match.de/api`) rather than localhost
+- **API Response Format Handling**: Services should be designed to handle both nested data structures (response.data.data) and direct array responses (response.data) as API response formats may differ between environments
+- **Environment-Specific Testing**: Always test admin interfaces with the production API after deployment, as local development environments may mask API connectivity issues
+- **Frontend-Backend Synchronization**: When the backend is deployed separately from the frontend (e.g., on Vercel), ensure that both systems are using compatible API response formats
+- **Response Transformation**: Frontend services should transform API responses into consistent formats that components can reliably consume regardless of the data source
+- **Error Handling for Production**: Enhance error logging in production environments to provide detailed diagnostic information for troubleshooting API communication issues
+- **Cross-Origin Considerations**: Production deployments often involve different domains for frontend and API, requiring proper CORS configuration
+
 ## Node.js Backend Architecture
 - Pay close attention to import paths in Node.js applications, especially between singular and plural folder names like "middleware" vs "middlewares" which can cause module resolution errors in production
 - Vercel serverless functions are especially sensitive to path inconsistencies that might work locally but fail in production

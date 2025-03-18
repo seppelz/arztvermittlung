@@ -526,17 +526,35 @@ const fetchBulletins = async () => {
   error.value = null;
   
   try {
+    console.log('AdminBulletin: Fetching bulletins from server...');
+    console.log('AdminBulletin: Using API URL:', api.defaults.baseURL);
+    
     const response = await bulletinService.getAllBulletins();
-    bulletins.value = response.data.map(item => ({
-      ...item,
-      id: item._id, // MongoDB verwendet _id, wir verwenden id für Konsistenz in der UI
-      timestamp: new Date(item.timestamp)
-    }));
+    console.log('AdminBulletin: Response received:', response);
+    
+    // Check if response has the expected structure
+    if (response && response.data) {
+      console.log('AdminBulletin: Processing data array with', response.data.length, 'items');
+      
+      bulletins.value = response.data.map(item => ({
+        ...item,
+        id: item._id || item.id, // MongoDB verwendet _id, wir verwenden id für Konsistenz in der UI
+        timestamp: new Date(item.timestamp || item.createdAt || Date.now())
+      }));
+      
+      console.log('AdminBulletin: Processed', bulletins.value.length, 'bulletins');
+    } else {
+      console.warn('AdminBulletin: Response format unexpected:', response);
+      bulletins.value = [];
+    }
   } catch (err) {
-    console.error('Error fetching bulletins:', err);
+    console.error('AdminBulletin: Error fetching bulletins:', err);
+    console.error('AdminBulletin: Error details:', err.response || err.message);
     error.value = 'Fehler beim Laden der Pinnwand-Einträge. Bitte versuchen Sie es später erneut.';
+    bulletins.value = [];
   } finally {
     isLoading.value = false;
+    console.log('AdminBulletin: Loading completed, bulletins count:', bulletins.value.length);
   }
 };
 
