@@ -16,7 +16,7 @@
             <div>
               <h2 class="text-2xl font-semibold mb-4">1. Geltungsbereich</h2>
               <p class="text-gray-700 mb-4">
-                Diese Allgemeinen Geschäftsbedingungen (AGB) gelten für die Nutzung der Vermittlungsplattform MedMatch, die von der MedMatch GmbH, Musterstraße 123, 10115 Berlin (nachfolgend "MedMatch") betrieben wird.
+                Diese Allgemeinen Geschäftsbedingungen (AGB) gelten für die Nutzung der Vermittlungsplattform MedMatch, die von MedMatch (nachfolgend "MedMatch") betrieben wird.
               </p>
               <p class="text-gray-700 mb-4">
                 Mit der Registrierung auf der Plattform akzeptieren Sie diese AGB. Abweichende Bedingungen werden nicht anerkannt, es sei denn, MedMatch stimmt diesen ausdrücklich zu.

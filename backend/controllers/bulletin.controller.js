@@ -86,52 +86,52 @@ exports.getBulletin = async (req, res) => {
 // Neuen Pinnwand-Eintrag erstellen
 exports.createBulletin = async (req, res) => {
   try {
-    const newBulletin = await Bulletin.create(req.body);
+    const bulletinData = req.body;
     
-    res.status(201).json({
-      status: 'success',
-      data: newBulletin
-    });
-  } catch (error) {
-    console.error('Error creating bulletin:', error);
-    
-    if (error.name === 'ValidationError') {
-      const messages = Object.values(error.errors).map(val => val.message);
-      return res.status(400).json({ message: messages.join(', ') });
+    // Validierung der Eingabedaten
+    if (!bulletinData.title || !bulletinData.content) {
+      return res.status(400).json({ message: 'Titel und Inhalt sind erforderlich' });
     }
     
+    const newBulletin = new Bulletin(bulletinData);
+    const savedBulletin = await newBulletin.save();
+    
+    res.status(201).json({ 
+      message: 'Pinnwand-Eintrag erfolgreich erstellt',
+      data: savedBulletin 
+    });
+    
+    // Das erstellte Bulletin-Objekt zurückgeben, damit es für E-Mail-Benachrichtigungen verwendet werden kann
+    return savedBulletin;
+  } catch (error) {
+    console.error('Error creating bulletin:', error);
     res.status(500).json({ message: 'Ein Fehler ist aufgetreten', error: error.message });
+    return null;
   }
 };
 
 // Pinnwand-Eintrag aktualisieren
 exports.updateBulletin = async (req, res) => {
   try {
-    const bulletin = await Bulletin.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      {
-        new: true,
-        runValidators: true
-      }
+    const { id } = req.params;
+    const updateData = req.body;
+    
+    const updatedBulletin = await Bulletin.findByIdAndUpdate(
+      id,
+      updateData,
+      { new: true } // Gibt das aktualisierte Dokument zurück
     );
     
-    if (!bulletin) {
+    if (!updatedBulletin) {
       return res.status(404).json({ message: 'Pinnwand-Eintrag nicht gefunden' });
     }
     
-    res.status(200).json({
-      status: 'success',
-      data: bulletin
+    res.status(200).json({ 
+      message: 'Pinnwand-Eintrag erfolgreich aktualisiert',
+      data: updatedBulletin 
     });
   } catch (error) {
     console.error('Error updating bulletin:', error);
-    
-    if (error.name === 'ValidationError') {
-      const messages = Object.values(error.errors).map(val => val.message);
-      return res.status(400).json({ message: messages.join(', ') });
-    }
-    
     res.status(500).json({ message: 'Ein Fehler ist aufgetreten', error: error.message });
   }
 };
@@ -139,15 +139,16 @@ exports.updateBulletin = async (req, res) => {
 // Pinnwand-Eintrag löschen
 exports.deleteBulletin = async (req, res) => {
   try {
-    const bulletin = await Bulletin.findByIdAndDelete(req.params.id);
+    const { id } = req.params;
+    const deletedBulletin = await Bulletin.findByIdAndDelete(id);
     
-    if (!bulletin) {
+    if (!deletedBulletin) {
       return res.status(404).json({ message: 'Pinnwand-Eintrag nicht gefunden' });
     }
     
-    res.status(204).json({
-      status: 'success',
-      data: null
+    res.status(200).json({ 
+      message: 'Pinnwand-Eintrag erfolgreich gelöscht',
+      data: deletedBulletin
     });
   } catch (error) {
     console.error('Error deleting bulletin:', error);

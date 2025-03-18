@@ -102,7 +102,7 @@
 
       <div class="mt-12 pt-6 border-t border-white/30">
         <p class="text-center text-white text-sm">
-          &copy; {{ new Date().getFullYear() }} MedMatch GmbH. Alle Rechte vorbehalten.
+          &copy; {{ new Date().getFullYear() }} MedMatch. Alle Rechte vorbehalten.
         </p>
       </div>
     </div>

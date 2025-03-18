@@ -13,7 +13,7 @@
     <section class="py-12 bg-light">
       <div class="container mx-auto px-4">
         <div class="max-w-4xl mx-auto bg-white rounded-lg shadow-strong p-8">
-          <h2 class="text-2xl md:text-3xl font-bold mb-8 text-center text-heading">Stellenazeige aufgeben</h2>
+          <h2 class="text-2xl md:text-3xl font-bold mb-8 text-center text-heading">Stellengesuch aufgeben</h2>
           
           <form @submit.prevent="submitForm" class="space-y-8">
             <!-- Hospital Information -->
@@ -21,24 +21,8 @@
               <h3 class="text-xl font-bold mb-6 pb-2 border-b-2 border-accent text-heading">Informationen zur Einrichtung</h3>
               <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="md:col-span-2">
-                  <label for="hospitalName" class="block text-text-dark font-semibold mb-2">Name der Einrichtung/Klinik (Ansprechpartner)*</label>
-                  <input type="text" id="hospitalName" v-model="form.hospitalName" required class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm" />
-                </div>
-                
-                <div class="md:col-span-2">
-                  <label for="hospitalType" class="block text-text-dark font-semibold mb-2">Art der Einrichtung*</label>
-                  <select id="hospitalType" v-model="form.hospitalType" required class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm appearance-none">
-                    <option value="">Bitte wählen</option>
-                    <option value="Universitätsklinikum">Universitätsklinikum</option>
-                    <option value="Krankenhaus der Maximalversorgung">Krankenhaus der Maximalversorgung</option>
-                    <option value="Krankenhaus der Schwerpunktversorgung">Krankenhaus der Schwerpunktversorgung</option>
-                    <option value="Krankenhaus der Grundversorgung">Krankenhaus der Grundversorgung</option>
-                    <option value="Fachklinik">Fachklinik</option>
-                    <option value="Rehabilitationsklinik">Rehabilitationsklinik</option>
-                    <option value="Medizinisches Versorgungszentrum (MVZ)">Medizinisches Versorgungszentrum (MVZ)</option>
-                    <option value="Praxis">Praxis</option>
-                    <option value="Sonstige">Sonstige</option>
-                  </select>
+                  <label for="hospitalName" class="block text-text-dark font-semibold mb-2">Name der Einrichtung/Klinik (Ansprechpartner)</label>
+                  <input type="text" id="hospitalName" v-model="form.hospitalName" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm" />
                 </div>
               </div>
             </div>
@@ -48,36 +32,9 @@
               <h3 class="text-xl font-bold mb-6 pb-2 border-b-2 border-accent text-heading">Informationen zur Stellenanfrage</h3>
               <div class="space-y-6">
                 <div>
-                  <label for="specialty" class="block text-text-dark font-semibold mb-2">Gesuchte Fachrichtung*</label>
-                  <select id="specialty" v-model="form.specialty" required class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm appearance-none">
-                    <option value="">Bitte wählen</option>
-                    <option value="Allgemeinmedizin">Allgemeinmedizin</option>
-                    <option value="Anästhesiologie">Anästhesiologie</option>
-                    <option value="Chirurgie">Chirurgie</option>
-                    <option value="Innere Medizin">Innere Medizin</option>
-                    <option value="Kardiologie">Kardiologie</option>
-                    <option value="Neurologie">Neurologie</option>
-                    <option value="Gynäkologie">Gynäkologie</option>
-                    <option value="Pädiatrie">Pädiatrie</option>
-                    <option value="Psychiatrie">Psychiatrie</option>
-                    <option value="Radiologie">Radiologie</option>
-                    <option value="Urologie">Urologie</option>
-                    <option value="Sonstige">Sonstige</option>
-                  </select>
+                  <label for="specialty" class="block text-text-dark font-semibold mb-2">Gesuchte Fachrichtung</label>
+                  <input type="text" id="specialty" v-model="form.specialty" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm" placeholder="Gewünschte Fachrichtung des Arztes" />
                 </div>
-                
-                <div>
-                  <label for="positionType" class="block text-text-dark font-semibold mb-2">Art der Position*</label>
-                  <select id="positionType" v-model="form.positionType" required class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm appearance-none">
-                    <option value="">Bitte wählen</option>
-                    <option value="Chefarzt">Chefarzt</option>
-                    <option value="Oberarzt">Oberarzt</option>
-                    <option value="Facharzt">Facharzt</option>
-                    <option value="Assistenzarzt">Assistenzarzt</option>
-                    <option value="Honorararzt">Honorararzt</option>
-                  </select>
-                </div>
-                
                 
                 <div>
                   <label for="requiredQualifications" class="block text-text-dark font-semibold mb-2">Erforderliche Qualifikationen</label>
@@ -85,14 +42,14 @@
                 </div>
                 
                 <div>
-                  <label for="jobDescription" class="block text-text-dark font-semibold mb-2">Stellenbeschreibung*</label>
-                  <textarea id="jobDescription" v-model="form.jobDescription" required rows="4" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm"></textarea>
+                  <label for="jobDescription" class="block text-text-dark font-semibold mb-2">Stellenbeschreibung</label>
+                  <textarea id="jobDescription" v-model="form.jobDescription" rows="4" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm"></textarea>
                 </div>
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label for="startDate" class="block text-text-dark font-semibold mb-2">Startdatum*</label>
-                    <input type="date" id="startDate" v-model="form.startDate" required class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm" />
+                    <label for="startDate" class="block text-text-dark font-semibold mb-2">Startdatum</label>
+                    <input type="date" id="startDate" v-model="form.startDate" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm" />
                   </div>
                   
                   <div>
@@ -144,7 +101,6 @@ import { ref, reactive } from 'vue'
 
 const form = reactive({
   hospitalName: '',
-  hospitalType: '',
   street: '',
   zip: '',
   city: '',
@@ -156,9 +112,6 @@ const form = reactive({
   contactEmail: '',
   contactPhone: '',
   specialty: '',
-  positionType: '',
-  employmentType: '',
-  duration: '',
   requiredQualifications: '',
   jobDescription: '',
   startDate: '',

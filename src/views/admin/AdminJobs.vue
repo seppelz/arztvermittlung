@@ -374,7 +374,7 @@
             Wiederherstellen
           </button>
           <button 
-            @click="editJob(selectedJob)"
+            @click="openEditModal(selectedJob)"
             class="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg flex items-center"
           >
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -389,6 +389,213 @@
             Schließen
           </button>
         </div>
+      </div>
+    </div>
+    
+    <!-- Job-Edit-Modal -->
+    <div v-if="showEditModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div class="bg-white rounded-lg shadow-xl p-8 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+        <div class="flex justify-between items-start mb-6">
+          <h3 class="text-2xl font-bold text-heading">Stellenangebot/-gesuch bearbeiten</h3>
+          <button 
+            @click="closeEditModal" 
+            class="text-gray-500 hover:text-gray-700"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        
+        <form @submit.prevent="saveJobChanges" class="space-y-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Titel -->
+            <div class="col-span-2">
+              <label for="title" class="block text-sm font-medium text-gray-700 mb-1">Titel*</label>
+              <input 
+                type="text" 
+                id="title" 
+                v-model="editForm.title" 
+                required
+                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500"
+              />
+            </div>
+            
+            <!-- Name (optional) -->
+            <div>
+              <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+              <input 
+                type="text" 
+                id="name" 
+                v-model="editForm.name"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500"
+              />
+            </div>
+            
+            <!-- E-Mail -->
+            <div>
+              <label for="email" class="block text-sm font-medium text-gray-700 mb-1">E-Mail*</label>
+              <input 
+                type="email" 
+                id="email" 
+                v-model="editForm.email"
+                required
+                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500"
+              />
+            </div>
+            
+            <!-- Benutzertyp -->
+            <div>
+              <label for="userType" class="block text-sm font-medium text-gray-700 mb-1">Benutzertyp*</label>
+              <select 
+                id="userType" 
+                v-model="editForm.userType"
+                required
+                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500"
+                @change="updateMessageType"
+              >
+                <option value="Arzt">Arzt</option>
+                <option value="Klinik">Klinik</option>
+              </select>
+            </div>
+            
+            <!-- Nachrichtentyp -->
+            <div>
+              <label for="messageType" class="block text-sm font-medium text-gray-700 mb-1">Nachrichtentyp*</label>
+              <select 
+                id="messageType" 
+                v-model="editForm.messageType"
+                required
+                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500"
+              >
+                <option value="Angebot">Angebot</option>
+                <option value="Gesuch">Gesuch</option>
+              </select>
+            </div>
+            
+            <!-- Fachrichtung -->
+            <div>
+              <label for="specialty" class="block text-sm font-medium text-gray-700 mb-1">Fachrichtung</label>
+              <select 
+                id="specialty" 
+                v-model="editForm.specialty"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500"
+              >
+                <option value="">Bitte wählen</option>
+                <option value="Allgemeinmedizin">Allgemeinmedizin</option>
+                <option value="Anästhesiologie">Anästhesiologie</option>
+                <option value="Augenheilkunde">Augenheilkunde</option>
+                <option value="Chirurgie">Chirurgie</option>
+                <option value="Dermatologie">Dermatologie</option>
+                <option value="Gynäkologie">Gynäkologie</option>
+                <option value="HNO">HNO</option>
+                <option value="Innere Medizin">Innere Medizin</option>
+                <option value="Kardiologie">Kardiologie</option>
+                <option value="Neurologie">Neurologie</option>
+                <option value="Orthopädie">Orthopädie</option>
+                <option value="Pädiatrie">Pädiatrie</option>
+                <option value="Psychiatrie">Psychiatrie</option>
+                <option value="Radiologie">Radiologie</option>
+                <option value="Urologie">Urologie</option>
+                <option value="Sonstige">Sonstige</option>
+              </select>
+            </div>
+            
+            <!-- Andere Fachrichtung (wenn "Sonstige" ausgewählt) -->
+            <div v-if="editForm.specialty === 'Sonstige'">
+              <label for="specialtyOther" class="block text-sm font-medium text-gray-700 mb-1">Andere Fachrichtung</label>
+              <input 
+                type="text" 
+                id="specialtyOther" 
+                v-model="editForm.specialtyOther"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500"
+              />
+            </div>
+            
+            <!-- Bundesland (nur für Kliniken) -->
+            <div v-if="editForm.userType === 'Klinik'">
+              <label for="federalState" class="block text-sm font-medium text-gray-700 mb-1">Bundesland</label>
+              <select 
+                id="federalState" 
+                v-model="editForm.federalState"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500"
+              >
+                <option value="">Bitte wählen</option>
+                <option value="Baden-Württemberg">Baden-Württemberg</option>
+                <option value="Bayern">Bayern</option>
+                <option value="Berlin">Berlin</option>
+                <option value="Brandenburg">Brandenburg</option>
+                <option value="Bremen">Bremen</option>
+                <option value="Hamburg">Hamburg</option>
+                <option value="Hessen">Hessen</option>
+                <option value="Mecklenburg-Vorpommern">Mecklenburg-Vorpommern</option>
+                <option value="Niedersachsen">Niedersachsen</option>
+                <option value="Nordrhein-Westfalen">Nordrhein-Westfalen</option>
+                <option value="Rheinland-Pfalz">Rheinland-Pfalz</option>
+                <option value="Saarland">Saarland</option>
+                <option value="Sachsen">Sachsen</option>
+                <option value="Sachsen-Anhalt">Sachsen-Anhalt</option>
+                <option value="Schleswig-Holstein">Schleswig-Holstein</option>
+                <option value="Thüringen">Thüringen</option>
+              </select>
+            </div>
+            
+            <!-- Startdatum -->
+            <div>
+              <label for="startDate" class="block text-sm font-medium text-gray-700 mb-1">Verfügbar ab</label>
+              <input 
+                type="date" 
+                id="startDate" 
+                v-model="editForm.startDate"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500"
+              />
+            </div>
+            
+            <!-- Status -->
+            <div>
+              <label for="status" class="block text-sm font-medium text-gray-700 mb-1">Status*</label>
+              <select 
+                id="status" 
+                v-model="editForm.status"
+                required
+                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500"
+              >
+                <option value="active">Aktiv</option>
+                <option value="pending">Ausstehend</option>
+                <option value="archived">Archiviert</option>
+              </select>
+            </div>
+          </div>
+          
+          <!-- Inhalt -->
+          <div>
+            <label for="content" class="block text-sm font-medium text-gray-700 mb-1">Beschreibung*</label>
+            <textarea 
+              id="content" 
+              v-model="editForm.content"
+              required
+              rows="6"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500"
+            ></textarea>
+          </div>
+          
+          <div class="flex justify-end space-x-4">
+            <button 
+              type="button"
+              @click="closeEditModal"
+              class="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg"
+            >
+              Abbrechen
+            </button>
+            <button 
+              type="submit"
+              class="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg"
+              :disabled="isSaving"
+            >
+              {{ isSaving ? 'Speichern...' : 'Änderungen speichern' }}
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
@@ -411,6 +618,10 @@ const pageSize = ref(10);
 
 const showDetailModal = ref(false);
 const selectedJob = ref({});
+
+const showEditModal = ref(false);
+const editForm = ref({});
+const isSaving = ref(false);
 
 // Stellenangebote und -gesuche vom Server holen
 const fetchJobs = async () => {
@@ -531,10 +742,113 @@ const closeDetailModal = () => {
 
 // Stellenangebot/-gesuch bearbeiten
 const editJob = (job) => {
-  console.log('Stellenangebot/-gesuch bearbeiten:', job);
-  // Später wird hier ein Bearbeitungs-Dialog implementiert
-  // Für jetzt schließen wir das Detail-Modal, falls es geöffnet ist
+  openEditModal(job);
+};
+
+// Edit-Modal öffnen
+const openEditModal = (job) => {
+  // Detail-Modal schließen, falls geöffnet
   showDetailModal.value = false;
+  
+  // Formular mit den Job-Daten initialisieren
+  editForm.value = {
+    id: job.id,
+    title: job.title,
+    name: job.name || '',
+    email: job.email,
+    userType: job.userType,
+    messageType: job.messageType,
+    content: job.content,
+    status: job.status,
+    specialty: job.specialty || '',
+    specialtyOther: job.specialtyOther || '',
+    federalState: job.federalState || '',
+    startDate: job.startDate ? new Date(job.startDate).toISOString().split('T')[0] : ''
+  };
+  
+  // Edit-Modal öffnen
+  showEditModal.value = true;
+};
+
+// Edit-Modal schließen
+const closeEditModal = () => {
+  showEditModal.value = false;
+  // Formular zurücksetzen
+  setTimeout(() => {
+    editForm.value = {};
+  }, 300);
+};
+
+// Aktualisiere den Nachrichtentyp basierend auf dem Benutzertyp
+const updateMessageType = () => {
+  if (editForm.value.userType === 'Arzt') {
+    editForm.value.messageType = 'Gesuch';
+  } else if (editForm.value.userType === 'Klinik') {
+    editForm.value.messageType = 'Angebot';
+  }
+};
+
+// Änderungen speichern
+const saveJobChanges = async () => {
+  isSaving.value = true;
+  
+  try {
+    // Stelle sicher, dass wir beim Speichern den richtigen Spezialitätswert verwenden
+    const updates = { ...editForm.value };
+    
+    // Behandle den Fall, wenn Spezialität "Sonstige" ausgewählt ist
+    if (updates.specialty === 'Sonstige') {
+      updates.specialtyOther = updates.specialtyOther || '';
+    } else {
+      // Wenn nicht "Sonstige", setze specialtyOther zurück
+      updates.specialtyOther = '';
+    }
+    
+    // Konvertiere das Datum in das richtige Format, falls es vorhanden ist
+    if (updates.startDate) {
+      updates.startDate = new Date(updates.startDate);
+    }
+    
+    // Entferne die ID aus dem Objekt, da diese nicht aktualisiert werden soll
+    const id = updates.id;
+    delete updates.id;
+    
+    // Sende die Aktualisierungsanfrage
+    const response = await bulletinService.updateBulletin(id, updates);
+    
+    if (!response || !response.data) {
+      throw new Error('Keine Daten vom Server erhalten');
+    }
+    
+    // Aktualisiere den Job in der lokalen Liste
+    const updatedJob = response.data;
+    const index = jobs.value.findIndex(job => job.id === id);
+    
+    if (index !== -1) {
+      // Stelle sicher, dass wir die ID korrekt beibehalten
+      jobs.value[index] = {
+        ...updatedJob,
+        id: updatedJob._id || updatedJob.id,
+        timestamp: new Date(updatedJob.timestamp)
+      };
+      
+      // Wenn das Detail-Modal für diesen Job geöffnet ist, aktualisiere auch diese Ansicht
+      if (showDetailModal.value && selectedJob.value.id === id) {
+        selectedJob.value = jobs.value[index];
+      }
+    }
+    
+    // Schließe das Modal
+    closeEditModal();
+    
+    // Zeige eine Erfolgsmeldung
+    alert('Die Änderungen wurden erfolgreich gespeichert.');
+  } catch (err) {
+    console.error('Error updating job:', err);
+    alert(`Fehler beim Speichern der Änderungen: ${err.message}`);
+  } finally {
+    isSaving.value = false;
+  }
 };
 
 // Stellenangebot/-gesuch löschen

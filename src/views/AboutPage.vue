@@ -16,8 +16,7 @@
           <div class="mb-12">
             <h2 class="text-2xl font-semibold mb-6">Unsere Mission</h2>
             <p class="text-gray-700 mb-4">
-              MedMatch wurde mit einer klaren Vision gegründet: Die Vermittlung zwischen Ärzten und Kliniken zu revolutionieren, indem wir beide Seiten direkt zusammenbringen und dabei die hohen Kosten traditioneller Vermittlungsagenturen eliminieren.
-            </p>
+              MedMatch wurde mit einer klaren Vision gegründet: Die Vermittlung zwischen Ärzten und Kliniken zu revolutionieren, ohne die hohen Kosten der Vermittlungsagenturen.             </p>
             <p class="text-gray-700 mb-4">
               Der Ärztemangel in Deutschland stellt Kliniken vor große Herausforderungen bei der Besetzung offener Stellen. Gleichzeitig suchen viele qualifizierte Ärzte nach passenden beruflichen Möglichkeiten. Bisher wurde diese Lücke oft durch teure Vermittlungsagenturen geschlossen, die bis zu 30% des ersten Jahresgehalts als Provision verlangen.
             </p>
@@ -89,19 +88,6 @@
                   Wir setzen auf hochwertige Matches durch präzise Anforderungsprofile und eine sorgfältige Überprüfung aller Angaben.
                 </p>
               </div>
-            </div>
-          </div>
-
-          <div>
-            <h2 class="text-2xl font-semibold mb-6">Das Team hinter MedMatch</h2>
-            <p class="text-gray-700 mb-8">
-              Unser Team besteht aus erfahrenen Fachleuten aus dem Gesundheitswesen und der Technologiebranche, die gemeinsam daran arbeiten, die Arzt-Klinik-Vermittlung zu verbessern. Wir verstehen die Herausforderungen beider Seiten und entwickeln Lösungen, die echten Mehrwert bieten.
-            </p>
-            
-            <div class="text-center">
-              <router-link to="/team" class="inline-block bg-primary text-white font-semibold py-3 px-8 rounded-lg shadow-md hover:bg-dark transition-colors duration-300">
-                Lernen Sie unser Team kennen
-              </router-link>
             </div>
           </div>
         </div>

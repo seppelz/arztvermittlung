@@ -16,12 +16,11 @@
             <div>
               <h2 class="text-2xl font-semibold mb-4">1. Verantwortliche Stelle</h2>
               <p class="text-gray-700">
-                MedMatch GmbH<br>
-                Musterstraße 123<br>
-                10115 Berlin<br>
+                MedMatch<br>
+                Hülshoffstr. 22<br>
+                46342 Velen<br>
                 Deutschland<br><br>
-                E-Mail: datenschutz@med-match.de<br>
-                Telefon: +49 (0) 30 1234 5678
+                E-Mail: info@med-match.de<br>
               </p>
             </div>
 

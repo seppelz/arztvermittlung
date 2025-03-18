@@ -114,12 +114,11 @@
             <!-- Zwei-Spalten-Layout für kompakteren Look -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
               <div>
-                <label for="name" class="block text-text-dark font-semibold mb-1">Name*</label>
+                <label for="name" class="block text-text-dark font-semibold mb-1">Name</label>
                 <input 
                   type="text" 
                   id="name" 
                   v-model="newMessage.name" 
-                  required 
                   class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm"
                   placeholder="Ihr Name oder Einrichtung"
                 />
@@ -138,16 +137,38 @@
               </div>
               
               <div>
-                <label for="title" class="block text-text-dark font-semibold mb-1">Titel*</label>
+                <label for="phone" class="block text-text-dark font-semibold mb-1">Telefonnummer</label>
                 <input 
-                  type="text" 
-                  id="title" 
-                  v-model="newMessage.title" 
-                  required 
+                  type="tel" 
+                  id="phone" 
+                  v-model="newMessage.phone" 
                   class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm"
-                  placeholder="Titel Ihrer Nachricht"
+                  placeholder="Ihre Telefonnummer"
                 />
               </div>
+            </div>
+            
+            <div>
+              <label for="title" class="block text-text-dark font-semibold mb-1">Titel*</label>
+              <input 
+                type="text" 
+                id="title" 
+                v-model="newMessage.title" 
+                required 
+                class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm"
+                placeholder="Titel Ihrer Nachricht"
+              />
+            </div>
+            
+            <div>
+              <label for="specialty" class="block text-text-dark font-semibold mb-1">Fachrichtung</label>
+              <input 
+                type="text" 
+                id="specialty" 
+                v-model="newMessage.specialty" 
+                class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm"
+                placeholder="Ihre Fachrichtung (optional)"
+              />
             </div>
             
             <div>
@@ -351,12 +372,14 @@ const fetchBulletins = async () => {
 const newMessage = reactive({
   name: '',
   email: '',
-  userType: '',
-  messageType: 'Information', // Always set to Information
+  phone: '',
   title: '',
+  specialty: '',
   content: '',
-  privacyPolicyAccepted: false
-});
+  userType: '',
+  privacyPolicyAccepted: false,
+  messageType: 'Information',
+})
 
 const contactForm = reactive({
   name: '',

@@ -267,3 +267,18 @@ All notable changes to this project will be documented in this file.
 - Darstellung von Stellenanzeigen auf der Startseite
 - Funktionalität zum Senden von Kontaktanfragen zu Pinnwand-Einträgen
 - Status-API-Endpunkt für einfache Server- und Umgebungsüberprüfung
+
+### Added
+- Backend endpoint for updating bulletin entries
+- Tests for bulletin controller
+- Backend environment example file
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
