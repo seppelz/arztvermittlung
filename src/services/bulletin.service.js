@@ -59,9 +59,28 @@ class BulletinService {
    */
   async createBulletin(bulletinData) {
     try {
-      const response = await api.post('/bulletin', bulletinData);
+      // Process the data to ensure dates are properly formatted
+      const processedData = { ...bulletinData };
+      
+      // Ensure startDate is properly set for job listings
+      if ((bulletinData.messageType === 'Angebot' || bulletinData.messageType === 'Gesuch') && bulletinData.startDate) {
+        // Ensure startDate is a Date object (if string, convert to Date)
+        if (typeof bulletinData.startDate === 'string') {
+          processedData.startDate = new Date(bulletinData.startDate);
+        }
+        
+        console.log('BulletinService: Using startDate for job listing:', processedData.startDate);
+      } else if ((bulletinData.messageType === 'Angebot' || bulletinData.messageType === 'Gesuch') && !bulletinData.startDate) {
+        // If no startDate provided for job listings, set to current date
+        processedData.startDate = new Date();
+        console.log('BulletinService: No startDate provided, using current date:', processedData.startDate);
+      }
+      
+      const response = await api.post('/bulletin', processedData);
       return response.data;
     } catch (error) {
+      console.error('BulletinService: Error creating bulletin:', error);
+      console.error('BulletinService: Error details:', error.response || error.message);
       throw error;
     }
   }
@@ -74,9 +93,24 @@ class BulletinService {
    */
   async updateBulletin(id, bulletinData) {
     try {
-      const response = await api.patch(`/bulletin/${id}`, bulletinData);
+      // Process the data to ensure dates are properly formatted
+      const processedData = { ...bulletinData };
+      
+      // Ensure startDate is properly set for job listings if provided
+      if (bulletinData.startDate) {
+        // Ensure startDate is a Date object (if string, convert to Date)
+        if (typeof bulletinData.startDate === 'string') {
+          processedData.startDate = new Date(bulletinData.startDate);
+        }
+        
+        console.log('BulletinService: Using startDate for update:', processedData.startDate);
+      }
+      
+      const response = await api.patch(`/bulletin/${id}`, processedData);
       return response.data;
     } catch (error) {
+      console.error('BulletinService: Error updating bulletin:', error);
+      console.error('BulletinService: Error details:', error.response || error.message);
       throw error;
     }
   }

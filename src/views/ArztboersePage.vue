@@ -289,7 +289,7 @@
           
           <div v-if="messageSent" class="mt-6 p-4 bg-success bg-opacity-10 text-success rounded-lg border-2 border-success">
             <p class="font-semibold">Vielen Dank für Ihre Nachricht!</p>
-            <p>Ihre Nachricht wurde erfolgreich veröffentlicht.</p>
+            <p>Ihre Nachricht wurde zur Freigabe weitergeleitet.</p>
           </div>
         </div>
       </div>

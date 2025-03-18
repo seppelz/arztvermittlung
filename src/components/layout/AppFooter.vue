@@ -10,7 +10,7 @@
               alt="MedMatch Logo"
               class="h-12 w-auto"
             />
-            <span class="text-xl font-bold text-white">MedMatch</span>
+            <span class="text-xl font-bold text-white">Med-Match</span>
           </div>
           <p class="text-white mb-6 max-w-md">
             Die Plattform für ärztliche Fachkräfte und medizinische Einrichtungen.
