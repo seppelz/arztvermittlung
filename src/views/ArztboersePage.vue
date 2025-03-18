@@ -88,14 +88,18 @@
                   </span>
                   <span class="text-sm text-gray-500">{{ formatDate(message.timestamp) }}</span>
                 </div>
-                <h3 class="text-xl font-bold mb-2 text-heading">{{ message.title }}</h3>
+                <h3 class="text-xl font-bold mb-2 text-heading">
+                  <span v-if="message.userType === 'Arzt'">Arzt sucht ab {{ formatDate(message.startDate || message.timestamp) }} {{ message.specialty ? 'Fachrichtung ' + message.specialty : '' }}</span>
+                  <span v-else-if="message.userType === 'Klinik'">Klinik sucht ab {{ formatDate(message.startDate || message.timestamp) }} {{ message.specialty ? 'Arzt der Fachrichtung ' + message.specialty : 'Arzt' }}</span>
+                  <span v-else>{{ message.title }}</span>
+                </h3>
                 <p class="text-gray-700 mb-4">{{ message.content }}</p>
                 <div class="mt-auto pt-4 border-t border-gray-200">
                   <div class="flex justify-between">
                     <div>
                       <p class="text-sm text-gray-600">
-                        <span v-if="message.userType === 'Arzt'">Ein Arzt der Fachrichtung <strong>{{ message.specialty || 'unbekannt' }}</strong> sucht ab <strong>{{ formatDate(message.startDate || message.timestamp) }}</strong> eine Stelle.</span>
-                        <span v-if="message.userType === 'Klinik'">Eine Klinik aus <strong>{{ message.federalState || 'unbekannt' }}</strong> sucht ab <strong>{{ formatDate(message.startDate || message.timestamp) }}</strong> einen Arzt der Fachrichtung <strong>{{ message.specialty || 'unbekannt' }}</strong>.</span>
+                        <span v-if="message.userType === 'Arzt'">Ein Arzt {{ message.specialty ? 'der Fachrichtung <strong>' + message.specialty + '</strong>' : '' }} sucht ab <strong>{{ formatDate(message.startDate || message.timestamp) }}</strong> eine Stelle.</span>
+                        <span v-if="message.userType === 'Klinik'">Eine Klinik aus <strong>{{ message.federalState || 'unbekannt' }}</strong> sucht ab <strong>{{ formatDate(message.startDate || message.timestamp) }}</strong> einen Arzt {{ message.specialty ? 'der Fachrichtung <strong>' + message.specialty + '</strong>' : '' }}.</span>
                       </p>
                     </div>
                     <button 
@@ -174,20 +178,6 @@
               </div>
               
               <div>
-                <label for="title" class="block text-text-dark font-semibold mb-1">Titel*</label>
-                <input 
-                  type="text" 
-                  id="title" 
-                  v-model="newMessage.title" 
-                  required 
-                  class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm"
-                  placeholder="Titel Ihres Angebots/Gesuchs"
-                />
-              </div>
-            </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-              <div>
                 <label for="userType" class="block text-text-dark font-semibold mb-1">Sie sind*</label>
                 <select 
                   id="userType" 
@@ -218,42 +208,13 @@
               </div>
 
               <div>
-                <label for="specialty" class="block text-text-dark font-semibold mb-1">Fachrichtung*</label>
-                <select 
-                  id="specialty" 
-                  v-model="newMessage.specialty" 
-                  required 
-                  class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm appearance-none"
-                >
-                  <option value="">Bitte wählen</option>
-                  <option value="Allgemeinmedizin">Allgemeinmedizin</option>
-                  <option value="Anästhesiologie">Anästhesiologie</option>
-                  <option value="Augenheilkunde">Augenheilkunde</option>
-                  <option value="Chirurgie">Chirurgie</option>
-                  <option value="Dermatologie">Dermatologie</option>
-                  <option value="Gynäkologie">Gynäkologie</option>
-                  <option value="HNO">HNO</option>
-                  <option value="Innere Medizin">Innere Medizin</option>
-                  <option value="Kardiologie">Kardiologie</option>
-                  <option value="Neurologie">Neurologie</option>
-                  <option value="Orthopädie">Orthopädie</option>
-                  <option value="Pädiatrie">Pädiatrie</option>
-                  <option value="Psychiatrie">Psychiatrie</option>
-                  <option value="Radiologie">Radiologie</option>
-                  <option value="Urologie">Urologie</option>
-                  <option value="Sonstige">Sonstige</option>
-                </select>
-              </div>
-              
-              <div v-if="newMessage.specialty === 'Sonstige'">
-                <label for="specialtyOther" class="block text-text-dark font-semibold mb-1">Andere Fachrichtung*</label>
+                <label for="specialty" class="block text-text-dark font-semibold mb-1">Fachrichtung</label>
                 <input 
                   type="text" 
-                  id="specialtyOther" 
-                  v-model="newMessage.specialtyOther" 
-                  required 
+                  id="specialty" 
+                  v-model="newMessage.specialty" 
                   class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm"
-                  placeholder="Bitte geben Sie Ihre Fachrichtung an"
+                  placeholder="Ihre Fachrichtung (optional)"
                 />
               </div>
               
@@ -446,10 +407,8 @@ const newMessage = reactive({
   email: '',
   userType: '',
   messageType: '', // Will be set automatically based on userType
-  title: '',
   content: '',
   specialty: '',
-  specialtyOther: '',
   federalState: '',
   startDate: new Date().toISOString().split('T')[0], // Heutiges Datum als Standardwert
   status: 'pending', // Neue Einträge werden standardmäßig auf 'pending' gesetzt
@@ -517,8 +476,13 @@ function submitMessage() {
   // Set messageType based on userType
   determineMessageType();
   
-  // Prepare specialty value
-  const finalSpecialty = newMessage.specialty === 'Sonstige' ? newMessage.specialtyOther : newMessage.specialty;
+  // Generate title based on userType and startDate
+  let generatedTitle = '';
+  if (newMessage.userType === 'Arzt') {
+    generatedTitle = `Arzt sucht ab ${formatDate(newMessage.startDate)}${newMessage.specialty ? ' Fachrichtung ' + newMessage.specialty : ''}`;
+  } else if (newMessage.userType === 'Klinik') {
+    generatedTitle = `Klinik sucht ab ${formatDate(newMessage.startDate)}${newMessage.specialty ? ' Arzt der Fachrichtung ' + newMessage.specialty : ' Arzt'}`;
+  }
   
   // Simuliere API-Aufruf
   setTimeout(() => {
@@ -526,8 +490,8 @@ function submitMessage() {
     
     const message = {
       ...newMessage,
-      specialty: finalSpecialty, // Use the final specialty value
       id: newId,
+      title: generatedTitle, // Use the generated title
       timestamp: new Date(),
       privacyPolicyAccepted: true
     };

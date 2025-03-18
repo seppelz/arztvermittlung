@@ -42,6 +42,18 @@ All notable changes to this project will be documented in this file.
 - Enhanced hero section with better spacing and readability
 - Improved MongoDB connection configuration for better reliability
 - Better handling of API URL configuration across components
+- Enhanced email utility with automatic port-based TLS configuration
+- Improved error handling for email sending with detailed logging
+- Added safety mechanism to ensure proper STARTTLS/SSL configuration for different SMTP ports
+- Optimierte Formulare für Ärzte, Kliniken und Pinnwand mit vereinfachter Feldstruktur für bessere Benutzererfahrung
+- Reduzierte Pflichtfelder in allen Formularen zur Senkung der Einstiegshürden
+- Umwandlung von Dropdown-Auswahlen zu Freitextfeldern für mehr Flexibilität bei Fachrichtungen
+- Fachrichtung-Feld zur Pinnwand hinzugefügt für verbesserte Kategorisierung von Informationen
+- Stellenbörse: Fachrichtung-Feld in ein optionales Textfeld umgewandelt für mehr Flexibilität
+- Titel-Feld aus dem Stellenformular entfernt und durch automatische Titel-Generierung ersetzt
+- Verbesserte Darstellung von Stellenanzeigen mit klaren Informationen wie Fachrichtung, Bundesland und Startdatum
+- Seed-Daten aktualisiert mit Bundesland- und Fachrichtungs-Informationen für relevantere Beispieleinträge
+- Stellenbörse-Formular vereinfacht und fokussiert auf die wichtigsten Informationen
 
 ### Security
 - Changed MongoDB Atlas password to improve database security
@@ -77,9 +89,12 @@ All notable changes to this project will be documented in this file.
 - Backend README with documentation for seeding and API endpoints
 - Improved error handling for API requests in frontend components
 - Added NewKnowledgeBase.md to document lessons learned and best practices
-- Admin-Bereich um Stellenbörse-Komponente erweitert zur Verwaltung von Stellenangeboten und -gesuchen
-- Status-Management für Stellenangebote und -gesuche (Freigeben, Archivieren, Wiederherstellen)
-- Detailansicht für Stellenangebote und -gesuche im Admin-Bereich
+- Email-Benachrichtigungssystem für neue Stellenangebote/-gesuche
+- Verbesserte Bearbeitung von Stellenangeboten/-gesuchen im Admin-Bereich
+- E-Mail-Utility für das Versenden von Benachrichtigungen mit Nodemailer
+- Test-Skripte für die Überprüfung der E-Mail-Funktionalität im Entwicklungsmodus
+- Unterstützung für Ethereal Test-Accounts zum E-Mail-Testing ohne echten SMTP-Server
+- Automatische Titel-Generierung für Stellenangebote/-gesuche basierend auf Benutzertyp, Datum und Fachrichtung
 
 ### Hinzugefügt
 - Admin-Komponente für die Benutzerverwaltung mit Filter-, Such- und Paginierungsfunktionen
@@ -246,6 +261,9 @@ All notable changes to this project will be documented in this file.
 - Verwendung des Med-MATCH Logos als Favicon
 - Dedizierte Seite für Stellenangebote
 - Dedizierte Seite für Stellengesuche
+- Darstellung von Stellenanzeigen auf der Startseite
+- Funktionalität zum Senden von Kontaktanfragen zu Pinnwand-Einträgen
+- Status-API-Endpunkt für einfache Server- und Umgebungsüberprüfung
 - Darstellung von Stellenanzeigen auf der Startseite
 - Funktionalität zum Senden von Kontaktanfragen zu Pinnwand-Einträgen
 - Status-API-Endpunkt für einfache Server- und Umgebungsüberprüfung
