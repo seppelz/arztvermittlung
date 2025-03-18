@@ -502,3 +502,10 @@ This document tracks key insights and lessons learned about the codebase to impr
    - Automatische Generierung aussagekräftiger Titel unter Einbeziehung relevanter Datumsinformationen
    - Verwendung spezifischer Datumswerte (z.B. Verfügbarkeitsdatum statt Erstellungsdatum) für kontextbezogene Titel
    - Standardisierte Datumsinformationen in Titeln für bessere Übersichtlichkeit und Konsistenz 
+
+## Cross-Service Integration
+
+- **Demo vs. Real Data Integration**: When transitioning from demo data to real API data, it's critical to maintain both sources temporarily with a preference for real data to ensure smooth user experience without data gaps.
+- **Form-to-API Consistency**: Forms must be directly connected to appropriate API service methods to ensure data persistence; simulated API calls with setTimeout are suitable for prototyping but inadequate for production.
+- **Database Schema-Frontend Alignment**: Ensure that form field models in frontend components exactly match database schema requirements to prevent validation errors or missing data issues.
+- **State Management During API Transitions**: Implement clear loading, error, and empty states when connecting components to live APIs to handle all possible response scenarios gracefully. 

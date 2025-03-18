@@ -12,61 +12,71 @@
 
     <section class="py-12 bg-light">
       <div class="container mx-auto px-4">
-        <!-- Filter-Optionen -->
-        <div class="max-w-7xl mx-auto mb-8">
-          <div class="bg-white rounded-lg shadow-md p-4 flex flex-wrap gap-4 items-center border border-gray-200">
+        <!-- Nachrichtenliste -->
+        <div class="max-w-7xl mx-auto bg-white rounded-lg shadow-strong p-6 border border-gray-200 mb-10">
+          <h2 class="text-2xl md:text-3xl font-bold mb-6 text-heading border-b-2 border-primary pb-3">Stellenangebote und -gesuche</h2>
+          
+          <!-- Filter-Optionen -->
+          <div class="flex flex-wrap gap-3 items-center mb-6">
             <h3 class="text-lg font-bold text-heading mr-4">Filter:</h3>
-            
-            <div class="flex items-center space-x-2">
-              <button 
-                @click="filterMessages('all')" 
-                class="px-4 py-2 rounded-lg transition-colors shadow-sm"
-                :class="currentFilter === 'all' ? 'bg-primary text-white font-bold' : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-300'"
-              >
-                Alle
-              </button>
-              <button 
-                @click="filterMessages('Angebot')" 
-                class="px-4 py-2 rounded-lg transition-colors shadow-sm"
-                :class="currentFilter === 'Angebot' ? 'bg-success text-white font-bold' : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-300'"
-              >
-                Angebote
-              </button>
-              <button 
-                @click="filterMessages('Gesuch')" 
-                class="px-4 py-2 rounded-lg transition-colors shadow-sm"
-                :class="currentFilter === 'Gesuch' ? 'bg-primary text-white font-bold' : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-300'"
-              >
-                Gesuche
-              </button>
-            </div>
+            <button 
+              @click="filterMessages('all')" 
+              class="px-4 py-2 rounded-lg transition-colors shadow-sm"
+              :class="currentFilter === 'all' ? 'bg-primary text-white font-bold' : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-300'"
+            >
+              Alle
+            </button>
+            <button 
+              @click="filterMessages('Angebot')" 
+              class="px-4 py-2 rounded-lg transition-colors shadow-sm"
+              :class="currentFilter === 'Angebot' ? 'bg-success text-white font-bold' : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-300'"
+            >
+              Angebote
+            </button>
+            <button 
+              @click="filterMessages('Gesuch')" 
+              class="px-4 py-2 rounded-lg transition-colors shadow-sm"
+              :class="currentFilter === 'Gesuch' ? 'bg-primary text-white font-bold' : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-300'"
+            >
+              Gesuche
+            </button>
             
             <div class="ml-auto flex items-center">
-              <label for="sortOrder" class="mr-2 text-gray-700 font-medium">Sortieren nach:</label>
-              <select 
-                id="sortOrder" 
-                v-model="sortOrder" 
-                class="px-4 py-2 border-2 border-gray-300 rounded-lg text-text-dark bg-white shadow-sm appearance-none"
-                @change="sortMessages()"
-              >
+              <span class="mr-2 text-gray-700">Sortieren:</span>
+              <select v-model="sortOrder" @change="sortMessages" class="px-3 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary bg-white shadow-sm">
                 <option value="newest">Neueste zuerst</option>
                 <option value="oldest">Älteste zuerst</option>
               </select>
             </div>
           </div>
-        </div>
-        
-        <!-- Nachrichten-Grid -->
-        <div class="max-w-7xl mx-auto mb-16">
-          <div v-if="filteredMessages.length === 0" class="text-center py-8">
-            <p class="text-gray-500 text-lg">Keine Angebote oder Gesuche gefunden. Erstellen Sie die erste!</p>
+          
+          <!-- Loading and Content States -->
+          <div v-if="isLoading" class="p-8 text-center">
+            <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-4"></div>
+            <p class="text-lg text-gray-600">Stellenangebote werden geladen...</p>
           </div>
           
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div v-else-if="loadError" class="p-6 bg-red-50 border border-red-200 rounded-lg text-center mb-4">
+            <p class="text-red-600 mb-2 font-medium">{{ loadError }}</p>
+            <button 
+              @click="fetchMessages" 
+              class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark text-sm"
+            >
+              Erneut versuchen
+            </button>
+          </div>
+          
+          <div v-else-if="filteredMessages.length === 0" class="p-8 text-center border border-gray-200 rounded-lg mb-4">
+            <p class="text-lg text-gray-600 mb-2">Keine Stellenangebote/-gesuche gefunden.</p>
+            <p class="text-gray-500">Erstellen Sie ein neues Angebot oder Gesuch mit dem Formular unten.</p>
+          </div>
+          
+          <!-- Messages list -->
+          <div v-else class="space-y-6">
             <div 
               v-for="message in filteredMessages" 
               :key="message.id" 
-              class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-strong transition-shadow duration-300 flex flex-col border border-gray-200"
+              class="relative p-5 border rounded-lg border-gray-200 shadow-sm hover:shadow-md transition-shadow"
             >
               <div 
                 class="h-2 w-full" 
@@ -89,8 +99,8 @@
                   <span class="text-sm text-gray-500">{{ formatDate(message.timestamp) }}</span>
                 </div>
                 <h3 class="text-xl font-bold mb-2 text-heading">
-                  <span v-if="message.userType === 'Arzt'">Arzt sucht ab {{ formatDate(message.startDate || message.timestamp) }} {{ message.specialty ? 'Fachrichtung ' + message.specialty : '' }}</span>
-                  <span v-else-if="message.userType === 'Klinik'">Klinik sucht ab {{ formatDate(message.startDate || message.timestamp) }} {{ message.specialty ? 'Arzt der Fachrichtung ' + message.specialty : 'Arzt' }}</span>
+                  <span v-if="message.userType === 'Arzt'">Arzt sucht ab {{ formatDate(message.startDate) }} {{ message.specialty ? 'Fachrichtung ' + message.specialty : '' }}</span>
+                  <span v-else-if="message.userType === 'Klinik'">Klinik sucht ab {{ formatDate(message.startDate) }} {{ message.specialty ? 'Arzt der Fachrichtung ' + message.specialty : 'Arzt' }}</span>
                   <span v-else>{{ message.title }}</span>
                 </h3>
                 <p class="text-gray-700 mb-4">{{ message.content }}</p>
@@ -98,8 +108,8 @@
                   <div class="flex justify-between">
                     <div>
                       <p class="text-sm text-gray-600">
-                        <span v-if="message.userType === 'Arzt'">Ein Arzt {{ message.specialty ? 'der Fachrichtung <strong>' + message.specialty + '</strong>' : '' }} sucht ab <strong>{{ formatDate(message.startDate || message.timestamp) }}</strong> eine Stelle.</span>
-                        <span v-if="message.userType === 'Klinik'">Eine Klinik aus <strong>{{ message.federalState || 'unbekannt' }}</strong> sucht ab <strong>{{ formatDate(message.startDate || message.timestamp) }}</strong> einen Arzt {{ message.specialty ? 'der Fachrichtung <strong>' + message.specialty + '</strong>' : '' }}.</span>
+                        <span v-if="message.userType === 'Arzt'">Ein Arzt {{ message.specialty ? 'der Fachrichtung <strong>' + message.specialty + '</strong>' : '' }} sucht ab <strong>{{ formatDate(message.startDate) }}</strong> eine Stelle.</span>
+                        <span v-if="message.userType === 'Klinik'">Eine Klinik aus <strong>{{ message.federalState || 'unbekannt' }}</strong> sucht ab <strong>{{ formatDate(message.startDate) }}</strong> einen Arzt {{ message.specialty ? 'der Fachrichtung <strong>' + message.specialty + '</strong>' : '' }}.</span>
                       </p>
                     </div>
                     <button 
@@ -330,6 +340,15 @@
 
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
+import bulletinService from '@/services/bulletin.service';
+import axios from 'axios';
+
+// Helper function to get API URL (copied from BulletinBoardPage)
+function getApiUrl(endpoint) {
+  // Try to use global config first
+  const baseUrl = import.meta.env.VITE_API_URL || 'https://www.med-match.de/api';
+  return `${baseUrl}/${endpoint}`;
+}
 
 // Beispieldaten für die Demonstration - nur Angebote und Gesuche
 const demoMessages = [
@@ -342,6 +361,7 @@ const demoMessages = [
     title: 'Vertretung Notfallmedizin (2 Wochen) - übertarifliche Vergütung',
     content: 'Suchen dringend Vertretung für unsere Notfallstation vom 15.-29.06.2025. Erfahrung in Notfallmedizin erforderlich. Übertarifliche Vergütung, Unterkunft wird gestellt.',
     timestamp: new Date('2025-05-15T10:30:00'),
+    startDate: new Date('2025-06-15T00:00:00'), // Start date for the job
     privacyPolicyAccepted: true
   },
   {
@@ -353,6 +373,7 @@ const demoMessages = [
     title: 'Anästhesist verfügbar für Kurzeinsätze bis 4 Wochen',
     content: 'Facharzt für Anästhesie mit 8 Jahren Erfahrung sucht Kurzeinsätze (1-4 Wochen) im Raum Köln ab sofort. Flexibel und kurzfristig verfügbar, auch Wochenenddienste möglich.',
     timestamp: new Date('2025-05-12T15:45:00'),
+    startDate: new Date('2025-05-20T00:00:00'), // Start date for availability
     privacyPolicyAccepted: true
   },
   {
@@ -364,6 +385,7 @@ const demoMessages = [
     title: 'Kardiologie - 3-Monats-Vertretung (übertariflich)',
     content: 'Suchen für den Zeitraum 01.07.-30.09.2025 Facharzt (m/w/d) für unsere kardiologische Abteilung. Übertarifliche Vergütung, Dienstwohnung möglich, flexible Dienstplangestaltung.',
     timestamp: new Date('2025-05-10T09:15:00'),
+    startDate: new Date('2025-07-01T00:00:00'), // Start date for the job
     privacyPolicyAccepted: true
   },
   {
@@ -375,6 +397,7 @@ const demoMessages = [
     title: 'Honorarärzte für Wochenenddienste (übertariflich)',
     content: 'Suchen regelmäßig Honorarärzte für Wochenenddienste (Fr-So). Attraktives Honorar, Unterkunft inklusive. Fachrichtung: Innere Medizin, Allgemeinmedizin.',
     timestamp: new Date('2025-05-05T14:10:00'),
+    startDate: new Date('2025-06-01T00:00:00'), // Start date for the job
     privacyPolicyAccepted: true
   },
   {
@@ -386,6 +409,7 @@ const demoMessages = [
     title: 'Kinderärztin für 3-Monats-Einsätze verfügbar',
     content: 'Fachärztin für Pädiatrie mit 12 Jahren Berufserfahrung sucht Vertretungsstellen oder Projekteinsätze für 1-3 Monate im Raum Berlin/Brandenburg. Flexible Zeiteinteilung, auch kurzfristig verfügbar.',
     timestamp: new Date('2025-05-03T16:30:00'),
+    startDate: new Date('2025-05-15T00:00:00'), // Start date for availability
     privacyPolicyAccepted: true
   }
 ];
@@ -400,6 +424,8 @@ const isSubmitting = ref(false);
 const messageSent = ref(false);
 const showContactModal = ref(false);
 const selectedMessage = ref({});
+const isLoading = ref(true);
+const loadError = ref(null);
 
 // Formulare
 const newMessage = reactive({
@@ -470,7 +496,7 @@ function determineMessageType() {
   }
 }
 
-function submitMessage() {
+async function submitMessage() {
   isSubmitting.value = true;
   
   // Set messageType based on userType
@@ -484,39 +510,53 @@ function submitMessage() {
     generatedTitle = `Klinik sucht ab ${formatDate(newMessage.startDate)}${newMessage.specialty ? ' Arzt der Fachrichtung ' + newMessage.specialty : ' Arzt'}`;
   }
   
-  // Simuliere API-Aufruf
-  setTimeout(() => {
-    const newId = messages.value.length > 0 ? Math.max(...messages.value.map(m => m.id)) + 1 : 1;
-    
-    const message = {
+  try {
+    // Prepare the data for submission
+    const bulletinData = {
       ...newMessage,
-      id: newId,
-      title: generatedTitle, // Use the generated title
+      title: generatedTitle,
       timestamp: new Date(),
-      privacyPolicyAccepted: true
+      privacyPolicyAccepted: true,
+      status: 'pending' // Ensure entries start as pending for moderation
     };
     
-    messages.value.unshift(message);
+    // Use the bulletinService to create a new entry
+    const response = await bulletinService.createBulletin(bulletinData);
     
-    // Formular zurücksetzen
-    Object.keys(newMessage).forEach(key => {
-      if (typeof newMessage[key] === 'boolean') {
-        newMessage[key] = false;
-      } else if (key === 'startDate') {
-        newMessage[key] = new Date().toISOString().split('T')[0]; // Reset to today's date
-      } else {
-        newMessage[key] = '';
-      }
-    });
-    
+    if (response && response.data) {
+      // Add the new bulletin to the local array with consistent id format
+      const newEntry = response.data;
+      const formattedEntry = {
+        ...newEntry,
+        id: newEntry._id || newEntry.id
+      };
+      
+      messages.value.unshift(formattedEntry);
+      
+      // Reset form
+      Object.keys(newMessage).forEach(key => {
+        if (typeof newMessage[key] === 'boolean') {
+          newMessage[key] = false;
+        } else if (key === 'startDate') {
+          newMessage[key] = new Date().toISOString().split('T')[0]; // Reset to today's date
+        } else {
+          newMessage[key] = '';
+        }
+      });
+      
+      messageSent.value = true;
+      
+      // Hide success message after 3 seconds
+      setTimeout(() => {
+        messageSent.value = false;
+      }, 3000);
+    }
+  } catch (error) {
+    console.error('Error submitting job listing:', error);
+    alert('Fehler beim Speichern: ' + (error.message || 'Unbekannter Fehler'));
+  } finally {
     isSubmitting.value = false;
-    messageSent.value = true;
-    
-    // Erfolgsmeldung nach 3 Sekunden ausblenden
-    setTimeout(() => {
-      messageSent.value = false;
-    }, 3000);
-  }, 1000);
+  }
 }
 
 function filterMessages(filter) {
@@ -530,6 +570,11 @@ function sortMessages() {
 }
 
 function formatDate(date) {
+  // Add safety check to handle missing dates
+  if (!date) {
+    return 'Unbekannt';
+  }
+  
   return new Date(date).toLocaleDateString('de-DE', {
     day: '2-digit',
     month: '2-digit',
@@ -578,9 +623,36 @@ function sendContact() {
   closeContactModal();
 }
 
-// Initialisierung
-onMounted(() => {
-  // Hier könnten Nachrichten von einer API geladen werden
-  // Für die Demo verwenden wir die vordefinierten Daten
+// Load real data on component mount
+onMounted(async () => {
+  await fetchMessages();
 });
+
+async function fetchMessages() {
+  isLoading.value = true;
+  
+  try {
+    // Get bulletins with messageType 'Angebot' or 'Gesuch'
+    const response = await bulletinService.getAllBulletins({
+      messageType: ['Angebot', 'Gesuch']
+    });
+    
+    if (response && response.data) {
+      // Format the data to use consistent id property (either id or _id)
+      const formattedData = response.data.map(item => ({
+        ...item,
+        id: item._id || item.id
+      }));
+      
+      // Merge with demo data initially, later can remove demo data completely
+      messages.value = [...formattedData, ...demoMessages];
+    }
+  } catch (error) {
+    console.error('Error loading job listings:', error);
+    loadError.value = 'Fehler beim Laden der Daten. Bitte versuchen Sie es später erneut.';
+    // Keep demo data as fallback
+  } finally {
+    isLoading.value = false;
+  }
+}
 </script> 

@@ -65,6 +65,7 @@ All notable changes to this project will be documented in this file.
 - Updated MongoDB connection test files to use environment variables for secure credential handling
 
 ### Fixed
+- Fixed issue with job listings in Stellenbörse not being saved to the database by connecting the form to the bulletin API
 - Fixed MongoDB Atlas connection issues by disabling SSL validation
 - Added test users to MongoDB Atlas database for guest login functionality
 - Fixed CORS issues with Vercel deployment by updating API URL configuration
