@@ -811,3 +811,10 @@ This approach ensures that regardless of which side of the platform a user engag
    - Error messages should be specific about the nature of the failure when possible
 
 By following these patterns, we ensure that all user data is properly captured and no forms become "black holes" where data is lost between the frontend and backend systems. 
+
+## Validation Requirements for Backend API
+
+- To minimize circular dependencies in Vue Router and authentication services, use dynamic imports and ensure the initialization sequence is properly managed
+- For better error tracking, add global error handlers for uncaught errors and unhandled promise rejections
+- When submitting data to the backend API, ensure all required fields are included and properly formatted with appropriate fallback values
+- Backend API validation may require specific formats for data fields like dates (as Date objects) and boolean flags (explicitly set to true/false) 
