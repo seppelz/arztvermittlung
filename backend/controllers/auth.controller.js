@@ -56,19 +56,31 @@ exports.register = async (req, res) => {
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
+    console.log(`Login attempt for email: ${email}`);
 
     // Prüfen, ob E-Mail und Passwort angegeben wurden
     if (!email || !password) {
+      console.log('Login rejected: Missing email or password');
       return res.status(400).json({ message: 'Bitte geben Sie E-Mail und Passwort an' });
     }
 
     // Benutzer in der Datenbank finden
+    console.log(`Looking up user with email: ${email}`);
     const user = await User.findOne({ email }).select('+password');
 
-    // Prüfen, ob der Benutzer existiert und das Passwort korrekt ist
-    if (!user || !(await user.checkPassword(password))) {
+    if (!user) {
+      console.log(`Login failed: No user found with email ${email}`);
       return res.status(401).json({ message: 'Falsche E-Mail oder falsches Passwort' });
     }
+
+    // Prüfen, ob das Passwort korrekt ist
+    const passwordCorrect = await user.checkPassword(password);
+    if (!passwordCorrect) {
+      console.log(`Login failed: Incorrect password for user ${email}`);
+      return res.status(401).json({ message: 'Falsche E-Mail oder falsches Passwort' });
+    }
+
+    console.log(`Login successful for user: ${user.email} (${user._id})`);
 
     // Letzten Login aktualisieren
     user.lastLogin = Date.now();
@@ -76,21 +88,39 @@ exports.login = async (req, res) => {
 
     // Token generieren und zurückgeben
     const token = generateToken(user._id);
+    console.log(`Generated token for user ${user._id}`);
+    
+    const userObject = {
+      id: user._id,
+      username: user.username,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      userType: user.userType
+    };
+    
+    console.log(`Returning user object:`, userObject);
+    
     res.status(200).json({
       status: 'success',
       token,
-      user: {
-        id: user._id,
-        username: user.username,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        userType: user.userType
-      }
+      user: userObject
     });
   } catch (error) {
     console.error('Login error:', error);
-    res.status(500).json({ message: 'Ein Fehler ist beim Login aufgetreten', error: error.message });
+    console.error('Error name:', error.name);
+    console.error('Error message:', error.message);
+    console.error('Error stack:', error.stack);
+    
+    // Check if this is a MongoDB connection error
+    if (error.name === 'MongoNetworkError' || error.name === 'MongooseServerSelectionError') {
+      console.error('MongoDB connection error detected during login');
+    }
+    
+    res.status(500).json({ 
+      message: 'Ein Fehler ist beim Login aufgetreten', 
+      error: error.message 
+    });
   }
 };
 

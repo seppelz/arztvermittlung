@@ -3,22 +3,27 @@ const Bulletin = require('../models/bulletin.model');
 // Alle Pinnwand-Einträge abrufen
 exports.getAllBulletins = async (req, res) => {
   try {
+    console.log(`Received request for bulletins with query:`, req.query);
+    
     // Filterobjekt erstellen
     const filter = {};
     
     // Nach Typ filtern, falls angegeben
     if (req.query.messageType) {
       filter.messageType = req.query.messageType;
+      console.log(`Filtering by messageType: ${req.query.messageType}`);
     }
 
     // Nach Status filtern, falls angegeben
     if (req.query.status) {
       filter.status = req.query.status;
+      console.log(`Filtering by status: ${req.query.status}`);
     }
 
     // Nach Benutzertyp filtern, falls angegeben
     if (req.query.userType) {
       filter.userType = req.query.userType;
+      console.log(`Filtering by userType: ${req.query.userType}`);
     }
 
     // Sortierung
@@ -32,9 +37,11 @@ exports.getAllBulletins = async (req, res) => {
           sort[field] = 1;
         }
       });
+      console.log(`Sorting by:`, sort);
     } else {
       // Standardsortierung nach Zeitstempel (neueste zuerst)
       sort.timestamp = -1;
+      console.log(`Using default sort by timestamp desc`);
     }
 
     // Paginierung
@@ -42,14 +49,20 @@ exports.getAllBulletins = async (req, res) => {
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
 
+    console.log(`Using filter:`, filter);
+    console.log(`Pagination: page=${page}, limit=${limit}, skip=${skip}`);
+
     // Abfrage ausführen
     const bulletins = await Bulletin.find(filter)
       .sort(sort)
       .skip(skip)
       .limit(limit);
 
+    console.log(`Found ${bulletins.length} bulletins`);
+
     // Gesamtanzahl für Paginierung
     const total = await Bulletin.countDocuments(filter);
+    console.log(`Total bulletins matching filter: ${total}`);
 
     res.status(200).json({
       status: 'success',
@@ -60,7 +73,19 @@ exports.getAllBulletins = async (req, res) => {
     });
   } catch (error) {
     console.error('Error fetching bulletins:', error);
-    res.status(500).json({ message: 'Ein Fehler ist aufgetreten', error: error.message });
+    console.error('Error name:', error.name);
+    console.error('Error message:', error.message);
+    console.error('Error stack:', error.stack);
+    
+    // Check if this is a MongoDB connection error
+    if (error.name === 'MongoNetworkError' || error.name === 'MongooseServerSelectionError') {
+      console.error('MongoDB connection error detected');
+    }
+    
+    res.status(500).json({ 
+      message: 'Ein Fehler ist aufgetreten beim Abrufen der Pinnwand-Einträge', 
+      error: error.message 
+    });
   }
 };
 

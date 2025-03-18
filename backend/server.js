@@ -78,30 +78,61 @@ app.get('/api/status', (req, res) => {
 
 // Generische Fehlerbehandlung
 app.use((err, req, res, next) => {
-  console.error(err.stack);
+  console.error('Global error handler caught:', err.stack);
   res.status(500).json({
     message: 'Ein Fehler ist aufgetreten',
     error: process.env.NODE_ENV === 'development' ? err : {}
   });
 });
 
-// MongoDB-Verbindung mit aktualisierter Konfiguration für Atlas
-mongoose.connect(process.env.MONGODB_URI)
+// MongoDB-Verbindung mit verbesserter Fehlerbehandlung
+console.log('Attempting to connect to MongoDB...');
+console.log(`Using MongoDB URI starting with: ${process.env.MONGODB_URI?.substring(0, 20)}...`);
+
+// MongoDB connection options
+const mongoOptions = {
+  // Only use these options in production if you're having SSL issues
+  ...(isProduction ? {
+    ssl: true,
+    sslValidate: false,
+    connectTimeoutMS: 30000,
+    socketTimeoutMS: 30000,
+    serverSelectionTimeoutMS: 30000,
+    maxPoolSize: 10
+  } : {})
+};
+
+console.log('Using MongoDB options:', mongoOptions);
+
+mongoose.connect(process.env.MONGODB_URI, mongoOptions)
 .then(() => {
-  console.log('Mit MongoDB Atlas verbunden');
+  console.log('Successfully connected to MongoDB Atlas');
   const PORT = process.env.PORT || 5000;
   app.listen(PORT, () => {
-    console.log(`Server läuft auf Port ${PORT}`);
+    console.log(`Server running on port ${PORT}`);
   });
 })
 .catch(err => {
-  console.error('MongoDB-Verbindungsfehler:', err);
-  console.error(err);
+  console.error('MongoDB connection error details:', err);
+  // Additional diagnostic information
+  console.error('Error name:', err.name);
+  console.error('Error message:', err.message);
+  if (err.code) console.error('Error code:', err.code);
+  if (err.codeName) console.error('Error codeName:', err.codeName);
   process.exit(1);
 });
 
 // Unbehandelte Promise-Rejections
 process.on('unhandledRejection', (err) => {
-  console.error('Unbehandelte Promise-Rejection:', err);
-  process.exit(1);
+  console.error('Unhandled Promise Rejection:', err);
+  console.error('Error name:', err.name);
+  console.error('Error message:', err.message);
+  if (err.code) console.error('Error code:', err.code);
+  if (err.codeName) console.error('Error codeName:', err.codeName);
+  // Keep the server running in production but log the error
+  if (process.env.NODE_ENV === 'production') {
+    console.error('In production mode, continuing despite error');
+  } else {
+    process.exit(1);
+  }
 }); 

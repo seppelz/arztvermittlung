@@ -75,6 +75,9 @@ All notable changes to this project will be documented in this file.
 - Fixed CORS issue when adding new bulletin entries
 - Fehlerhafte div-Struktur im Kontaktformular korrigiert
 - Fixed axios import in bulletin.service.js to use the configured api instance with proper base URL and interceptors
+- Enhanced MongoDB connection options to fix SSL-related issues in production
+- Improved error handling and diagnostics in server.js for better troubleshooting
+- Added detailed logging in bulletin controller and auth controller for better error diagnostics
 
 ### Added
 - Created test scripts for MongoDB Atlas connection testing
