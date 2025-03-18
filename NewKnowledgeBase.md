@@ -478,3 +478,27 @@ This document tracks key insights and lessons learned about the codebase to impr
 - Vercel serverless functions are especially sensitive to path inconsistencies that might work locally but fail in production
 - Using consistent naming conventions for folders (all singular or all plural) helps prevent path-related errors
 - Import errors often manifest as 500 status codes in production while working fine in development 
+
+## Datenhandhabung und Datumswerte
+
+### Effektives Datumshandling in Vue.js Anwendungen
+
+1. **Konsistentes Datums-Datenmodell zwischen Frontend und Backend**:
+   - Explizite Konvertierung von String zu Date-Objekten beim Senden von API-Anfragen verhindert Datumsinkongruenzen
+   - Verwendung des gleichen Datums-Datentyps (z.B. `startDate` als Date-Objekt) in allen Schichten der Anwendung
+   - Implementierung von Fallback-Mechanismen für fehlende Datumswerte verhindert Rendering-Fehler
+
+2. **Datumsformatierung und -validierung**:
+   - Zentralisierte Formatierungsfunktionen (z.B. `formatDate()`) für einheitliche Darstellung in der gesamten Anwendung
+   - Berücksichtigung von Zeitzonen und Lokalisierung bei der Datumsverarbeitung
+   - Validierung von Datumseingaben sowohl im Frontend als auch im Backend zur Sicherstellung der Datenintegrität
+
+3. **Optimiertes Datumshandling in der Benutzeroberfläche**:
+   - Klare visuelle Unterscheidung zwischen Erstellungs-/Änderungsdatum und inhaltlich relevanten Datumswerten (z.B. Verfügbarkeitsdatum)
+   - Konsistente Verwendung desselben Datumswerts (z.B. `startDate`) über verschiedene UI-Komponenten hinweg
+   - Fehlerbehandlung für fehlende oder ungültige Datumsangaben mit benutzerfreundlichen Fallback-Werten
+
+4. **Datums-bezogene Titelgenerierung**:
+   - Automatische Generierung aussagekräftiger Titel unter Einbeziehung relevanter Datumsinformationen
+   - Verwendung spezifischer Datumswerte (z.B. Verfügbarkeitsdatum statt Erstellungsdatum) für kontextbezogene Titel
+   - Standardisierte Datumsinformationen in Titeln für bessere Übersichtlichkeit und Konsistenz 

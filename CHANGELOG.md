@@ -89,6 +89,7 @@ All notable changes to this project will be documented in this file.
 - Added robust error handling to router configuration to prevent cryptic parsing errors
 - Enhanced app initialization with proper error catching to provide better diagnostic information
 - Fixed dynamic import issues by adding fallback routes when component loading fails
+- Fixed date display in Stellenbörse job listings to correctly use the selected startDate instead of the publication date
 
 ### Added
 - Created test scripts for MongoDB Atlas connection testing
