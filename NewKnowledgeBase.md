@@ -814,3 +814,29 @@ Wir haben neue, vertiefte Erkenntnisse über zirkuläre Abhängigkeiten in Vue-A
    - Timeout-basierte Erkennung von Deadlocks während der App-Initialisierung
 
 Diese Erkenntnisse haben uns ermöglicht, die Router-Navigation erheblich stabiler und performanter zu gestalten und gleichzeitig die Debugging-Fähigkeiten für komplexe asynchrone Prozesse zu verbessern. 
+
+## Cookie-Management gemäß DSGVO
+
+Um die Anforderungen der DSGVO (Datenschutz-Grundverordnung) zu erfüllen, wurde ein Cookie-Consent-System implementiert:
+
+1. **Zentrale Cookie-Verwaltung**:
+   - Der `CookieService` bietet eine zentrale Schnittstelle für alle Cookie-Operationen
+   - Konsistente Cookie-Handhabung über die gesamte Anwendung hinweg
+   - Einfaches API für das Setzen, Abrufen und Löschen von Cookies
+
+2. **Benutzerfreundliches Cookie-Banner**:
+   - Transparente Information über die Verwendung von Cookies
+   - Klare Entscheidungsmöglichkeiten (Akzeptieren/Ablehnen)
+   - Responsives Design für optimale Darstellung auf allen Geräten
+
+3. **Einwilligungsmanagement**:
+   - Speicherung der Nutzerentscheidung für ein Jahr
+   - Event-System zur Benachrichtigung anderer Komponenten über Änderungen des Consent-Status
+   - Möglichkeit zum Reset des Consent-Status für erneute Abfrage
+
+4. **Integration in die Anwendung**:
+   - Globale Verfügbarkeit des `cookiesEnabled`-Flags
+   - Einfache Abfrage des aktuellen Einwilligungsstatus
+   - Modular und erweiterbar für zusätzliche Cookie-Kategorien (notwendig, Funktional, Analytisch, etc.)
+
+Diese Implementierung stellt sicher, dass die Website den aktuellen Datenschutzrichtlinien entspricht und Nutzern die volle Kontrolle über ihre Cookie-Präferenzen gibt. 

@@ -343,3 +343,6 @@ All notable changes to this project will be documented in this file.
 - Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
 - Improved footer design
 - Updated dependencies in package.json
+
+### Added
+- Implementierung eines datenschutzkonformen Cookie-Banners zur Einholung der Einwilligung der Nutzer gemäß DSGVO

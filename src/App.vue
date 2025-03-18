@@ -3,6 +3,7 @@ import { RouterView } from 'vue-router'
 import AppHeader from '@/components/layout/AppHeader.vue'
 import AppFooter from '@/components/layout/AppFooter.vue'
 import ToastNotification from '@/components/ToastNotification.vue'
+import CookieBanner from '@/components/CookieBanner.vue'
 </script>
 
 <template>
@@ -13,6 +14,7 @@ import ToastNotification from '@/components/ToastNotification.vue'
     </main>
     <AppFooter />
     <ToastNotification />
+    <CookieBanner />
   </div>
 </template>
 
