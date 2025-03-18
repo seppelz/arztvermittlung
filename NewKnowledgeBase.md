@@ -445,4 +445,5 @@ This document tracks key insights and lessons learned about the codebase to impr
 - API endpoints follow RESTful conventions with controllers handling business logic
 - Backend tests are organized in a separate directory structure
 - Environment configuration uses separate files for development, production, and example templates
-- User authentication is handled via JWT tokens with role-based access control 
+- User authentication is handled via JWT tokens with role-based access control
+- Axios configuration should be centralized in a single api.js file that sets up base URL and interceptors, then imported into service files rather than using raw axios imports 

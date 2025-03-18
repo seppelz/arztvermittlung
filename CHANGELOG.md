@@ -74,6 +74,7 @@ All notable changes to this project will be documented in this file.
 - Fixed API URL configuration in BulletinBoardPage.vue to use the global config before falling back to environment variables
 - Fixed CORS issue when adding new bulletin entries
 - Fehlerhafte div-Struktur im Kontaktformular korrigiert
+- Fixed axios import in bulletin.service.js to use the configured api instance with proper base URL and interceptors
 
 ### Added
 - Created test scripts for MongoDB Atlas connection testing

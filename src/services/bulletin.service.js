@@ -1,4 +1,4 @@
-import axios from '@/utils/axios';
+import api from './api';
 
 /**
  * Service for bulletin board related API calls
@@ -11,7 +11,7 @@ class BulletinService {
    */
   async getAllBulletins(params = {}) {
     try {
-      const response = await axios.get('/bulletins', { params });
+      const response = await api.get('/bulletins', { params });
       return response.data;
     } catch (error) {
       throw error;
@@ -25,7 +25,7 @@ class BulletinService {
    */
   async getBulletinById(id) {
     try {
-      const response = await axios.get(`/bulletins/${id}`);
+      const response = await api.get(`/bulletins/${id}`);
       return response.data;
     } catch (error) {
       throw error;
@@ -39,7 +39,7 @@ class BulletinService {
    */
   async createBulletin(bulletinData) {
     try {
-      const response = await axios.post('/bulletins', bulletinData);
+      const response = await api.post('/bulletins', bulletinData);
       return response.data;
     } catch (error) {
       throw error;
@@ -54,7 +54,7 @@ class BulletinService {
    */
   async updateBulletin(id, bulletinData) {
     try {
-      const response = await axios.patch(`/bulletins/${id}`, bulletinData);
+      const response = await api.patch(`/bulletins/${id}`, bulletinData);
       return response.data;
     } catch (error) {
       throw error;
@@ -68,7 +68,7 @@ class BulletinService {
    */
   async deleteBulletin(id) {
     try {
-      const response = await axios.delete(`/bulletins/${id}`);
+      const response = await api.delete(`/bulletins/${id}`);
       return response.data;
     } catch (error) {
       throw error;
