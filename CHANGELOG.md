@@ -102,6 +102,11 @@ All notable changes to this project will be documented in this file.
 - Fixed rendering of HTML tags in specialty fields of job listings by using v-html directive
 - Fixed "TypeError: s.filter is not a function" in AdminDashboard by adding proper type checks before using array methods
 - Fixed "ReferenceError: api is not defined" in AdminBulletin by removing unnecessary api reference
+- Fixed issue with Kontaktanfragen (contact requests) in the admin area to use real contact data from the database instead of dummy data
+- Implemented proper contact form submission functionality with backend integration
+- Added email notification for new contact requests
+- Enhanced contact model with subject and privacy policy fields
+- Added loading states and error handling to contact management UI
 
 ### Added
 - Created test scripts for MongoDB Atlas connection testing
@@ -129,6 +134,12 @@ All notable changes to this project will be documented in this file.
 - Added conditional validation for job listings requiring start date and federal state fields
 - Added dashboard.service.js to fetch and aggregate real-time activity data for Admin Dashboard
 - Added real-time activity tracking in Admin Dashboard showing latest user registrations and bulletin entries
+- Echte Benutzerdaten in AdminUsers-Komponente implementiert
+- API-Integration für das Benutzerverzeichnis hinzugefügt
+- Filter- und Paginierungsfunktionen für Benutzer
+- Bearbeitungsdialog für Benutzerdetails
+- Detailansicht für Benutzer
+- Verbesserte Fehlerbehandlung in UserService
 
 ### Hinzugefügt
 - Admin-Komponente für die Benutzerverwaltung mit Filter-, Such- und Paginierungsfunktionen

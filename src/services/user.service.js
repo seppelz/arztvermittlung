@@ -47,13 +47,39 @@ class UserService {
 
   /**
    * Get all users (admin only)
+   * @param {Object} filters - Filter options like role, status, etc.
+   * @param {Object} pagination - Pagination options like page, limit
+   * @param {Object} sort - Sorting options
    * @returns {Promise} - Promise with the users
    */
-  async getAllUsers() {
+  async getAllUsers(filters = {}, pagination = {}, sort = {}) {
     try {
-      const response = await api.get('/users');
+      // Construct query parameters
+      const queryParams = new URLSearchParams();
+      
+      // Add filter parameters
+      if (filters.role) queryParams.append('role', filters.role);
+      if (filters.status) queryParams.append('status', filters.status);
+      if (filters.userType) queryParams.append('userType', filters.userType);
+      if (filters.search) queryParams.append('search', filters.search);
+      
+      // Add pagination parameters
+      if (pagination.page) queryParams.append('page', pagination.page);
+      if (pagination.limit) queryParams.append('limit', pagination.limit);
+      
+      // Add sorting parameters
+      if (sort.field) {
+        const sortDirection = sort.direction === 'desc' ? '-' : '';
+        queryParams.append('sort', `${sortDirection}${sort.field}`);
+      }
+      
+      const queryString = queryParams.toString() ? `?${queryParams.toString()}` : '';
+      console.log('Fetching users with query:', queryString);
+      
+      const response = await api.get(`/users${queryString}`);
       return response;
     } catch (error) {
+      console.error('Error in getAllUsers:', error);
       throw error;
     }
   }
@@ -79,12 +105,23 @@ class UserService {
    * @returns {Promise} - Promise with the update response
    */
   async updateUser(userId, userData) {
-    try {
-      const response = await api.put(`/users/${userId}`, userData);
-      return response;
-    } catch (error) {
+    return api.patch(`/users/${userId}`, userData).catch(error => {
+      console.error('Error updating user:', error);
       throw error;
-    }
+    });
+  }
+
+  /**
+   * Update user status (admin only)
+   * @param {string} userId - User ID
+   * @param {string} status - New status (active, inactive, suspended)
+   * @returns {Promise} - Promise with the update response
+   */
+  async updateUserStatus(userId, status) {
+    return api.patch(`/users/${userId}/status`, { status }).catch(error => {
+      console.error('Error updating user status:', error);
+      throw error;
+    });
   }
 
   /**

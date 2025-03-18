@@ -51,8 +51,36 @@
       </div>
     </div>
     
+    <!-- Loading-Indikator -->
+    <div v-if="loading" class="flex justify-center items-center py-12">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+    </div>
+    
+    <!-- Fehlermeldung -->
+    <div v-else-if="error" class="bg-white rounded-lg shadow-md p-8 mb-6 border border-gray-200 text-center">
+      <div class="text-red-500 mb-4">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      </div>
+      <p class="text-gray-700 mb-4">{{ error }}</p>
+      <button @click="fetchContacts" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors">
+        Erneut versuchen
+      </button>
+    </div>
+    
+    <!-- Keine Kontaktanfragen -->
+    <div v-else-if="contacts.length === 0" class="bg-white rounded-lg shadow-md p-8 mb-6 border border-gray-200 text-center">
+      <div class="text-gray-400 mb-4">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+        </svg>
+      </div>
+      <p class="text-gray-700">Keine Kontaktanfragen gefunden</p>
+    </div>
+    
     <!-- Tabelle -->
-    <div class="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden">
+    <div v-else class="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden">
       <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-gray-50">
@@ -81,16 +109,16 @@
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
-            <tr v-for="contact in filteredContacts" :key="contact.id" class="hover:bg-gray-50">
+            <tr v-for="contact in filteredContacts" :key="contact._id" class="hover:bg-gray-50">
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                {{ contact.id }}
+                {{ contact._id }}
               </td>
               <td class="px-6 py-4">
-                <div v-if="contact.relatedPost" class="text-sm font-medium text-gray-900">
-                  {{ contact.relatedPost.title }}
+                <div v-if="contact.relatedPostId" class="text-sm font-medium text-gray-900">
+                  {{ contact.relatedPostId.title || 'Kein Titel' }}
                 </div>
                 <div v-else class="text-sm font-medium text-gray-900">
-                  Direkte Anfrage
+                  {{ contact.subject || 'Direkte Anfrage' }}
                 </div>
                 <div class="text-sm text-gray-500 mt-1 line-clamp-2">
                   {{ truncateMessage(contact.message) }}
@@ -165,11 +193,11 @@
           <div>
             <p class="text-sm text-gray-700">
               Zeige
-              <span class="font-medium">{{ filteredContacts.length > 0 ? (currentPage - 1) * pageSize + 1 : 0 }}</span>
+              <span class="font-medium">{{ totalItems > 0 ? (currentPage - 1) * pageSize + 1 : 0 }}</span>
               bis
-              <span class="font-medium">{{ Math.min(currentPage * pageSize, filteredContacts.length) }}</span>
+              <span class="font-medium">{{ Math.min(currentPage * pageSize, totalItems) }}</span>
               von
-              <span class="font-medium">{{ filteredContacts.length }}</span>
+              <span class="font-medium">{{ totalItems }}</span>
               Einträgen
             </p>
           </div>
@@ -240,16 +268,28 @@
                 >
                   {{ getStatusLabel(activeContact.status) }}
                 </span>
-                <span class="text-sm text-gray-500">ID: {{ activeContact.id }}</span>
+                <span class="text-sm text-gray-500">ID: {{ activeContact._id }}</span>
               </div>
               <span class="text-sm text-gray-500">{{ formatDate(activeContact.timestamp) }}</span>
             </div>
             
-            <div v-if="activeContact.relatedPost" class="mb-4">
+            <div v-if="activeContact.relatedPostId" class="mb-4">
               <h4 class="text-base font-semibold text-gray-800 mb-1">Bezug auf Pinnwand-Eintrag:</h4>
               <div class="bg-gray-50 p-3 rounded-lg border border-gray-200">
-                <div class="font-medium">{{ activeContact.relatedPost.title }}</div>
-                <div class="text-sm text-gray-500">{{ activeContact.relatedPost.messageType }}</div>
+                <div class="font-medium text-gray-800">{{ activeContact.relatedPostId.title || 'Kein Titel' }}</div>
+                <div class="flex items-center mt-1 text-gray-600 text-sm">
+                  <span class="mr-2">Typ:</span>
+                  <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100">
+                    {{ activeContact.relatedPostId.messageType || 'Unbekannt' }}
+                  </span>
+                </div>
+              </div>
+            </div>
+            
+            <div v-else-if="activeContact.subject" class="mb-4">
+              <h4 class="text-base font-semibold text-gray-800 mb-1">Betreff:</h4>
+              <div class="bg-gray-50 p-3 rounded-lg border border-gray-200">
+                <div class="font-medium text-gray-800">{{ activeContact.subject }}</div>
               </div>
             </div>
           </div>
@@ -319,150 +359,85 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
+import contactService from '@/services/contact.service';
 
 // Zustandsvariablen
-const contacts = ref([
-  {
-    id: '1001',
-    name: 'Dr. Julia Weber',
-    email: 'j.weber@arztpraxis.de',
-    fromUser: {
-      id: '2001',
-      name: 'Dr. Julia Weber'
-    },
-    toUser: {
-      id: '2002',
-      name: 'Klinikum München',
-      email: 'personal@klinikum-muenchen.de'
-    },
-    relatedPost: {
-      title: 'Chirurgen für Sommereinsatz gesucht',
-      messageType: 'Angebot'
-    },
-    message: 'Sehr geehrte Damen und Herren,\n\nIch interessiere mich für Ihre Stellenausschreibung als Chirurg für den Sommereinsatz. Ich habe bereits 5 Jahre Erfahrung in der Unfallchirurgie und bin flexibel einsetzbar.\n\nMit freundlichen Grüßen,\nDr. Julia Weber',
-    timestamp: new Date('2025-05-15T14:30:00'),
-    status: 'pending'
-  },
-  {
-    id: '1002',
-    name: 'Thomas Schmidt',
-    email: 't.schmidt@mail.de',
-    fromUser: {
-      id: '2003',
-      name: 'Dr. Thomas Schmidt'
-    },
-    toUser: {
-      id: '2004',
-      name: 'Universitätsklinikum Hamburg',
-      email: 'karriere@uk-hamburg.de'
-    },
-    relatedPost: {
-      title: 'Radiologie-Facharzt für Teilzeit gesucht',
-      messageType: 'Gesuch'
-    },
-    message: 'Hallo,\n\nIch bin interessiert an der Teilzeitstelle in der Radiologie. Wann könnten wir telefonieren, um Details zu besprechen?\n\nBeste Grüße,\nThomas Schmidt',
-    timestamp: new Date('2025-05-14T10:15:00'),
-    status: 'viewed'
-  },
-  {
-    id: '1003',
-    name: 'Maria Müller',
-    email: 'm.mueller@praxis.de',
-    fromUser: null,
-    toUser: {
-      id: '2005',
-      name: 'Rehaklinik Schwarzwald',
-      email: 'personal@rehaklinik-schwarzwald.de'
-    },
-    relatedPost: {
-      title: 'Internisten für Rehaklinik gesucht',
-      messageType: 'Gesuch'
-    },
-    message: 'Sehr geehrtes Team,\n\nIch bin Fachärztin für Innere Medizin und suche eine neue Herausforderung. Ihre Stellenausschreibung für die Rehaklinik hat mein Interesse geweckt.\n\nGerne möchte ich mich vorstellen. Wann wäre ein guter Zeitpunkt für ein Gespräch?\n\nFreundliche Grüße,\nDr. Maria Müller',
-    timestamp: new Date('2025-05-12T16:45:00'),
-    status: 'responded'
-  },
-  {
-    id: '1004',
-    name: 'Andreas Klein',
-    email: 'a.klein@klinik-rheinland.de',
-    fromUser: {
-      id: '2006',
-      name: 'Klinik Rheinland'
-    },
-    toUser: {
-      id: '2007',
-      name: 'Dr. Markus Klein',
-      email: 'm.klein@doktor.de'
-    },
-    relatedPost: {
-      title: 'Erfahrener Chirurg bietet Vertretung an',
-      messageType: 'Angebot'
-    },
-    message: 'Sehr geehrter Herr Dr. Klein,\n\nWir haben Ihr Angebot zur Vertretung als Chirurg mit großem Interesse gelesen. Unsere Klinik sucht aktuell für den Zeitraum August bis September eine Vertretung.\n\nKönnten Sie uns Ihre Verfügbarkeit in diesem Zeitraum mitteilen?\n\nMit freundlichen Grüßen,\nAndreas Klein\nPersonalabteilung Klinik Rheinland',
-    timestamp: new Date('2025-05-11T09:30:00'),
-    status: 'pending'
-  },
-  {
-    id: '1005',
-    name: 'Sarah Fischer',
-    email: 's.fischer@mail.de',
-    fromUser: null,
-    toUser: null,
-    relatedPost: null,
-    message: 'Guten Tag,\n\nIch habe eine allgemeine Frage zur Plattform. Wie kann ich mich als Arzt registrieren? Ich finde die Anmeldeseite nicht.\n\nVielen Dank und freundliche Grüße,\nSarah Fischer',
-    timestamp: new Date('2025-05-10T11:20:00'),
-    status: 'pending'
-  }
-]);
-
+const contacts = ref([]);
+const loading = ref(false);
+const error = ref(null);
 const currentFilter = ref('all');
 const searchQuery = ref('');
 const currentPage = ref(1);
 const pageSize = ref(10);
+const totalPages = ref(1);
+const totalItems = ref(0);
 const activeContact = ref(null);
 
-// Gefilterte und sortierte Kontaktanfragen
-const filteredContacts = computed(() => {
-  let result = [...contacts.value];
+// Kontaktanfragen laden
+const fetchContacts = async () => {
+  loading.value = true;
+  error.value = null;
   
-  // Nach Status filtern, falls angegeben
-  if (currentFilter.value !== 'all') {
-    result = result.filter(contact => contact.status === currentFilter.value);
+  try {
+    // Filter vorbereiten
+    const params = {};
+    if (currentFilter.value !== 'all') {
+      params.status = currentFilter.value;
+    }
+    
+    // Paginierung
+    params.page = currentPage.value;
+    params.limit = pageSize.value;
+    
+    // Sortierung (neueste zuerst)
+    params.sort = '-timestamp';
+    
+    console.log('Fetching contacts with params:', params);
+    const response = await contactService.getAllContacts(params);
+    console.log('Contacts response:', response);
+    
+    if (response && response.data) {
+      contacts.value = response.data;
+      totalItems.value = response.results || 0;
+      totalPages.value = response.totalPages || 1;
+      
+      if (currentPage.value > totalPages.value && totalPages.value > 0) {
+        currentPage.value = totalPages.value;
+        await fetchContacts(); // Erneut laden mit korrigierter Seite
+        return;
+      }
+    } else {
+      contacts.value = [];
+      totalItems.value = 0;
+      totalPages.value = 1;
+    }
+  } catch (err) {
+    console.error('Error fetching contacts:', err);
+    error.value = 'Fehler beim Laden der Kontaktanfragen. Bitte versuchen Sie es später erneut.';
+    contacts.value = [];
+  } finally {
+    loading.value = false;
   }
-  
-  // Nach Suchbegriff filtern
-  if (searchQuery.value.trim() !== '') {
-    const query = searchQuery.value.toLowerCase();
-    result = result.filter(contact => 
-      (contact.name && contact.name.toLowerCase().includes(query)) || 
-      (contact.email && contact.email.toLowerCase().includes(query)) ||
-      (contact.message && contact.message.toLowerCase().includes(query)) ||
-      (contact.relatedPost && contact.relatedPost.title && contact.relatedPost.title.toLowerCase().includes(query))
-    );
-  }
-  
-  // Nach Zeitstempel sortieren (neueste zuerst)
-  result.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-  
-  return result;
-});
+};
 
-// Berechnung der Gesamtseitenzahl
-const totalPages = computed(() => {
-  return Math.ceil(filteredContacts.value.length / pageSize.value) || 1;
+// Gefilterte Kontaktanfragen
+const filteredContacts = computed(() => {
+  // Bei API-basierter Filterung direkt die contacts zurückgeben
+  return contacts.value;
 });
 
 // Nach Status filtern
 const filterByStatus = (status) => {
   currentFilter.value = status;
   currentPage.value = 1;
+  fetchContacts();
 };
 
 // Zur Seite wechseln
 const goToPage = (page) => {
   if (page >= 1 && page <= totalPages.value) {
     currentPage.value = page;
+    fetchContacts();
   }
 };
 
@@ -498,10 +473,15 @@ const truncateMessage = (message) => {
 };
 
 // Kontaktanfrage ansehen
-const viewContact = (contact) => {
+const viewContact = async (contact) => {
   // Wenn der Status "pending" ist, auf "viewed" setzen
   if (contact.status === 'pending') {
-    contact.status = 'viewed';
+    try {
+      await contactService.updateContact(contact._id, { status: 'viewed' });
+      contact.status = 'viewed';
+    } catch (err) {
+      console.error('Error updating contact status:', err);
+    }
   }
   
   // Kontaktdetails anzeigen
@@ -509,35 +489,49 @@ const viewContact = (contact) => {
 };
 
 // Kontaktanfrage als beantwortet markieren
-const markAsResponded = (contact) => {
+const markAsResponded = async (contact) => {
   if (confirm(`Möchten Sie die Kontaktanfrage von "${contact.name}" als beantwortet markieren?`)) {
-    console.log('Kontaktanfrage als beantwortet markieren:', contact);
-    contact.status = 'responded';
-    
-    // Wenn das Modal geöffnet ist, muss der aktive Kontakt aktualisiert werden
-    if (activeContact.value && activeContact.value.id === contact.id) {
-      activeContact.value.status = 'responded';
+    try {
+      console.log('Markiere Kontaktanfrage als beantwortet:', contact);
+      await contactService.updateContact(contact._id, { status: 'responded' });
+      contact.status = 'responded';
+      
+      // Wenn das Modal geöffnet ist, muss der aktive Kontakt aktualisiert werden
+      if (activeContact.value && activeContact.value._id === contact._id) {
+        activeContact.value.status = 'responded';
+      }
+    } catch (err) {
+      console.error('Error marking contact as responded:', err);
+      alert('Fehler beim Markieren als beantwortet. Bitte versuchen Sie es später erneut.');
     }
   }
 };
 
 // Kontaktanfrage löschen
-const deleteContact = (contact) => {
+const deleteContact = async (contact) => {
   if (confirm(`Möchten Sie die Kontaktanfrage von "${contact.name}" wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.`)) {
-    console.log('Kontaktanfrage löschen:', contact);
-    contacts.value = contacts.value.filter(item => item.id !== contact.id);
-    
-    // Wenn das Modal geöffnet ist, schließen
-    if (activeContact.value && activeContact.value.id === contact.id) {
-      activeContact.value = null;
+    try {
+      console.log('Lösche Kontaktanfrage:', contact);
+      await contactService.deleteContact(contact._id);
+      
+      // Aus der lokalen Liste entfernen
+      contacts.value = contacts.value.filter(item => item._id !== contact._id);
+      
+      // Wenn das Modal geöffnet ist, schließen
+      if (activeContact.value && activeContact.value._id === contact._id) {
+        activeContact.value = null;
+      }
+    } catch (err) {
+      console.error('Error deleting contact:', err);
+      alert('Fehler beim Löschen der Kontaktanfrage. Bitte versuchen Sie es später erneut.');
     }
   }
 };
 
 // Initialisierung
 onMounted(() => {
-  // Hier würden normalerweise API-Aufrufe erfolgen, um die Daten zu laden
   console.log('AdminContacts initialisiert');
+  fetchContacts();
 });
 </script>
 

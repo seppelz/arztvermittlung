@@ -20,6 +20,11 @@ const contactSchema = new mongoose.Schema({
     trim: true,
     lowercase: true
   },
+  subject: {
+    type: String,
+    required: [true, 'Bitte geben Sie einen Betreff ein'],
+    trim: true
+  },
   relatedPostId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Bulletin'
@@ -38,6 +43,10 @@ const contactSchema = new mongoose.Schema({
     type: String,
     enum: ['pending', 'viewed', 'responded'],
     default: 'pending'
+  },
+  privacyPolicyAccepted: {
+    type: Boolean,
+    required: [true, 'Bitte akzeptieren Sie die Datenschutzerklärung']
   }
 }, {
   timestamps: true

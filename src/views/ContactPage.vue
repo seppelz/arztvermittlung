@@ -44,13 +44,26 @@
                 </div>
                 
                 <div>
-                  <button type="submit" class="bg-primary text-white font-semibold py-3 px-8 rounded-lg shadow-md hover:bg-dark transition-colors duration-300">
-                    Nachricht senden
+                  <button 
+                    type="submit" 
+                    class="bg-primary text-white font-semibold py-3 px-8 rounded-lg shadow-md hover:bg-dark transition-colors duration-300"
+                    :disabled="isSubmitting"
+                  >
+                    <span v-if="isSubmitting" class="flex items-center">
+                      <span class="w-5 h-5 mr-2 rounded-full border-2 border-white border-t-transparent animate-spin"></span>
+                      Wird gesendet...
+                    </span>
+                    <span v-else>Nachricht senden</span>
                   </button>
                 </div>
                 
                 <p class="text-sm text-gray-500">* Pflichtfelder</p>
               </form>
+              
+              <div v-if="errorMessage" class="mt-8 p-4 bg-red-100 text-red-800 rounded-lg">
+                <p class="font-semibold">Fehler!</p>
+                <p>{{ errorMessage }}</p>
+              </div>
               
               <div v-if="formSubmitted" class="mt-8 p-4 bg-green-100 text-green-800 rounded-lg">
                 <p class="font-semibold">Vielen Dank für Ihre Nachricht!</p>
@@ -89,6 +102,7 @@
 
 <script setup>
 import { ref, reactive } from 'vue'
+import contactService from '@/services/contact.service'
 
 const form = reactive({
   name: '',
@@ -99,21 +113,43 @@ const form = reactive({
 })
 
 const formSubmitted = ref(false)
+const isSubmitting = ref(false)
+const errorMessage = ref('')
 
-const submitForm = () => {
-  // Here you would normally send the form data to your backend
-  console.log('Form submitted:', form)
-  
-  // For demo purposes, we'll just show a success message
-  formSubmitted.value = true
-  
-  // Reset form after submission (optional)
-  // Object.keys(form).forEach(key => {
-  //   if (typeof form[key] === 'boolean') {
-  //     form[key] = false
-  //   } else {
-  //     form[key] = ''
-  //   }
-  // })
+const submitForm = async () => {
+  try {
+    isSubmitting.value = true
+    errorMessage.value = ''
+    
+    // Prepare data for API
+    const contactData = {
+      name: form.name,
+      email: form.email,
+      subject: form.subject,
+      message: form.message,
+      privacyPolicyAccepted: form.privacyPolicyAccepted
+    }
+    
+    console.log('Submitting contact form:', contactData)
+    
+    // Send to backend using contact service
+    await contactService.createContact(contactData)
+    
+    // Show success message
+    formSubmitted.value = true
+    
+    // Reset form
+    form.name = ''
+    form.email = ''
+    form.subject = ''
+    form.message = ''
+    form.privacyPolicyAccepted = false
+    
+  } catch (error) {
+    console.error('Error submitting contact form:', error)
+    errorMessage.value = 'Es ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut.'
+  } finally {
+    isSubmitting.value = false
+  }
 }
 </script> 

@@ -1,4 +1,5 @@
 const Contact = require('../models/contact.model');
+const { sendEmail } = require('../utils/email');
 
 // Alle Kontaktanfragen abrufen
 exports.getAllContacts = async (req, res) => {
@@ -85,6 +86,40 @@ exports.getContact = async (req, res) => {
 exports.createContact = async (req, res) => {
   try {
     const newContact = await Contact.create(req.body);
+    
+    // E-Mail-Benachrichtigung senden
+    try {
+      const adminEmail = process.env.ADMIN_EMAIL || 'info@med-match.de';
+      
+      await sendEmail({
+        to: adminEmail,
+        subject: `Neue Kontaktanfrage: ${req.body.subject || 'Keine Betreffzeile'}`,
+        text: `
+Neue Kontaktanfrage über das Formular erhalten:
+
+Name: ${req.body.name}
+E-Mail: ${req.body.email}
+Betreff: ${req.body.subject || 'Keine Betreffzeile'}
+Nachricht:
+${req.body.message}
+
+Diese Anfrage kann im Admin-Bereich unter "Kontaktanfragen" eingesehen werden.
+`,
+        html: `
+<h2>Neue Kontaktanfrage über das Formular erhalten</h2>
+<p><strong>Name:</strong> ${req.body.name}</p>
+<p><strong>E-Mail:</strong> ${req.body.email}</p>
+<p><strong>Betreff:</strong> ${req.body.subject || 'Keine Betreffzeile'}</p>
+<p><strong>Nachricht:</strong></p>
+<p style="white-space: pre-line;">${req.body.message}</p>
+<p>Diese Anfrage kann im <a href="${process.env.FRONTEND_URL || 'https://www.med-match.de'}/admin/contacts">Admin-Bereich unter "Kontaktanfragen"</a> eingesehen werden.</p>
+`
+      });
+      console.log('Email notification sent for new contact request');
+    } catch (emailError) {
+      // Logge den Fehler, aber lasse die Anfrage trotzdem erfolgreich sein
+      console.error('Failed to send email notification for contact request:', emailError);
+    }
     
     res.status(201).json({
       status: 'success',
