@@ -3,6 +3,7 @@ import './assets/main.css'
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import App from './App.vue'
+import { trackPageView, initOutboundLinkTracking } from './services/analyticsService'
 
 // Global error handler mit verbessertem Stack-Logging
 window.addEventListener('error', function(event) {
@@ -91,12 +92,21 @@ const initializeApp = async () => {
     const routerModule = await import('./router');
     const router = routerModule.default;
     
+    // Setup analytics page tracking with router
+    router.afterEach((to) => {
+      // Track page view on route change
+      trackPageView(window.location.origin + to.fullPath);
+    });
+    
     // 3. Router an die App anhängen
     app.use(router);
     console.log('Router initialized');
     
     // 4. Auth-Status initialisieren (benutzt jetzt lokalen Cache)
     console.log('Initializing auth state...');
+    
+    // Initialize outbound link tracking
+    initOutboundLinkTracking();
     
     // 5. App mounten
     app.mount('#app');

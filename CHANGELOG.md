@@ -229,6 +229,12 @@ All notable changes to this project will be documented in this file.
 - CORS-Konfiguration für Produktionsumgebung verbessert, um Cross-Origin-Anfragen von der Vercel-Bereitstellung zu ermöglichen
 - Dummy-Daten im Admin-Dashboard durch echte Echtzeit-Aktivitätsdaten aus der Datenbank ersetzt
 
+### Added
+- Implemented Plausible Analytics for privacy-focused user tracking without cookies
+- Created analytics service for standardized event tracking across the application
+- Added composable for Vue component-specific analytics integration
+- Integrated automated page view tracking with Vue Router
+
 ## [0.1.0] - 2025-03-13
 
 ### Added
@@ -346,4 +352,3 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 - Implementierung eines datenschutzkonformen Cookie-Banners zur Einholung der Einwilligung der Nutzer gemäß DSGVO
-- Verbessertes Design des Cookie-Banners mit höherem Kontrast für bessere Sichtbarkeit und Zugänglichkeit
