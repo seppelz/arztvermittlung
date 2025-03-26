@@ -144,6 +144,9 @@ All notable changes to this project will be documented in this file.
   - Added fallback minimal router if main router fails to load
   - Implemented timeout protection for router initialization
   - Added race condition handling for component loading
+- Fixed auth middleware imports in doctor.routes.js and hospital.routes.js
+- Enhanced API URL configuration to properly use localhost:5000 in development mode
+- Added better MongoDB connection error logging in server.js
 
 ### Added
 - Created test scripts for MongoDB Atlas connection testing
@@ -279,6 +282,14 @@ All notable changes to this project will be documented in this file.
 - BulletinService now tries multiple approaches to fetch data before failing
 - Main.js initialization process now handles router initialization more safely
 - Components now provide feedback to users when using demo data instead of real data
+
+## [1.0.0] - 2024-03-26
+
+### Added
+- Initial release with doctor and hospital profile management
+- Bulletin board functionality for posting job offers and requests
+- User authentication system
+- Admin dashboard for managing users and content
 
 ## [0.1.0] - 2025-03-13
 

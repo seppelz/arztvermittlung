@@ -190,7 +190,7 @@
 
 1. **CSS-Optimierung mit Tailwind**:
    - Nutzung des JIT-Compilers für minimales CSS-Gewicht
-   - Vermeidung von überflüssigen Utility-Klassen durch Komponenten-Extraktion
+   - Vermeidung von überflüssigen Utility-Klassen durch Komponent-Extraktion
 
 2. **Gradient-Implementierungen**:
    - Vorberechnete Gradienten als Tailwind-Klassen statt rechenintensiver CSS-Variablen
@@ -654,28 +654,18 @@ Diese Implementierung stellt sicher, dass die Website den aktuellen Datenschutzr
 
 # New Knowledge Base
 
-This document contains important learnings about the codebase that help with development.
+This file contains important learnings about the codebase that help improve productivity.
 
-## API and Services
+## Environment Configuration
+- MongoDB connection strings should be on a single line in `.env` files - line breaks can cause connection issues
+- The project uses different API URLs for development (`http://localhost:5000/api`) and production (`https://www.med-match.de/api`)
+- JWT secrets don't expire, but the tokens they sign have an expiration time (7 days in this project)
 
-- The application's API structure uses `/api` as the base endpoint, but URL normalization is critical to handle various formats
-- BulletinService needs robust error handling due to 500 errors from the backend
-- API calls should always be wrapped in try/catch blocks with fallback strategies
-- Using multiple attempt strategies for critical API calls improves reliability significantly
+## Project Structure
+- Backend routes use `auth.middleware.js` for authentication, not `auth.js`
+- The middleware export is structured as `authMiddleware.protect` not `{ auth }`
+- The backend's MongoDB connection includes helpful logging for diagnostics
 
-## Router
-
-- Navigation guards can potentially cause infinite loops if they aren't implemented carefully
-- Adding timeout protection to navigation guards prevents the application from hanging
-- Vue Router's error handling system needs explicit error handling for various error types
-
-## Component Design
-
-- Using progressive enhancement through fallbacks ensures components remain functional even when API calls fail
-- Service errors should be handled gracefully with user-friendly messages and demo data as a last resort
-
-## Deployment Considerations
-
-- API URL configuration is critical - the application normalizes URLs to ensure consistent behavior
-- Error logging is essential for diagnosing production issues
-- Client-side timeout protection prevents frozen UI when server responses are delayed 
+## Deployment
+- The project uses Vercel for deployment, triggered by pushing to the main branch
+- Both development and production environments need separate environment configurations 
