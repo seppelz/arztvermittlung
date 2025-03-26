@@ -68,6 +68,9 @@ All notable changes to this project will be documented in this file.
   - Pre-populated profile forms with data from registration (name, email)
   - Added fallback values to ensure data persists between form submissions
   - Integrated auth store with profile forms for consistent user data access
+  - Made phone number and specialty optional fields for easier profile completion
+  - Simplified required fields in both doctor and hospital profile forms
+  - Added better fallback handling for missing fields
 
 ### Security
 - Changed MongoDB Atlas password to improve database security
