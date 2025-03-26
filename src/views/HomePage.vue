@@ -404,9 +404,8 @@ import bulletinProxyService from '@/services/bulletinProxyService';
 const bulletinEntries = ref([]);
 const loading = ref(true);
 const error = ref(null);
-const usingDemoData = ref(false);
 
-// Fetch bulletin board entries from the API with graceful fallback
+// Fetch bulletin board entries exclusively from the API
 const fetchBulletinEntries = async () => {
   loading.value = true;
   error.value = null;
@@ -417,31 +416,22 @@ const fetchBulletinEntries = async () => {
       sort: '-timestamp'
     };
     
-    console.log('Attempting to fetch bulletin entries with proxy service');
+    console.log('Fetching bulletin entries from API');
     
-    // The proxy service will handle API failures and return demo data if needed
+    // Use the proxy service (which now only uses real data)
     const response = await bulletinProxyService.getAllBulletins(params);
     
     if (response && response.data) {
       bulletinEntries.value = response.data;
-      usingDemoData.value = bulletinProxyService.isUsingDemoData();
-      
-      if (usingDemoData.value) {
-        console.log('Using demo data for bulletin entries');
-        error.value = 'Verbindung zum Server nicht möglich. Zeige Beispieldaten an.';
-      } else {
-        console.log('Successfully loaded real data from database:', bulletinEntries.value.length, 'entries');
-      }
+      console.log('Successfully loaded', bulletinEntries.value.length, 'entries from database');
+    } else {
+      error.value = 'Keine Einträge gefunden.';
+      bulletinEntries.value = [];
     }
   } catch (err) {
-    console.error('Failed to fetch bulletin entries even with fallbacks:', err);
-    error.value = 'Fehler beim Laden der Daten. Verwende temporär lokale Daten.';
-    
-    // In case of total failure, ensure we have some data to display
-    if (!bulletinEntries.value || !bulletinEntries.value.length) {
-      bulletinEntries.value = bulletinProxyService.getDemoData({ limit: 3 }).data;
-      usingDemoData.value = true;
-    }
+    console.error('Error fetching bulletin entries:', err);
+    error.value = 'Fehler beim Laden der Daten. Bitte versuchen Sie es später erneut.';
+    bulletinEntries.value = [];
   } finally {
     loading.value = false;
   }
@@ -468,7 +458,7 @@ const formatDate = (date) => {
 };
 
 onMounted(() => {
-  // Fetch bulletin entries
+  // Fetch bulletin entries from real database only
   fetchBulletinEntries();
   
   // Animate the counters
@@ -703,7 +693,7 @@ onMounted(() => {
 }
 
 .network-line {
-  animation: dash 15s linear infinite;
+  animation: dash 15s linear infinite alternate;
   stroke-dasharray: 5;
 }
 

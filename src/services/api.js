@@ -7,6 +7,11 @@ const normalizeApiUrl = (url) => {
   // Try to normalize URL by removing common problems
   let normalizedUrl = url.trim();
   
+  // Always use https://www. prefix for production
+  if (!normalizedUrl.startsWith('https://www.') && normalizedUrl.includes('med-match.de')) {
+    normalizedUrl = 'https://www.' + normalizedUrl.replace(/^https?:\/\/(www\.)?/, '');
+  }
+  
   // Remove trailing slash if present
   normalizedUrl = normalizedUrl.endsWith('/') ? normalizedUrl.slice(0, -1) : normalizedUrl;
   
@@ -23,6 +28,7 @@ const normalizeApiUrl = (url) => {
   // Check if the URL is valid before returning
   try {
     new URL(normalizedUrl);
+    console.log('Using API URL:', normalizedUrl);
     return normalizedUrl;
   } catch (e) {
     console.error('Invalid API URL provided:', url);

@@ -270,43 +270,6 @@
 import { ref, reactive, computed, onMounted } from 'vue'
 import bulletinProxyService from '@/services/bulletinProxyService'
 
-// Beispieldaten für die Demonstration - nur als Fallback verwendet
-const demoMessages = [
-  {
-    id: 4,
-    name: 'Dr. Thomas Schmidt',
-    email: 't.schmidt@mail.de',
-    userType: 'Arzt',
-    messageType: 'Information',
-    title: 'Fachärztliche Vertretungs-Pool Radiologie',
-    content: 'Organisiere Vertretungs-Pool für kurzfristige Radiologie-Einsätze (max. 3 Monate). Über 20 Kolleginnen und Kollegen bereits dabei. Interessierte Radiologen und Kliniken können mich kontaktieren.',
-    timestamp: new Date('2025-05-08T11:20:00'),
-    privacyPolicyAccepted: true
-  },
-  {
-    id: 7,
-    name: 'Ärztekammer Berlin',
-    email: 'fortbildung@aerztekammer-berlin.de',
-    userType: 'Klinik',
-    messageType: 'Information',
-    title: 'Fortbildung: Aktuelle Entwicklungen in der Notfallmedizin',
-    content: 'Die Ärztekammer Berlin bietet am 15.-16.07.2025 eine zertifizierte Fortbildung zu aktuellen Entwicklungen in der Notfallmedizin an. 16 CME-Punkte. Begrenzte Teilnehmerzahl, frühzeitige Anmeldung empfohlen.',
-    timestamp: new Date('2025-05-01T10:00:00'),
-    privacyPolicyAccepted: true
-  },
-  {
-    id: 8,
-    name: 'Medizinische Hochschule Hannover',
-    email: 'kongress@mh-hannover.de',
-    userType: 'Klinik',
-    messageType: 'Information',
-    title: 'Internationaler Kongress für Innere Medizin',
-    content: 'Vom 10.-12.09.2025 findet an der MH Hannover der 35. Internationale Kongress für Innere Medizin statt. Themenschwerpunkte: Kardiologie, Gastroenterologie, Endokrinologie. Anmeldung ab sofort möglich.',
-    timestamp: new Date('2025-04-28T14:30:00'),
-    privacyPolicyAccepted: true
-  }
-];
-
 // Zustandsvariablen
 const messages = ref([]);
 const sortOrder = ref('newest');
@@ -318,9 +281,8 @@ const showContactModal = ref(false);
 const selectedMessage = ref({});
 const isLoading = ref(true);
 const loadError = ref(null);
-const usingDemoData = ref(false);
 
-// Fetch actual bulletin board entries using the proxy service
+// Fetch actual bulletin board entries using the proxy service that now only uses real data
 const fetchBulletins = async () => {
   isLoading.value = true;
   loadError.value = null;
@@ -334,30 +296,22 @@ const fetchBulletins = async () => {
     });
     
     if (response && response.data) {
-      // If we get data from the service, use it
+      // Process real API data
       messages.value = response.data.map(item => ({
         ...item,
         id: item._id || item.id // Handle MongoDB _id vs id
       }));
       
-      usingDemoData.value = bulletinProxyService.isUsingDemoData();
-      
-      if (usingDemoData.value) {
-        console.log('Using demo bulletins:', messages.value.length);
-        loadError.value = 'Server nicht erreichbar. Zeige Beispieldaten an.';
-      } else {
-        console.log('Loaded real bulletins from API:', messages.value.length);
-      }
+      console.log('Loaded bulletins from database:', messages.value.length);
+    } else {
+      // API returned no data
+      messages.value = [];
+      loadError.value = 'Keine Einträge gefunden.';
     }
   } catch (err) {
     console.error('Error fetching bulletins:', err);
     loadError.value = 'Fehler beim Laden der Daten: ' + (err.message || 'Unbekannter Fehler');
-    
-    // Ensure we always have data to display
-    if (!messages.value.length) {
-      messages.value = [...demoMessages];
-      usingDemoData.value = true;
-    }
+    messages.value = [];
   } finally {
     isLoading.value = false;
   }

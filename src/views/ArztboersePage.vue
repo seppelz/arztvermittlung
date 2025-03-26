@@ -446,9 +446,9 @@ async function submitMessage() {
   }
   
   try {
-    console.log('Submitting job listing via proxy service');
+    console.log('Submitting job listing to database');
     
-    // Create the job listing via the proxy service
+    // Create the job listing via the direct database API
     const response = await bulletinProxyService.createBulletin({
       ...newMessage,
       title: generatedTitle,
@@ -481,11 +481,6 @@ async function submitMessage() {
       });
       
       messageSent.value = true;
-      
-      // Show warning if using demo data
-      if (response.isDemoData) {
-        alert('Ihr Eintrag wurde erstellt, aber der Server konnte nicht erreicht werden. Der Eintrag wird lokal angezeigt, aber nicht dauerhaft gespeichert. Bitte versuchen Sie es später erneut.');
-      }
       
       // Hide success message after 3 seconds
       setTimeout(() => {
@@ -574,7 +569,7 @@ async function fetchMessages() {
   loadError.value = null;
   
   try {
-    console.log('Fetching job listings via proxy service');
+    console.log('Fetching job listings from database');
     
     // Fetch both types of job listings - offers and requests
     const params = {
@@ -596,12 +591,11 @@ async function fetchMessages() {
         id: item._id || item.id // Handle MongoDB _id vs id
       }));
       
-      if (response.isDemoData) {
-        console.log('Using demo job listings:', messages.value.length);
-        loadError.value = 'Server nicht erreichbar. Zeige Beispieldaten an.';
-      } else {
-        console.log('Loaded real job listings from API:', messages.value.length);
-      }
+      console.log('Loaded job listings from database:', messages.value.length);
+    } else {
+      console.warn('No job listings found in database');
+      messages.value = [];
+      loadError.value = 'Keine Stellenangebote/Gesuche gefunden.';
     }
   } catch (err) {
     console.error('Error fetching job listings:', err);
