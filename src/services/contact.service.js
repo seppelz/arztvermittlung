@@ -54,7 +54,7 @@ class ContactService {
    */
   async updateContact(id, contactData) {
     try {
-      const response = await api.put(`/contacts/${id}`, contactData);
+      const response = await api.patch(`/contacts/${id}`, contactData);
       return response.data;
     } catch (error) {
       throw error;

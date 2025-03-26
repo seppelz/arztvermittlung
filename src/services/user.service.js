@@ -24,7 +24,7 @@ class UserService {
    */
   async updateProfile(profileData) {
     try {
-      const response = await api.put('/users/profile', profileData);
+      const response = await api.patch('/users/profile', profileData);
       return response;
     } catch (error) {
       throw error;
@@ -38,7 +38,7 @@ class UserService {
    */
   async completeProfile(extendedProfileData) {
     try {
-      const response = await api.put('/users/complete-profile', extendedProfileData);
+      const response = await api.patch('/users/complete-profile', extendedProfileData);
       return response;
     } catch (error) {
       throw error;

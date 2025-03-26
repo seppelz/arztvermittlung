@@ -205,7 +205,7 @@ class AuthService {
    */
   async updateProfile(userData) {
     try {
-      const response = await api.put('/users/profile', userData);
+      const response = await api.patch('/users/profile', userData);
       if (response.data && response.data.user) {
         // Update cachedAuthState
         const currentUser = cachedAuthState.user || {};
