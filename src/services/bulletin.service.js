@@ -13,40 +13,84 @@ class BulletinService {
     try {
       console.log('BulletinService: Fetching bulletins with params:', params);
       
-      // Direct approach with proper error handling
-      const response = await api.get('/bulletin', { 
-        params,
-        // Add explicit timeout for this request
-        timeout: 10000,
-        // Add additional headers if needed
-        headers: {
-          'Accept': 'application/json'
+      // Try with a different URL structure - bulletins (plural) instead of bulletin
+      let endpoint = '/bulletins';
+      
+      // First attempt with the new URL
+      try {
+        console.log(`BulletinService: First attempt with endpoint ${endpoint}`);
+        
+        const response = await api.get(endpoint, { 
+          params,
+          timeout: 10000,
+          headers: {
+            'Accept': 'application/json'
+          }
+        });
+        
+        console.log(`BulletinService: Response received successfully from ${endpoint}`);
+        
+        // Process response data
+        if (!response.data) {
+          console.warn('BulletinService: Empty response data');
+          return { data: [] };
         }
-      });
-      
-      console.log('BulletinService: Response received successfully');
-      
-      // Handle different response formats consistently
-      if (!response.data) {
-        console.warn('BulletinService: Empty response data');
+        
+        // Return appropriate data structure
+        if (Array.isArray(response.data)) {
+          console.log('BulletinService: Response is an array with', response.data.length, 'items');
+          return { data: response.data };
+        }
+        
+        if (response.data.data && Array.isArray(response.data.data)) {
+          console.log('BulletinService: Found nested data array with', response.data.data.length, 'items');
+          return response.data;
+        }
+        
+        console.warn('BulletinService: Unexpected response format', response.data);
+        return { data: [] };
+        
+      } catch (firstError) {
+        // If first attempt fails, try with original endpoint
+        console.log('BulletinService: First attempt failed, trying original endpoint /bulletin');
+        endpoint = '/bulletin';
+        
+        // Try sending the request without the sort parameter
+        const simplifiedParams = { ...params };
+        delete simplifiedParams.sort;
+        
+        console.log('BulletinService: Using simplified params without sort:', simplifiedParams);
+        
+        const response = await api.get(endpoint, {
+          params: simplifiedParams,
+          timeout: 10000,
+          headers: {
+            'Accept': 'application/json'
+          }
+        });
+        
+        console.log(`BulletinService: Response received successfully from ${endpoint}`);
+        
+        // Process response data
+        if (!response.data) {
+          console.warn('BulletinService: Empty response data');
+          return { data: [] };
+        }
+        
+        // Return appropriate data structure
+        if (Array.isArray(response.data)) {
+          console.log('BulletinService: Response is an array with', response.data.length, 'items');
+          return { data: response.data };
+        }
+        
+        if (response.data.data && Array.isArray(response.data.data)) {
+          console.log('BulletinService: Found nested data array with', response.data.data.length, 'items');
+          return response.data;
+        }
+        
+        console.warn('BulletinService: Unexpected response format', response.data);
         return { data: [] };
       }
-      
-      // Check if response.data is already an array
-      if (Array.isArray(response.data)) {
-        console.log('BulletinService: Response is an array with', response.data.length, 'items');
-        return { data: response.data };
-      }
-      
-      // Check if response.data.data exists (nested structure)
-      if (response.data.data && Array.isArray(response.data.data)) {
-        console.log('BulletinService: Found nested data array with', response.data.data.length, 'items');
-        return response.data;
-      }
-      
-      // Handle any other structure by defaulting to an empty array
-      console.warn('BulletinService: Unexpected response format', response.data);
-      return { data: [] };
       
     } catch (error) {
       console.error('BulletinService: Error fetching bulletins:', error);

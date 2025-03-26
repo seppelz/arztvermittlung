@@ -4,17 +4,34 @@ import axios from 'axios';
 const normalizeApiUrl = (url) => {
   if (!url) return 'https://www.med-match.de/api';
   
-  // Remove trailing slash if present
-  let normalizedUrl = url.endsWith('/') ? url.slice(0, -1) : url;
+  // Try to normalize URL by removing common problems
+  let normalizedUrl = url.trim();
   
-  // Ensure the URL ends with /api
-  if (!normalizedUrl.endsWith('/api')) {
-    normalizedUrl = normalizedUrl.includes('/api/') 
-      ? normalizedUrl.split('/api/')[0] + '/api'
-      : normalizedUrl + '/api';
+  // Remove trailing slash if present
+  normalizedUrl = normalizedUrl.endsWith('/') ? normalizedUrl.slice(0, -1) : normalizedUrl;
+  
+  // Handle URLs with or without /api suffix
+  if (!normalizedUrl.includes('/api')) {
+    // No /api in URL at all, add it
+    normalizedUrl = normalizedUrl + '/api';
+  } else if (!normalizedUrl.endsWith('/api')) {
+    // Has /api/ somewhere in the middle, ensure it ends with /api
+    const apiIndex = normalizedUrl.lastIndexOf('/api');
+    normalizedUrl = normalizedUrl.substring(0, apiIndex + 4); // 4 is length of '/api'
   }
   
-  return normalizedUrl;
+  // Check if the URL is valid before returning
+  try {
+    new URL(normalizedUrl);
+    return normalizedUrl;
+  } catch (e) {
+    console.error('Invalid API URL provided:', url);
+    console.error('Normalized to:', normalizedUrl);
+    console.error('Error:', e);
+    
+    // Return a default as fallback
+    return 'https://www.med-match.de/api';
+  }
 };
 
 // Get API URL from global config, environment variable, or use a default

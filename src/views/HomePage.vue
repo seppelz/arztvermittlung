@@ -412,28 +412,51 @@ const fetchBulletinEntries = async () => {
   
   try {
     const params = {
-      messageType: 'Information',
+      // Try without the messageType filter, which might be causing issues
       limit: 3,
       sort: '-timestamp'
     };
     
-    console.log('Attempting to fetch real bulletin data from database');
-    const response = await bulletinService.getAllBulletins(params);
+    console.log('Attempting to fetch bulletin entries from API');
     
-    if (response && response.data) {
-      bulletinEntries.value = response.data;
-      console.log('Successfully loaded data from database:', bulletinEntries.value);
-    } else {
-      // Only use demo data if the API returns empty results
-      console.warn('API returned empty data, using fallback');
+    // First attempt - simple request with minimal params
+    try {
+      const response = await bulletinService.getAllBulletins(params);
+      
+      if (response && response.data && response.data.length) {
+        bulletinEntries.value = response.data;
+        console.log('Successfully loaded data from database:', bulletinEntries.value.length, 'entries');
+        return; // Success, exit the function
+      } else {
+        console.warn('API returned empty data on first attempt');
+      }
+    } catch (firstError) {
+      console.warn('First API attempt failed:', firstError.message);
+    }
+    
+    // Second attempt - try with no parameters at all
+    try {
+      console.log('Trying second attempt with no parameters');
+      const response = await bulletinService.getAllBulletins({});
+      
+      if (response && response.data && response.data.length) {
+        // If we get more than we need, just take the first 3
+        bulletinEntries.value = response.data.slice(0, 3);
+        console.log('Second attempt successful, loaded', bulletinEntries.value.length, 'entries');
+        return; // Success, exit the function
+      } else {
+        console.warn('API returned empty data on second attempt');
+      }
+    } catch (secondError) {
+      console.error('Second API attempt also failed:', secondError.message);
+      // Fall back to demo data
       useDemoData();
     }
   } catch (err) {
-    console.error('Error fetching bulletin entries:', err);
+    console.error('All attempts to fetch bulletin entries failed:', err);
     error.value = 'Fehler beim Laden der Daten. Verwende temporär lokale Daten.';
     
-    // Fallback to demo data ONLY on error
-    console.warn('Using fallback demo data due to API error');
+    // Fallback to demo data as last resort
     useDemoData();
   } finally {
     loading.value = false;

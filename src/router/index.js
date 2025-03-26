@@ -289,6 +289,12 @@ const router = createRouter({
 
 // Navigation guard to check authentication for routes that require it
 router.beforeEach((to, from, next) => {
+  // Add a timeout protection to prevent navigation guard from hanging
+  const guardTimeout = setTimeout(() => {
+    console.warn('Navigation guard timeout triggered - forcing navigation to proceed');
+    next(); // Force navigation after timeout
+  }, 3000); // 3 second timeout
+  
   try {
     // Simple version - only check localStorage directly without any async operations
     // to completely avoid potential circular dependencies
@@ -297,6 +303,7 @@ router.beforeEach((to, from, next) => {
       const token = localStorage.getItem('token');
       
       if (!token) {
+        clearTimeout(guardTimeout); // Clear timeout if we're redirecting
         // Redirect to login based on route path
         if (to.path.startsWith('/admin')) {
           next({ name: 'AdminLogin' });
@@ -313,11 +320,13 @@ router.beforeEach((to, from, next) => {
           const user = userJson ? JSON.parse(userJson) : null;
           
           if (!user || user.role !== 'admin') {
+            clearTimeout(guardTimeout); // Clear timeout if we're redirecting
             next({ name: 'Home' });
             return;
           }
         } catch (err) {
           console.error('Error checking admin status:', err);
+          clearTimeout(guardTimeout); // Clear timeout if we're redirecting
           next({ name: 'Home' });
           return;
         }
@@ -325,9 +334,11 @@ router.beforeEach((to, from, next) => {
     }
     
     // Allow navigation to proceed
+    clearTimeout(guardTimeout); // Clear timeout when guard completes normally
     next();
   } catch (error) {
     console.error('Navigation guard error:', error);
+    clearTimeout(guardTimeout); // Clear timeout on error
     // In case of any error, allow navigation anyway to prevent blocking the user
     next();
   }
