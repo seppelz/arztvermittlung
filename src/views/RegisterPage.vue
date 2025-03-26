@@ -215,7 +215,7 @@ const handleSubmit = async () => {
     // Add role based on userType
     const userData = {
       ...formData,
-      role: formData.userType === 'Arzt' ? 'doctor' : 'hospital'  // Set role based on userType
+      role: 'user'  // Keep using 'user' as role since backend only accepts this enum value
     };
     
     const response = await authService.register(userData);
