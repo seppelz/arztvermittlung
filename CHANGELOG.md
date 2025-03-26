@@ -234,6 +234,7 @@ All notable changes to this project will be documented in this file.
 - Created analytics service for standardized event tracking across the application
 - Added composable for Vue component-specific analytics integration
 - Integrated automated page view tracking with Vue Router
+- Added comprehensive privacy policy with Plausible Analytics information
 
 ## [0.1.0] - 2025-03-13
 
