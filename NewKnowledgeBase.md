@@ -687,3 +687,17 @@ This file contains important learnings about the codebase that help improve prod
 - Homepage should only display 'active' bulletin entries by using status filter parameter
 - User-specific bulletin entries should be filtered by email to ensure users only see their own entries
 - Axios API service should be used consistently instead of fetch API for better error handling 
+
+## API Integration Patterns
+
+1. **Profile Data Management**:
+   - Registration data should be retrievable and editable in profile views for a seamless user experience
+   - Form components should utilize the API service instead of direct fetch calls for consistent error handling
+   - Data mapping between API responses and form fields should handle nested objects and provide fallbacks for missing properties
+   - Successful form submissions should provide visual feedback with toast notifications
+
+2. **API Service Organization**:
+   - Consistent HTTP methods should be used across the application (PATCH for updates, POST for creation, etc.)
+   - API services should handle error responses gracefully with appropriate fallback behaviors
+   - Loading state management should be implemented for all API calls to improve user experience
+   - Environment-aware API configuration ensures proper endpoint usage in development and production 

@@ -152,6 +152,7 @@ All notable changes to this project will be documented in this file.
   - Ensured bulletin entries are properly filtered by user's email
   - Corrected user type labels to show proper role names ("Ärzte", "Kliniken / Einrichtungen")
   - Fixed profile data loading by using the API service correctly
+  - Made registration data visible and editable in profile view
 - Fixed bulletin update functionality by changing HTTP method from PUT to PATCH to match backend endpoint
 - Fixed HTTP method mismatches in multiple services:
   - Updated user.service.js to use PATCH instead of PUT for profile updates
