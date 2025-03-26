@@ -215,7 +215,7 @@ const handleSubmit = async () => {
     // Add role based on userType
     const userData = {
       ...formData,
-      role: 'user'  // Default role for all registrations is 'user'
+      role: formData.userType === 'Arzt' ? 'doctor' : 'hospital'  // Set role based on userType
     };
     
     const response = await authService.register(userData);
