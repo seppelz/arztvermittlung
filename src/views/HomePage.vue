@@ -413,7 +413,8 @@ const fetchBulletinEntries = async () => {
   try {
     const params = {
       limit: 3,
-      sort: '-timestamp'
+      sort: '-timestamp',
+      status: 'active' // Only show active/approved entries
     };
     
     console.log('Fetching bulletin entries from API');
@@ -423,7 +424,7 @@ const fetchBulletinEntries = async () => {
     
     if (response && response.data) {
       bulletinEntries.value = response.data;
-      console.log('Successfully loaded', bulletinEntries.value.length, 'entries from database');
+      console.log('Successfully loaded', bulletinEntries.value.length, 'active entries from database');
     } else {
       error.value = 'Keine Einträge gefunden.';
       bulletinEntries.value = [];
