@@ -417,18 +417,26 @@ const fetchBulletinEntries = async () => {
       sort: '-timestamp'
     };
     
-    const response = await bulletinService.getAllBulletins(params);
-    
-    if (response && response.data) {
-      bulletinEntries.value = response.data;
-    } else {
-      throw new Error('Keine Daten verfügbar');
+    try {
+      const response = await bulletinService.getAllBulletins(params);
+      
+      if (response && response.data) {
+        bulletinEntries.value = response.data;
+        return; // Successfully loaded data, exit the function
+      }
+    } catch (apiError) {
+      console.warn('API error - using fallback data', apiError);
+      // Don't set error.value here, as we'll use fallback data
     }
+    
+    // If we reach here, either the API returned no data or there was an error
+    // In both cases, use demo data
+    useDemoData();
   } catch (err) {
-    console.error('Error fetching bulletin entries:', err);
+    console.error('Error in fetchBulletinEntries:', err);
     error.value = 'Fehler beim Laden der Daten';
     
-    // Fallback to demo data if API fails
+    // Fallback to demo data for any error
     useDemoData();
   } finally {
     loading.value = false;

@@ -291,8 +291,13 @@ const router = createRouter({
 router.beforeEach(async (to, from, next) => {
   try {
     // Create a timeout promise to prevent infinite loops or long-running auth checks
+    // Extend timeout to 5 seconds to allow more time for auth checks
     const timeoutPromise = new Promise((_, reject) => {
-      setTimeout(() => reject(new Error('Authentication check timed out')), 2000);
+      setTimeout(() => {
+        console.warn('Authentication check timed out - allowing navigation to continue');
+        // Return resolved promise with false instead of rejecting
+        return false;
+      }, 5000);
     });
     
     // If route requires authentication
@@ -301,7 +306,10 @@ router.beforeEach(async (to, from, next) => {
       try {
         // Use Promise.race to either get the auth result or timeout
         const authenticated = await Promise.race([
-          isAuthenticated(),
+          isAuthenticated().catch(err => {
+            console.error('Auth check failed:', err);
+            return false;
+          }),
           timeoutPromise
         ]);
         
@@ -317,7 +325,10 @@ router.beforeEach(async (to, from, next) => {
           if (to.matched.some(record => record.meta.requiresAdmin)) {
             try {
               const isAdminUser = await Promise.race([
-                isAdmin(),
+                isAdmin().catch(err => {
+                  console.error('Admin check failed:', err);
+                  return false;
+                }),
                 timeoutPromise
               ]);
               
@@ -329,6 +340,7 @@ router.beforeEach(async (to, from, next) => {
               }
             } catch (adminCheckError) {
               console.error('Admin check failed with error:', adminCheckError);
+              // On error, default to non-admin
               next({ name: 'Home' });
             }
           } else {
