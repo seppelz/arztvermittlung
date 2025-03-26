@@ -54,6 +54,12 @@ export const useAuthStore = defineStore('auth', {
       localStorage.removeItem('token')
     },
     
+    logout() {
+      // Call clearAuth to handle the logout process
+      this.clearAuth()
+      return Promise.resolve() // Return a resolved promise for async/await compatibility
+    },
+    
     updateUser(userData) {
       // Update user data after profile update
       this.user = { ...this.user, ...userData }

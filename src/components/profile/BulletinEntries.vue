@@ -190,6 +190,7 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useToast } from '@/composables/useToast'
 import { useAuthStore } from '@/stores/auth'
+import { api } from '@/services/api'
 
 const router = useRouter()
 const { showToast } = useToast()
@@ -241,24 +242,14 @@ const loadEntries = async () => {
       throw new Error('Benutzer nicht angemeldet')
     }
     
-    // Fetch all bulletins filtered by user's email
-    const response = await fetch(`/api/bulletin?email=${encodeURIComponent(userEmail)}`, {
-      headers: {
-        'Authorization': `Bearer ${authStore.token}`
-      }
-    })
-    
-    if (!response.ok) {
-      throw new Error('Fehler beim Laden der Einträge')
-    }
-    
-    const data = await response.json()
+    // Fetch all bulletins filtered by user's email using the api instance
+    const response = await api.get(`/bulletin?email=${encodeURIComponent(userEmail)}`)
     
     // Handle different response structures
-    if (data.data) {
-      entries.value = data.data
+    if (response.data.data) {
+      entries.value = response.data.data
     } else {
-      entries.value = data
+      entries.value = response.data
     }
     
     // Sort entries by date (newest first)
@@ -269,7 +260,7 @@ const loadEntries = async () => {
     })
   } catch (err) {
     console.error('Error loading bulletin entries:', err)
-    error.value = err.message
+    error.value = err.message || 'Fehler beim Laden der Einträge'
   } finally {
     isLoading.value = false
   }
@@ -296,18 +287,7 @@ const updateEntry = async () => {
   isSubmitting.value = true
   
   try {
-    const response = await fetch(`/api/bulletin/${editingEntry.value._id}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${authStore.token}`
-      },
-      body: JSON.stringify(editingEntry.value)
-    })
-    
-    if (!response.ok) {
-      throw new Error('Fehler beim Aktualisieren des Eintrags')
-    }
+    await api.put(`/bulletin/${editingEntry.value._id}`, editingEntry.value)
     
     showToast('Eintrag erfolgreich aktualisiert', 'success')
     showEditModal.value = false
@@ -316,7 +296,7 @@ const updateEntry = async () => {
     await loadEntries()
   } catch (err) {
     console.error('Error updating bulletin entry:', err)
-    showToast(err.message, 'error')
+    showToast(err.message || 'Fehler beim Aktualisieren des Eintrags', 'error')
   } finally {
     isSubmitting.value = false
   }
@@ -333,16 +313,7 @@ const confirmDelete = async () => {
   isSubmitting.value = true
   
   try {
-    const response = await fetch(`/api/bulletin/${deletingEntryId.value}`, {
-      method: 'DELETE',
-      headers: {
-        'Authorization': `Bearer ${authStore.token}`
-      }
-    })
-    
-    if (!response.ok) {
-      throw new Error('Fehler beim Löschen des Eintrags')
-    }
+    await api.delete(`/bulletin/${deletingEntryId.value}`)
     
     showToast('Eintrag erfolgreich gelöscht', 'success')
     showDeleteModal.value = false
@@ -351,7 +322,7 @@ const confirmDelete = async () => {
     entries.value = entries.value.filter(entry => entry._id !== deletingEntryId.value)
   } catch (err) {
     console.error('Error deleting bulletin entry:', err)
-    showToast(err.message, 'error')
+    showToast(err.message || 'Fehler beim Löschen des Eintrags', 'error')
   } finally {
     isSubmitting.value = false
     deletingEntryId.value = null
