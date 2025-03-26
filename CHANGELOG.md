@@ -129,6 +129,17 @@ All notable changes to this project will be documented in this file.
 - Authentication state management in profile page
 - Profile completion button visibility logic
 - Profile data loading and display
+- Fixed 500 error when trying to fetch bulletin entries from the API
+  - Implemented multi-attempt strategy with fallback to alternative endpoints
+  - Added more robust error handling in bulletin service
+  - Removed potentially problematic query parameters
+- Fixed potential infinite loop in router navigation guard
+  - Added timeout protection to prevent the navigation guard from hanging
+  - Improved error handling and logging
+- Enhanced API URL normalization
+  - More robust handling of malformed URLs
+  - Better validation of API base URL
+  - Improved error handling for invalid URLs
 
 ### Added
 - Created test scripts for MongoDB Atlas connection testing
@@ -162,6 +173,8 @@ All notable changes to this project will be documented in this file.
 - Bearbeitungsdialog für Benutzerdetails
 - Detailansicht für Benutzer
 - Verbesserte Fehlerbehandlung in UserService
+- Added comprehensive logging to help diagnose API issues
+- Added fallback to demo data when API calls fail
 
 ### Hinzugefügt
 - Admin-Komponente für die Benutzerverwaltung mit Filter-, Such- und Paginierungsfunktionen
@@ -251,6 +264,8 @@ All notable changes to this project will be documented in this file.
 - Enhanced authentication handling in profile page
 - Updated header branding for better visibility
 - Improved error handling and user feedback
+- API service now includes timeout protection to prevent hanging requests
+- BulletinService now tries multiple approaches to fetch data before failing
 
 ### Fixed
 - Authentication state management in profile page

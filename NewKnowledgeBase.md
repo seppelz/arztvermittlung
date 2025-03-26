@@ -651,3 +651,31 @@ Diese Implementierung stellt sicher, dass die Website den aktuellen Datenschutzr
    - Empty state handling with action button guides users to create content
    - Dynamic form fields based on entry type (Angebot vs. Gesuch) simplifies the interface
    - Reusable date and status formatting functions ensure consistent content display 
+
+# New Knowledge Base
+
+This document contains important learnings about the codebase that help with development.
+
+## API and Services
+
+- The application's API structure uses `/api` as the base endpoint, but URL normalization is critical to handle various formats
+- BulletinService needs robust error handling due to 500 errors from the backend
+- API calls should always be wrapped in try/catch blocks with fallback strategies
+- Using multiple attempt strategies for critical API calls improves reliability significantly
+
+## Router
+
+- Navigation guards can potentially cause infinite loops if they aren't implemented carefully
+- Adding timeout protection to navigation guards prevents the application from hanging
+- Vue Router's error handling system needs explicit error handling for various error types
+
+## Component Design
+
+- Using progressive enhancement through fallbacks ensures components remain functional even when API calls fail
+- Service errors should be handled gracefully with user-friendly messages and demo data as a last resort
+
+## Deployment Considerations
+
+- API URL configuration is critical - the application normalizes URLs to ensure consistent behavior
+- Error logging is essential for diagnosing production issues
+- Client-side timeout protection prevents frozen UI when server responses are delayed 
