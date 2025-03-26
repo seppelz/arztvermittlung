@@ -153,10 +153,13 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useToast } from '@/composables/useToast'
 import { useAnalytics } from '@/composables/useAnalytics'
+import api from '@/services/api'
 
 const router = useRouter()
 const { showToast } = useToast()
 const { trackForm } = useAnalytics()
+
+const emit = defineEmits(['close', 'profile-updated'])
 
 const isSubmitting = ref(false)
 const specialties = ref([
@@ -190,13 +193,32 @@ const formData = ref({
 // Load existing profile data if available
 onMounted(async () => {
   try {
-    const response = await fetch('/api/hospital/profile')
-    if (response.ok) {
-      const data = await response.json()
-      formData.value = { ...formData.value, ...data }
+    const response = await api.get('/hospital/profile')
+    if (response.data) {
+      console.log('Loading existing hospital profile:', response.data)
+      // Map the data to our form structure, with fallbacks for missing properties
+      formData.value = {
+        name: response.data.name || '',
+        type: response.data.type || '',
+        address: {
+          street: response.data.address?.street || '',
+          city: response.data.address?.city || '',
+          postalCode: response.data.address?.postalCode || ''
+        },
+        contact: {
+          phone: response.data.contact?.phone || ''
+        },
+        specialties: response.data.specialties || [],
+        description: response.data.description || '',
+        website: response.data.website || ''
+      }
     }
   } catch (error) {
-    console.error('Error loading profile:', error)
+    console.error('Error loading hospital profile:', error)
+    // Don't show an error toast here, as this might be a new user with no profile yet
+    if (error.response && error.response.status !== 404) {
+      showToast('Fehler beim Laden des Profils', 'error')
+    }
   }
 })
 
@@ -204,26 +226,17 @@ const submitProfile = async () => {
   isSubmitting.value = true
   
   try {
-    const response = await fetch('/api/hospital/profile', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(formData.value)
+    const response = await api.post('/hospital/profile', formData.value)
+    
+    showToast('Profil erfolgreich aktualisiert', 'success')
+    trackForm('Hospital Profile Update', {
+      hasSpecialties: formData.value.specialties.length > 0,
+      hasWebsite: !!formData.value.website
     })
     
-    if (response.ok) {
-      showToast('Profil erfolgreich aktualisiert', 'success')
-      trackForm('Hospital Profile Update', {
-        hasSpecialties: formData.value.specialties.length > 0,
-        hasWebsite: !!formData.value.website
-      })
-      router.push('/profile')
-    } else {
-      throw new Error('Failed to update profile')
-    }
+    emit('profile-updated', response.data)
   } catch (error) {
-    console.error('Error updating profile:', error)
+    console.error('Error updating hospital profile:', error)
     showToast('Fehler beim Aktualisieren des Profils', 'error')
   } finally {
     isSubmitting.value = false

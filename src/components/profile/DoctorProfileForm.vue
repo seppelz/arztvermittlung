@@ -162,6 +162,7 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useToast } from '@/composables/useToast'
 import { useAnalytics } from '@/composables/useAnalytics'
+import api from '@/services/api'
 
 const router = useRouter()
 const { showToast } = useToast()
@@ -206,23 +207,25 @@ const formData = ref({
 // Load existing profile data if available
 onMounted(async () => {
   try {
-    const response = await fetch('/api/doctor/profile', {
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
-      }
-    })
+    const response = await api.get('/doctor/profile')
     
-    if (response.ok) {
-      const data = await response.json()
-      // Map the data to our form structure
+    if (response.data) {
+      console.log('Loading existing doctor profile:', response.data)
+      // Map the data to our form structure, with fallbacks for missing properties
       formData.value = {
-        name: data.name || '',
-        specialty: data.specialty || '',
-        qualifications: data.qualifications || [],
-        otherQualifications: data.otherQualifications || '',
-        contact: data.contact || { email: '', phone: '' },
-        availability: data.availability || { availableFrom: '', federalState: '' },
-        additionalInfo: data.additionalInfo || ''
+        name: response.data.name || '',
+        specialty: response.data.specialty || '',
+        qualifications: response.data.qualifications || [],
+        otherQualifications: response.data.otherQualifications || '',
+        contact: {
+          email: response.data.contact?.email || '',
+          phone: response.data.contact?.phone || ''
+        },
+        availability: {
+          availableFrom: response.data.availability?.availableFrom || '',
+          federalState: response.data.availability?.federalState || ''
+        },
+        additionalInfo: response.data.additionalInfo || ''
       }
       
       // Convert date string to ISO date format for input
@@ -232,7 +235,11 @@ onMounted(async () => {
       }
     }
   } catch (error) {
-    console.error('Error loading profile:', error)
+    console.error('Error loading doctor profile:', error)
+    // Don't show an error toast here, as this might be a new user with no profile yet
+    if (error.response && error.response.status !== 404) {
+      showToast('Fehler beim Laden des Profils', 'error')
+    }
   }
 })
 
@@ -243,25 +250,12 @@ const submitProfile = async () => {
     // Track the form submission
     trackForm('doctor_profile', 'submit')
     
-    const response = await fetch('/api/doctor/profile', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
-      },
-      body: JSON.stringify(formData.value)
-    })
-    
-    if (!response.ok) {
-      throw new Error('Fehler beim Speichern des Profils')
-    }
-    
-    const updatedProfile = await response.json()
+    const response = await api.post('/doctor/profile', formData.value)
     
     showToast('Profil erfolgreich gespeichert', 'success')
-    emit('profile-updated', updatedProfile)
+    emit('profile-updated', response.data)
   } catch (error) {
-    console.error('Error submitting profile:', error)
+    console.error('Error submitting doctor profile:', error)
     showToast(error.message || 'Ein Fehler ist aufgetreten', 'error')
   } finally {
     isSubmitting.value = false
