@@ -338,8 +338,16 @@ const loadProfile = async () => {
       return
     }
     
+    console.log('User profile loaded:', user.value)
+    
+    // Check if user is a hospital (either by role or userType)
+    const isHospital = user.value.role === 'hospital' || (user.value.role === 'user' && user.value.userType === 'Klinik')
+    
+    // Check if user is a doctor (either by role or userType)
+    const isDoctor = user.value.role === 'doctor' || (user.value.role === 'user' && user.value.userType === 'Arzt')
+    
     // If user is a hospital, load hospital profile
-    if (user.value.role === 'hospital') {
+    if (isHospital) {
       try {
         const response = await api.get('/hospital/profile')
         console.log('Hospital profile response:', response)
@@ -359,7 +367,7 @@ const loadProfile = async () => {
     }
     
     // If user is a doctor, load doctor profile
-    if (user.value.role === 'doctor') {
+    if (isDoctor) {
       try {
         const response = await api.get('/doctor/profile')
         console.log('Doctor profile response:', response)
@@ -403,9 +411,15 @@ const deleteProfile = async () => {
   
   try {
     let url = ''
-    if (user.value.role === 'hospital') {
+    // Check if user is a hospital (either by role or userType)
+    const isHospital = user.value.role === 'hospital' || (user.value.role === 'user' && user.value.userType === 'Klinik')
+    
+    // Check if user is a doctor (either by role or userType)
+    const isDoctor = user.value.role === 'doctor' || (user.value.role === 'user' && user.value.userType === 'Arzt')
+    
+    if (isHospital) {
       url = '/hospital/profile'
-    } else if (user.value.role === 'doctor') {
+    } else if (isDoctor) {
       url = '/doctor/profile'
     } else {
       throw new Error('Ungültiger Benutzertyp')
@@ -417,9 +431,9 @@ const deleteProfile = async () => {
     showDeleteConfirm.value = false
     
     // Reset profile data
-    if (user.value.role === 'hospital') {
+    if (isHospital) {
       hospitalProfile.value = null
-    } else if (user.value.role === 'doctor') {
+    } else if (isDoctor) {
       doctorProfile.value = null
     }
   } catch (err) {

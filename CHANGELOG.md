@@ -158,6 +158,14 @@ All notable changes to this project will be documented in this file.
   - Updated user.service.js to use PATCH instead of PUT for profile updates
   - Updated contact.service.js to use PATCH instead of PUT for contact updates
   - Updated auth.service.js to use PATCH instead of PUT for profile updates
+- Fixed user registration to correctly set role based on userType:
+  - Users registering as "Arzt" now have role="doctor" instead of role="user"
+  - Users registering as "Klinik" now have role="hospital" instead of role="user"
+  - This ensures proper profile loading and role-specific features work correctly
+- Fixed profile detection for existing users:
+  - Updated code to support both new (role-based) and existing (userType-based) accounts
+  - Added dual-checking logic for doctor/hospital detection that works with both data structures
+  - Ensures backward compatibility with existing database records
 
 ### Added
 - Created test scripts for MongoDB Atlas connection testing

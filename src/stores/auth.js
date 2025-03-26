@@ -12,10 +12,10 @@ export const useAuthStore = defineStore('auth', {
       return state.user && state.user.role === 'admin'
     },
     isDoctor: (state) => {
-      return state.user && state.user.userType === 'Arzt'
+      return state.user && (state.user.role === 'doctor' || (state.user.role === 'user' && state.user.userType === 'Arzt'))
     },
     isHospital: (state) => {
-      return state.user && state.user.userType === 'Klinik'
+      return state.user && (state.user.role === 'hospital' || (state.user.role === 'user' && state.user.userType === 'Klinik'))
     }
   },
   
