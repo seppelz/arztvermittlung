@@ -4,6 +4,15 @@ import AppHeader from '@/components/layout/AppHeader.vue'
 import AppFooter from '@/components/layout/AppFooter.vue'
 import ToastNotification from '@/components/ToastNotification.vue'
 import CookieBanner from '@/components/CookieBanner.vue'
+import { onMounted } from 'vue'
+import { useAuthStore } from '@/stores/auth'
+
+const authStore = useAuthStore()
+
+onMounted(() => {
+  // Initialize auth state from localStorage
+  authStore.initAuth()
+})
 </script>
 
 <template>

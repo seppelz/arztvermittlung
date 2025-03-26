@@ -9,4 +9,7 @@ router.get('/profile', auth, hospitalController.getProfile);
 // Update hospital profile
 router.post('/profile', auth, hospitalController.updateProfile);
 
+// Delete hospital profile
+router.delete('/profile', auth, hospitalController.deleteProfile);
+
 module.exports = router; 

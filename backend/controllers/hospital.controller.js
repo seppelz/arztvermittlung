@@ -73,4 +73,24 @@ exports.updateProfile = async (req, res) => {
     console.error('Error updating hospital profile:', error);
     res.status(500).json({ message: 'Error updating hospital profile' });
   }
+};
+
+/**
+ * Delete hospital profile
+ * @route DELETE /api/hospital/profile
+ * @access Private
+ */
+exports.deleteProfile = async (req, res) => {
+  try {
+    const result = await Hospital.findOneAndDelete({ userId: req.user.id });
+    
+    if (!result) {
+      return res.status(404).json({ message: 'Hospital profile not found' });
+    }
+    
+    res.json({ message: 'Hospital profile deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting hospital profile:', error);
+    res.status(500).json({ message: 'Error deleting hospital profile' });
+  }
 }; 

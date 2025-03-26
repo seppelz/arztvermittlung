@@ -5,6 +5,9 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 ### Improved
+- Enhanced authentication initialization to ensure user state is properly loaded on app startup
+- Improved API error handling for authentication failures with smarter redirection logic
+- Added auth state reinitialization in profile page to handle edge cases
 - Enhanced header branding with white MedMatch text for better contrast and visibility
 - Increased spacing between navigation items in header menu for improved readability
 - Added more separation between MedMatch logo/text and navigation menu for better visual hierarchy
@@ -122,6 +125,10 @@ All notable changes to this project will be documented in this file.
 - Optimierung der Authentifizierungs-Überprüfung mit Cache-Implementierung für bessere Performance
 - Umbau des Auth-Service, um direkte zirkuläre Abhängigkeiten zum Router und Pinia zu vermeiden
 - Verbessertes Fehlerlogging mit tiefgreifender Analyse von Stacktraces zur Erkennung zirkulärer Abhängigkeiten
+- Fixed profile completion button not appearing for hospital users with incomplete profiles
+- Authentication state management in profile page
+- Profile completion button visibility logic
+- Profile data loading and display
 
 ### Added
 - Created test scripts for MongoDB Atlas connection testing
@@ -367,3 +374,9 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 - Implementierung eines datenschutzkonformen Cookie-Banners zur Einholung der Einwilligung der Nutzer gemäß DSGVO
+- Doctor profile management with form and backend support
+- Doctor profile model with validation and auto-completion check
+- Implemented doctor profile API endpoints for GET, POST, and DELETE operations
+- Added delete functionality for both hospital and doctor profiles
+- Bulletin entries management component for users to view, edit, and delete their entries
+- Enhanced profile page to support both doctor and hospital user types

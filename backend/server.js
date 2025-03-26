@@ -9,6 +9,8 @@ const authRoutes = require('./routes/auth.routes');
 const bulletinRoutes = require('./routes/bulletin.routes');
 const userRoutes = require('./routes/user.routes');
 const contactRoutes = require('./routes/contact.routes');
+const hospitalRoutes = require('./routes/hospital.routes');
+const doctorRoutes = require('./routes/doctor.routes');
 
 // App-Initialisierung
 const app = express();
@@ -65,6 +67,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/bulletin', bulletinRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/contacts', contactRoutes);
+app.use('/api/hospital', hospitalRoutes);
+app.use('/api/doctor', doctorRoutes);
 
 // Add a test route to verify the server is running correctly
 app.get('/api/status', (req, res) => {

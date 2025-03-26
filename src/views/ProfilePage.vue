@@ -15,14 +15,26 @@
           <div>
             <h1 class="text-2xl font-semibold text-gray-900">Profil</h1>
             <p class="text-gray-600">{{ user?.email }}</p>
+            <p class="text-gray-600">
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                {{ user?.role === 'doctor' ? 'Arzt' : user?.role === 'hospital' ? 'Klinik' : user?.role }}
+              </span>
+            </p>
           </div>
           <div class="flex items-center space-x-4">
             <button
-              v-if="user?.role === 'hospital' && !isProfileComplete"
+              v-if="(user?.role === 'hospital' && !isHospitalProfileComplete) || (user?.role === 'doctor' && !isDoctorProfileComplete)"
               @click="showProfileForm = true"
               class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             >
               Profil vervollständigen
+            </button>
+            <button
+              v-if="(user?.role === 'hospital' && isHospitalProfileComplete) || (user?.role === 'doctor' && isDoctorProfileComplete)"
+              @click="showDeleteConfirm = true"
+              class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-red-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+            >
+              Profil löschen
             </button>
             <button
               @click="logout"
@@ -34,8 +46,8 @@
         </div>
       </div>
 
-      <!-- Profile Content -->
-      <div v-if="user?.role === 'hospital' && hospitalProfile" class="bg-white shadow rounded-lg p-6">
+      <!-- Hospital Profile Content -->
+      <div v-if="user?.role === 'hospital' && hospitalProfile" class="bg-white shadow rounded-lg p-6 mb-6">
         <h2 class="text-xl font-semibold text-gray-900 mb-4">Klinik-Informationen</h2>
         
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -94,30 +106,138 @@
         </div>
       </div>
 
+      <!-- Doctor Profile Content -->
+      <div v-if="user?.role === 'doctor' && doctorProfile" class="bg-white shadow rounded-lg p-6 mb-6">
+        <h2 class="text-xl font-semibold text-gray-900 mb-4">Arzt-Informationen</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <h3 class="text-sm font-medium text-gray-500">Name</h3>
+            <p class="mt-1 text-sm text-gray-900">{{ doctorProfile.name }}</p>
+          </div>
+          
+          <div>
+            <h3 class="text-sm font-medium text-gray-500">Fachrichtung</h3>
+            <p class="mt-1 text-sm text-gray-900">{{ doctorProfile.specialty }}</p>
+          </div>
+          
+          <div>
+            <h3 class="text-sm font-medium text-gray-500">Kontakt</h3>
+            <p class="mt-1 text-sm text-gray-900">
+              {{ doctorProfile.contact.email }}<br>
+              {{ doctorProfile.contact.phone }}
+            </p>
+          </div>
+          
+          <div>
+            <h3 class="text-sm font-medium text-gray-500">Verfügbar ab</h3>
+            <p class="mt-1 text-sm text-gray-900">{{ formatDate(doctorProfile.availability.availableFrom) }}</p>
+          </div>
+          
+          <div v-if="doctorProfile.availability.federalState" class="md:col-span-1">
+            <h3 class="text-sm font-medium text-gray-500">Bevorzugtes Bundesland</h3>
+            <p class="mt-1 text-sm text-gray-900">{{ doctorProfile.availability.federalState }}</p>
+          </div>
+          
+          <div v-if="doctorProfile.qualifications?.length" class="md:col-span-2">
+            <h3 class="text-sm font-medium text-gray-500">Qualifikationen</h3>
+            <div class="mt-2 flex flex-wrap gap-2">
+              <span
+                v-for="qualification in doctorProfile.qualifications"
+                :key="qualification"
+                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+              >
+                {{ formatQualification(qualification) }}
+              </span>
+            </div>
+            <p v-if="doctorProfile.otherQualifications" class="mt-1 text-sm text-gray-900">
+              {{ doctorProfile.otherQualifications }}
+            </p>
+          </div>
+          
+          <div v-if="doctorProfile.additionalInfo" class="md:col-span-2">
+            <h3 class="text-sm font-medium text-gray-500">Weitere Informationen</h3>
+            <p class="mt-1 text-sm text-gray-900">{{ doctorProfile.additionalInfo }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bulletin Entries -->
+      <div class="mt-8">
+        <BulletinEntries />
+      </div>
+      
       <!-- Profile Completion Form -->
       <HospitalProfileForm
-        v-if="showProfileForm"
+        v-if="showProfileForm && user?.role === 'hospital'"
         @close="showProfileForm = false"
         @profile-updated="handleProfileUpdate"
       />
+      
+      <DoctorProfileForm
+        v-if="showProfileForm && user?.role === 'doctor'"
+        @close="showProfileForm = false"
+        @profile-updated="handleDoctorProfileUpdate"
+      />
+      
+      <!-- Delete Profile Confirmation Modal -->
+      <div v-if="showDeleteConfirm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+          <h3 class="text-lg font-medium text-gray-900 mb-4">Profil löschen</h3>
+          <p class="text-gray-700 mb-6">Sind Sie sicher, dass Sie Ihr Profil löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.</p>
+          
+          <div class="flex justify-end space-x-3">
+            <button
+              @click="showDeleteConfirm = false"
+              class="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              Abbrechen
+            </button>
+            <button
+              @click="deleteProfile"
+              :disabled="isDeleting"
+              class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+            >
+              {{ isDeleting ? 'Wird gelöscht...' : 'Löschen' }}
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { useToast } from '@/composables/useToast'
 import HospitalProfileForm from '@/components/profile/HospitalProfileForm.vue'
+import DoctorProfileForm from '@/components/profile/DoctorProfileForm.vue'
+import BulletinEntries from '@/components/profile/BulletinEntries.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
+const { showToast } = useToast()
 
 const isLoading = ref(true)
+const isDeleting = ref(false)
 const error = ref(null)
 const user = ref(null)
 const hospitalProfile = ref(null)
+const doctorProfile = ref(null)
 const showProfileForm = ref(false)
+const showDeleteConfirm = ref(false)
+
+// Computed property to determine if hospital profile is complete
+const isHospitalProfileComplete = computed(() => {
+  return !!hospitalProfile.value && Object.keys(hospitalProfile.value).length > 0
+})
+
+// Computed property to determine if doctor profile is complete
+const isDoctorProfileComplete = computed(() => {
+  return !!doctorProfile.value && Object.keys(doctorProfile.value).length > 0
+})
 
 // Format hospital type for display
 const formatType = (type) => {
@@ -146,6 +266,31 @@ const formatSpecialty = (specialty) => {
   return specialties[specialty] || specialty
 }
 
+// Format qualification for display
+const formatQualification = (qualification) => {
+  const qualifications = {
+    facharzt: 'Facharzt',
+    oberarzt: 'Oberarzt',
+    chefarzt: 'Chefarzt',
+    assistenzarzt: 'Assistenzarzt',
+    promotion: 'Promotion',
+    habilitation: 'Habilitation'
+  }
+  return qualifications[qualification] || qualification
+}
+
+// Format date for display
+const formatDate = (dateString) => {
+  if (!dateString) return 'Nicht angegeben'
+  
+  const date = new Date(dateString)
+  return new Intl.DateTimeFormat('de-DE', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  }).format(date)
+}
+
 // Load user profile
 const loadProfile = async () => {
   try {
@@ -155,23 +300,73 @@ const loadProfile = async () => {
     // Get user from auth store
     user.value = authStore.user
     
+    // If user is not available in the store, try to initialize auth from localStorage
     if (!user.value) {
-      throw new Error('Kein Benutzer angemeldet')
+      console.log('User not found in store, reinitializing auth state')
+      authStore.initAuth()
+      user.value = authStore.user
+    }
+    
+    // If still no user, redirect to login
+    if (!user.value) {
+      console.error('No user found after auth state initialization')
+      error.value = 'Kein Benutzer angemeldet'
+      router.push('/login')
+      return
     }
     
     // If user is a hospital, load hospital profile
     if (user.value.role === 'hospital') {
-      const response = await fetch('/api/hospital/profile', {
-        headers: {
-          'Authorization': `Bearer ${authStore.token}`
+      try {
+        const response = await fetch('/api/hospital/profile', {
+          headers: {
+            'Authorization': `Bearer ${authStore.token}`
+          }
+        })
+        
+        if (!response.ok) {
+          if (response.status === 404) {
+            // Profile doesn't exist yet, which is fine - we'll show the "complete profile" button
+            console.log('Hospital profile not found - new user needs to complete profile')
+            hospitalProfile.value = null
+          } else {
+            throw new Error('Fehler beim Laden des Profils')
+          }
+        } else {
+          hospitalProfile.value = await response.json()
         }
-      })
-      
-      if (!response.ok) {
-        throw new Error('Fehler beim Laden des Profils')
+      } catch (profileErr) {
+        console.error('Error loading hospital profile:', profileErr)
+        // Don't set error.value here - just log it, as we still want to show the profile page
+        // with the "complete profile" button for new users
       }
-      
-      hospitalProfile.value = await response.json()
+    }
+    
+    // If user is a doctor, load doctor profile
+    if (user.value.role === 'doctor') {
+      try {
+        const response = await fetch('/api/doctor/profile', {
+          headers: {
+            'Authorization': `Bearer ${authStore.token}`
+          }
+        })
+        
+        if (!response.ok) {
+          if (response.status === 404) {
+            // Profile doesn't exist yet, which is fine - we'll show the "complete profile" button
+            console.log('Doctor profile not found - new user needs to complete profile')
+            doctorProfile.value = null
+          } else {
+            throw new Error('Fehler beim Laden des Profils')
+          }
+        } else {
+          doctorProfile.value = await response.json()
+        }
+      } catch (profileErr) {
+        console.error('Error loading doctor profile:', profileErr)
+        // Don't set error.value here - just log it, as we still want to show the profile page
+        // with the "complete profile" button for new users
+      }
     }
   } catch (err) {
     console.error('Error loading profile:', err)
@@ -181,10 +376,58 @@ const loadProfile = async () => {
   }
 }
 
-// Handle profile update
+// Handle hospital profile update
 const handleProfileUpdate = (updatedProfile) => {
   hospitalProfile.value = updatedProfile
   showProfileForm.value = false
+}
+
+// Handle doctor profile update
+const handleDoctorProfileUpdate = (updatedProfile) => {
+  doctorProfile.value = updatedProfile
+  showProfileForm.value = false
+}
+
+// Delete profile
+const deleteProfile = async () => {
+  isDeleting.value = true
+  
+  try {
+    let url = ''
+    if (user.value.role === 'hospital') {
+      url = '/api/hospital/profile'
+    } else if (user.value.role === 'doctor') {
+      url = '/api/doctor/profile'
+    } else {
+      throw new Error('Ungültiger Benutzertyp')
+    }
+    
+    const response = await fetch(url, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${authStore.token}`
+      }
+    })
+    
+    if (!response.ok) {
+      throw new Error('Fehler beim Löschen des Profils')
+    }
+    
+    showToast('Profil erfolgreich gelöscht', 'success')
+    showDeleteConfirm.value = false
+    
+    // Reset profile data
+    if (user.value.role === 'hospital') {
+      hospitalProfile.value = null
+    } else if (user.value.role === 'doctor') {
+      doctorProfile.value = null
+    }
+  } catch (err) {
+    console.error('Error deleting profile:', err)
+    showToast(err.message || 'Ein Fehler ist aufgetreten', 'error')
+  } finally {
+    isDeleting.value = false
+  }
 }
 
 // Logout function

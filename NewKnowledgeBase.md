@@ -410,276 +410,29 @@ Dieses Dokument enthält wichtige Lernpunkte, die während der Entwicklung der M
 - Die automatische Entfernung von Toast-Benachrichtigungen nach einer bestimmten Zeit verhindert die Überfrachtung der Benutzeroberfläche.
 - Die Möglichkeit, Toast-Benachrichtigungen manuell zu schließen, gibt dem Benutzer mehr Kontrolle.
 
-## Authentication and User Management
+## Authentication Best Practices
 
-- **Role-Based Authentication Flow**: Implementation of separate login paths for regular users (`/login`) and administrators (`/admin`), enhancing security by segregating admin access from the public-facing interface.
-- **User Experience Best Practices**: Separation of administrator functions from regular user interfaces ensures clarity in user workflows and prevents accidental exposure of administrative credentials.
-- **Security Through UI Design**: Using interface design as a security enhancement by not exposing admin login options on public-facing pages.
-- **Guest Access Implementation**: Providing a guest access option for demonstration purposes while preserving system security.
-- **JWT Token Management**: Central authentication logic with proper token storage and verification processes.
-- **State Management with Pinia**: Auth store manages authentication state including user information, permissions and session persistence.
+### Robust Authentication State Management
 
-## Security Best Practices
+1. **Initialization Order Matters**:
+   - Authentication state should be initialized before router and component mounting to prevent race conditions
+   - Use a centralized initialization in main.js to ensure auth state is ready before the app renders
+   - Implement defensive checks in components that rely on authentication state
 
-- **Separation of Admin Credentials**: Test credentials for administrative access should never be displayed on public-facing pages or in client-side code that could be viewed by users.
-- **Contextual Authentication Interfaces**: Different user types should have appropriately scoped login interfaces - admin interfaces should be separate from regular user interfaces.
-- **UI-based Security Enhancements**: Using UI design to reinforce security principles by only showing appropriate options to each user type.
-- **Guest Access Implementation**: While providing demo/guest access for evaluation purposes, such accounts should have limited permissions and be clearly labeled.
-- **Login Credential Management**: Demo or test credentials should be provided securely to authorized personnel rather than embedded in the application.
+2. **Layered Authentication Storage**:
+   - Maintain auth state in multiple layers (Pinia store, localStorage, and service cache) for resilience
+   - Implement re-initialization logic in components that might load before auth state is fully ready
+   - Use authCache with appropriate TTL (Time To Live) to optimize repeated auth checks during navigation
 
-## Deployment auf Vercel
+3. **Smart API Error Handling**:
+   - Implement context-aware 401 error handling that directs users to the appropriate login page
+   - Prevent redirect loops by checking the current path before redirecting on auth errors
+   - Distinguish between admin and regular user authentication workflows for better UX
 
-### Vercel und MongoDB-Integration
-
-- **Fullstack Deployment**: Vercel ermöglicht das Deployment sowohl von Frontend (Vue.js SPA) als auch Backend (Express.js API) in einer Konfiguration.
-- **Serverless Functions**: Der Express.js Backend-Server wird als Serverless Function auf Vercel ausgeführt, wodurch ein separates Backend-Hosting entfällt.
-- **Route Handling**: Die Vercel-Konfiguration muss korrekt eingerichtet sein, um API-Anfragen an die Serverless Function weiterzuleiten und SPA-Routen korrekt zu behandeln.
-- **MongoDB Atlas**: Für Produktionsumgebungen wird MongoDB Atlas als Cloud-Datenbank verwendet, anstatt einer lokalen MongoDB-Installation.
-  - **Verbindungssicherheit**: MongoDB Atlas bietet IP-Whitelist und Auth-Mechanismen für sichere Datenbankverbindungen.
-  - **Skalierbarkeit**: Serverlose Funktionen können dynamisch mit MongoDB Atlas skaliert werden.
-  - **Datenbank-Administration**: Atlas bietet ein Dashboard für Datenbanküberwachung, Backup und Wiederherstellung.
-  - **Verbindungsstring-Format**: `mongodb+srv://<username>:<password>@<cluster>.mongodb.net/<dbname>?retryWrites=true&w=majority`
-- **Seeding-Mechanismen**: Die Bereitstellung von Seed-Skripten vereinfacht das Einrichten der Produktionsdatenbank mit Testdaten.
-
-### Umgebungsvariablen und Konfiguration
-
-- **Trennung von Entwicklungs- und Produktionsumgebungen**: Die Verwendung von Umgebungsvariablen ermöglicht eine klare Trennung zwischen Entwicklungs- und Produktionseinstellungen.
-- **Sensible Daten**: JWT-Secrets, Datenbankverbindungszeichenfolgen und andere sensible Informationen sollten als Umgebungsvariablen in Vercel gespeichert werden.
-- **API-Basis-URLs**: Die Verwendung von relativen Pfaden in der Frontend-Anwendung vereinfacht die Bereitstellung, da keine hartcodierten URLs angepasst werden müssen.
-- **Umgebungsdetektierung**: Die Anwendung sollte Umgebungsvariablen verwenden, um die Laufzeitumgebung zu erkennen und entsprechend unterschiedliche Konfigurationen zu laden.
-
-### Deployment-Workflow
-
-- **Automatisiertes Deployment**: Vercel bietet automatisiertes Deployment aus Git-Repositories, wodurch der Entwicklungsworkflow vereinfacht wird.
-- **Preview-Deployments**: Vercel erstellt automatisch Vorschau-Deployments für Pull Requests, um Änderungen vor der Zusammenführung zu testen.
-- **Rollbacks**: Bei Problemen kann einfach zu einer früheren Version zurückgewechselt werden.
-- **Deployment-Tests**: Testskripte vor dem Deployment helfen, häufige Probleme zu identifizieren und zu beheben, bevor sie in Produktion gehen.
-- **Kontinuierliche Integration**: Der Deployment-Prozess kann in CI/CD-Pipelines integriert werden, um Tests und Qualitätschecks vor dem Deployment auszuführen. 
-
-## Managing Circular Dependencies in Vue Router and Auth Services
-
-Circular dependencies can cause subtle but serious issues in Vue applications, particularly when the router and authentication services depend on each other. Here are key insights from resolving these issues:
-
-### Root Causes of Circular Dependencies
-
-1. **Direct Imports**: When router imports auth service and auth service (or components that use it) imports router
-2. **Indirect Circular Paths**: When multiple modules form a dependency circle (A → B → C → A)
-3. **Early Access**: Accessing services before they're fully initialized
-
-### Effective Solutions
-
-1. **Lazy Loading with Dynamic Imports**:
-   - Use `import()` for lazy loading instead of static imports for services that may cause circular dependencies
-   - Wrap async imports in try/catch blocks with fallbacks
-
-2. **Memoization for Service Instances**:
-   - Cache service instances to prevent redundant initializations
-   - Provide fallback objects when services can't be instantiated
-
-3. **Proper Initialization Order**:
-   - Initialize Pinia before any services that might use stores
-   - Mount the Vue app only after all critical services are properly initialized
-   - Use async/await patterns for sequential initialization
-
-4. **Enhanced Error Handling**:
-   - Add specific error handlers for different types of failures
-   - Provide user-friendly error messages when critical services fail
-   - Log detailed debugging information in the console
-
-### Symptoms of Circular Dependencies
-
-- Infinite recursion errors
-- "Maximum call stack size exceeded" errors
-- Components that partially render or don't render at all
-- Unexplained navigation failures
-- Authentication status that seems to "forget" itself
-
-By implementing these patterns, we've been able to resolve deep-seated issues with Vue Router that were causing unpredictable behavior and error messages. 
-
-# New Knowledge Base
-
-This document tracks key insights and lessons learned about the codebase to improve our productivity.
-
-## Insights
-
-- MongoDB Atlas connection requires careful configuration of SSL/TLS settings, especially when deployed to production environments
-- The codebase uses a mix of environment variables and runtime configuration for API URL management
-- Bulletin board functionality is split between information messages and job postings (Arztbörse)
-- The project follows a structure with frontend in Vue.js and backend using Express.js with MongoDB
-- API endpoints follow RESTful conventions with controllers handling business logic
-- Backend tests are organized in a separate directory structure
-- Environment configuration uses separate files for development, production, and example templates
-- User authentication is handled via JWT tokens with role-based access control
-- Axios configuration should be centralized in a single api.js file that sets up base URL and interceptors, then imported into service files rather than using raw axios imports
-- MongoDB Atlas in production environments often requires specific connection options including SSL settings and timeout configurations
-- Enhanced error logging in controllers provides crucial diagnostic information for troubleshooting 500 errors
-- Vercel serverless functions have specific requirements for MongoDB connections that may differ from local development
-- Form validations must be consistent with database model validations to avoid confusing error messages
-- Conditional field requirements based on other fields (e.g., federalState required only for Klinik Angebot types) should be synchronized between frontend forms and backend models
-- Controllers should provide detailed validation error messages to help users understand what went wrong with form submissions
-- Admin interfaces must provide full access to all database fields to ensure proper management of data
-- Modal forms in admin interfaces should respect the same validation rules as public forms but provide greater flexibility for administrators
-- Conditional visibility of form fields based on other field values ensures that admin forms remain relevant and focused
-- Reusing validation logic across frontend forms and admin interfaces ensures consistency in data management
-
-## API Configuration for Production Deployments
-
-- **Default API URL Configuration**: When deploying to production, always set the default API URL in the api.js service to point to the production endpoint (e.g., `https://www.med-match.de/api`) rather than localhost
-- **API Response Format Handling**: Services should be designed to handle both nested data structures (response.data.data) and direct array responses (response.data) as API response formats may differ between environments
-- **Environment-Specific Testing**: Always test admin interfaces with the production API after deployment, as local development environments may mask API connectivity issues
-- **Frontend-Backend Synchronization**: When the backend is deployed separately from the frontend (e.g., on Vercel), ensure that both systems are using compatible API response formats
-- **Response Transformation**: Frontend services should transform API responses into consistent formats that components can reliably consume regardless of the data source
-- **Error Handling for Production**: Enhance error logging in production environments to provide detailed diagnostic information for troubleshooting API communication issues
-- **Cross-Origin Considerations**: Production deployments often involve different domains for frontend and API, requiring proper CORS configuration
-- **API Endpoint Naming Consistency**: Ensure that frontend service endpoint paths (e.g., '/bulletin' vs '/bulletins') exactly match the backend route definitions, as even small discrepancies will cause 404 errors in production while potentially working in development due to different error handling
-- **Subdomain Sensitivity**: API URLs must specifically include the correct subdomain (www vs non-www) as redirects between these may cause CORS issues or return HTML instead of JSON, leading to parsing errors
-- **SyntaxError Debugging**: "SyntaxError: expected expression, got '<'" typically indicates HTML is being returned instead of JavaScript/JSON, often due to HTTP redirects or 404 responses
-- **Vue Router Error Handling**: Add error handlers to both the router (router.onError) and Vue application (app.config.errorHandler) to provide better diagnostics for dynamic import issues
-- **Fallback Components**: Implement fallback components and routes to gracefully handle loading failures and prevent the entire application from crashing
-
-## Node.js Backend Architecture
-- Pay close attention to import paths in Node.js applications, especially between singular and plural folder names like "middleware" vs "middlewares" which can cause module resolution errors in production
-- Vercel serverless functions are especially sensitive to path inconsistencies that might work locally but fail in production
-- Using consistent naming conventions for folders (all singular or all plural) helps prevent path-related errors
-- Import errors often manifest as 500 status codes in production while working fine in development 
-
-## Datenhandhabung und Datumswerte
-
-### Effektives Datumshandling in Vue.js Anwendungen
-
-1. **Konsistentes Datums-Datenmodell zwischen Frontend und Backend**:
-   - Explizite Konvertierung von String zu Date-Objekten beim Senden von API-Anfragen verhindert Datumsinkongruenzen
-   - Verwendung des gleichen Datums-Datentyps (z.B. `startDate` als Date-Objekt) in allen Schichten der Anwendung
-   - Implementierung von Fallback-Mechanismen für fehlende Datumswerte verhindert Rendering-Fehler
-
-2. **Datumsformatierung und -validierung**:
-   - Zentralisierte Formatierungsfunktionen (z.B. `formatDate()`) für einheitliche Darstellung in der gesamten Anwendung
-   - Berücksichtigung von Zeitzonen und Lokalisierung bei der Datumsverarbeitung
-   - Validierung von Datumseingaben sowohl im Frontend als auch im Backend zur Sicherstellung der Datenintegrität
-
-3. **Optimiertes Datumshandling in der Benutzeroberfläche**:
-   - Klare visuelle Unterscheidung zwischen Erstellungs-/Änderungsdatum und inhaltlich relevanten Datumswerten (z.B. Verfügbarkeitsdatum)
-   - Konsistente Verwendung desselben Datumswerts (z.B. `startDate`) über verschiedene UI-Komponenten hinweg
-   - Fehlerbehandlung für fehlende oder ungültige Datumsangaben mit benutzerfreundlichen Fallback-Werten
-
-4. **Datums-bezogene Titelgenerierung**:
-   - Automatische Generierung aussagekräftiger Titel unter Einbeziehung relevanter Datumsinformationen
-   - Verwendung spezifischer Datumswerte (z.B. Verfügbarkeitsdatum statt Erstellungsdatum) für kontextbezogene Titel
-   - Standardisierte Datumsinformationen in Titeln für bessere Übersichtlichkeit und Konsistenz 
-
-## Header-Design für medizinische Plattformen
-
-1. **Lesbarkeit und Kontrast im Header**:
-   - Die Verwendung von weißem Text auf dunkleren Hintergründen (wie Gradienten) verbessert die Lesbarkeit und Sichtbarkeit
-   - Der Markenname sollte sich durch ausreichenden Kontrast klar vom Hintergrund abheben, um die Markenidentität zu stärken
-   - Farbkombinationen sollten WCAG-Kontrastrichtlinien (mindestens 4.5:1) folgen, besonders für Navigationstext
-
-2. **Optimales Spacing für Navigation**:
-   - Erhöhter horizontaler Abstand zwischen Navigationseinträgen (space-x-6 statt space-x-4) verbessert die Lesbarkeit und visuelle Trennung
-   - Ausgewogene Abstände zwischen Logo/Markenname und dem ersten Navigationselement reduzieren visuelle Kompression
-   - Konsistente Abstände im responsiven Design unterstützen eine professionelle Darstellung auf allen Geräten
-
-3. **Responsive Header-Anpassungen**:
-   - Die mobile Anzeige sollte klare Kontraste beibehalten, besonders bei komprimierter Navigation
-   - Farbübergänge von Desktop zu Mobil sollten konsistent bleiben, um ein einheitliches Markenerlebnis zu gewährleisten
-   - Bei der Entwicklung von Styling-Änderungen müssen sowohl Desktop- als auch Mobile-Varianten berücksichtigt werden
-
-4. **Logo und Markenplatzierung**:
-   - Eine Mindestbreite für den Logo-Container (z.B. min-w-[200px]) gewährleistet ausreichend visuellen Raum für die Markenidentität
-   - Ein dedizierter rechter Abstand (z.B. pr-8) zwischen Logo und Navigation verhindert visuelle Überlappungen
-   - Die Balance zwischen Logo-Größe und verfügbarem Navigationsraum ist besonders wichtig bei mittleren Viewport-Größen
-
-## Cross-Service Integration
-
-- **Demo vs. Real Data Integration**: When transitioning from demo data to real API data, it's critical to maintain both sources temporarily with a preference for real data to ensure smooth user experience without data gaps.
-- **Form-to-API Consistency**: Forms must be directly connected to appropriate API service methods to ensure data persistence; simulated API calls with setTimeout are suitable for prototyping but inadequate for production.
-- **Database Schema-Frontend Alignment**: Ensure that form field models in frontend components exactly match database schema requirements to prevent validation errors or missing data issues.
-- **State Management During API Transitions**: Implement clear loading, error, and empty states when connecting components to live APIs to handle all possible response scenarios gracefully. 
-
-## Data Management in Production
-
-- **Demo Data vs. Production Data**: While demo data is useful during development, it should be completely removed in production environments to prevent confusion between real and fake entries.
-- **Layout Consistency**: Grid layouts should be consistent across related views to maintain user expectations - inconsistent layouts between similar components lead to disjointed user experience.
-- **Comprehensive Logging for Troubleshooting**: Enhanced logging in data-loading functions is crucial for diagnosing issues in production environments, including request parameters, response structures, and statistics about loaded data.
-- **Data Flow Traceability**: Maintaining clear visibility of data flow from API to components ensures that issues with missing or incorrect data can be quickly diagnosed and fixed.
-- **Admin vs. Frontend Data Consistency**: Administrator interfaces must display the same data source as frontend components to ensure proper moderation and management capabilities.
-- **Production Debugging Best Practices**: When troubleshooting production data issues, adding temporary detailed logging is preferable to hard-coded demo data, as it provides real insights without confusing real and fake entries.
-
-## Secure HTML Rendering in Vue.js
-
-- **Text Interpolation vs. HTML Rendering**: Vue's default text interpolation (`{{ }}`) escapes HTML for security, rendering HTML tags as text; use `v-html` directive when intentionally rendering HTML content.
-- **HTML Content Security**: When using `v-html`, be aware that the content is inserted as raw HTML, which could lead to XSS vulnerabilities if user-provided content is rendered; only use for trusted content.
-- **Nested Rendering Strategy**: For conditional HTML rendering, use nested spans with `v-if` and `v-html` together to properly structure conditional HTML content.
-- **String Concatenation with HTML**: When concatenating strings containing HTML tags, prefer to use `v-html` on the complete string rather than mixing text interpolation and HTML.
-- **Dynamic Content Styling**: For dynamic styling without security risks, consider alternatives to HTML injection such as class binding or computed properties.
-- **Interface Consistency**: Ensure that HTML rendering behavior is consistent across similar components and views for a unified user experience.
-- **Accessibility Considerations**: When rendering HTML elements like `<strong>`, ensure they serve semantic purposes rather than just visual styling, to maintain proper accessibility.
-
-## Defensive Programming in Frontend Components
-
-- **API Response Validation**: Always check the structure and type of API responses before operating on them; use conditional checks like `Array.isArray()` before applying array methods.
-- **Fallback Strategies**: Implement fallback mechanisms that return sensible default values when API calls fail or return unexpected data structures.
-- **Error Isolation**: Use try-catch blocks to isolate errors in different parts of data processing, preventing failures in one section from affecting others.
-- **Type Checking**: Apply explicit type checking (e.g., `typeof x === 'object' && x !== null`) before accessing properties or calling methods to prevent runtime errors.
-- **Data Normalization**: Normalize API responses to a consistent format immediately upon receipt to ensure uniform data structure throughout the application.
-- **Graceful Degradation**: Design components to function with minimal data, showing appropriate UI for empty or error states rather than breaking completely.
-- **Comprehensive Logging**: Implement detailed logging at critical points in the data processing chain to facilitate debugging of production issues.
-- **Modular Error Handling**: Separate error handling logic from core business logic to improve code readability and maintenance.
-- **Defensive Object Access**: Use optional chaining (`?.`) and nullish coalescing (`??`) operators to safely access nested properties and provide fallbacks.
-- **Variables Initialization**: Always initialize variables with appropriate default values (e.g., empty arrays or objects) to prevent "undefined is not an object" errors.
-
-## Effektives Admin-Dashboard Design
-
-### Aggregation von Daten für Admin-Dashboards
-
-1. **Service-Layer für Dashboard-Daten**:
-   - Ein dedizierter Dashboard-Service, der Daten aus verschiedenen Quellen aggregiert, hält die Komponente sauber und wartbar
-   - Konsolidierung von API-Aufrufen in einem Service reduziert Duplizierung und verbessert die Fehlerbehandlung
-   - Zentralisierte Transformation und Normalisierung von Daten aus unterschiedlichen Quellen ermöglicht ein konsistentes UI-Erlebnis
-
-2. **Echtzeitaktivitäten vs. Statische Daten**:
-   - Aktivitätsfeeds sollten aus tatsächlichen Benutzeraktionen generiert werden, nicht aus Demo-Daten
-   - Der Activity-Feed sollte zeitlich sortiert sein (neueste zuerst) für eine intuitive Darstellung
-   - Typisierung von Aktivitäten nach Benutzeraktion (Registrierung, Erstellung, Bearbeitung) ermöglicht eine visuelle Differenzierung
-
-3. **Statistik-Aggregation**:
-   - Dashboard-Statistiken sollten echte Daten widerspiegeln, um Vertrauen in die Plattform zu fördern
-   - Kategorisierung von Daten (z.B. nach Status oder Benutzertyp) bietet wertvolle Einblicke für Administratoren
-   - Fehlerbehandlung bei der Statistikerfassung ist essentiell, um partielle Dashboard-Anzeigen zu ermöglichen, selbst wenn einzelne Datenquellen fehlschlagen
-
-### Benutzerfreundlichkeit im Administrationsbereich
-
-1. **Fortschrittsanzeige und Zustandsmanagement**:
-   - Deutliche visuelle Indikatoren für Ladezustände verbessern die Benutzererfahrung bei datenintensiven Dashboards
-   - Fehlerbehandlung mit benutzerfreundlichen Nachrichten und Wiederholungsoptionen ermöglicht Recovery ohne Seitenneuladung
-   - Leerzustände für Abschnitte ohne Daten bieten Klarheit und verhindern Verwirrung
-
-2. **Optimiertes Dashboard-Layout**:
-   - Statistik-Karten mit visueller Differenzierung für unterschiedliche Metriken verbessern die Scanbarkeit
-   - Aktivitätsfeeds mit klarer Typunterscheidung ermöglichen schnelles Erfassen relevanter Informationen
-   - Berücksichtigung der Datendichte bei der Gestaltung von Tabellen und Listen führt zu besserer Übersichtlichkeit
-
-3. **Schnellzugriff-Funktionen**:
-   - Direkte Links zu häufig verwendeten Administratorfunktionen erhöhen die Effizienz
-   - Visuelle Gruppierung ähnlicher Funktionen verbessert die kognitive Erfassung
-   - Konsistente Ikonografie und Beschriftungen über das gesamte Admin-Interface fördern die Vertrautheit
-
-### Technische Implementierung
-
-1. **Datenstruktur für Dashboards**:
-   - Normalisierte Aktivitätsformate unabhängig von der Datenquelle erleichtern die einheitliche Darstellung
-   - Gemeinsame Felder wie `type`, `description`, `user` und `date` bieten eine konsistente Basis für Aktivitätseinträge
-   - Typdifferenzierung durch Konstanten statt hartcodierter Strings verbessert die Wartbarkeit und verhindert Tippfehler
-
-2. **Optimierte API-Nutzung**:
-   - Konsolidierung mehrerer API-Aufrufe in einem Service reduziert die Netzwerklast und verbessert die Leistung
-   - Caching von Dashboard-Daten für kurze Zeiträume kann die Ansprechbarkeit verbessern, besonders bei häufigen Dashboard-Besuchen
-   - Überwachung der API-Leistung ist besonders wichtig für Dashboards, die Daten aus mehreren Quellen zusammenführen
-
-3. **Fehlertolerante Datenverarbeitung**:
-   - Fehler in einzelnen Datenquellen sollten nicht das gesamte Dashboard zum Scheitern bringen
-   - Defensive Programmierung mit Fallback-Werten für fehlende oder unerwartete Datenformate 
-   - Detaillierte Logging-Informationen für jede Datenquelle vereinfachen die Diagnose von API-Problemen
+4. **User Experience Improvements**:
+   - Provide clear error messages when authentication fails
+   - Implement automatic redirection to login page with friendly error notifications
+   - Add defensive auth re-initialization in profile pages where authentication is critical
 
 ## Deployment auf Vercel
 
@@ -865,15 +618,36 @@ Um die Anforderungen der DSGVO (Datenschutz-Grundverordnung) zu erfüllen, wurde
 
 Diese Implementierung stellt sicher, dass die Website den aktuellen Datenschutzrichtlinien entspricht und Nutzern die volle Kontrolle über ihre Cookie-Präferenzen gibt. 
 
-## Profile System
-- The profile system uses a role-based approach, with specific handling for hospital profiles
-- Hospital profiles include detailed information such as clinic type, specialties, and contact details
-- Profile completion status is tracked automatically based on required fields
-- The system uses a separate hospital model to store additional profile information
-- Profile updates are handled through a dedicated API endpoint with proper authentication
+## Role-Based Profile System
 
-## Authentication
-- The system uses token-based authentication with Bearer tokens
-- Authentication state is managed through a central auth store
-- Protected routes require valid authentication tokens
-- Profile data is loaded only after successful authentication 
+1. **Unified Profile Management Architecture**:
+   - Common pattern for both doctor and hospital profile handling reduces duplicate code
+   - Similar controller structure with parallel endpoints (GET, POST, DELETE) creates consistency
+   - Shared profile completion button logic with role-specific form display simplifies UI management
+
+2. **Mongoose Schema Best Practices**:
+   - Using pre-save hooks for calculating derived fields like `isProfileComplete` ensures data integrity
+   - Structured nested objects for related fields (contact, availability) creates logical data organization
+   - Index creation on frequently queried fields (userId) improves query performance
+
+3. **Profile Deletion Strategy**:
+   - Soft confirmation via modal before permanent deletion protects against accidental data loss
+   - Proper cleanup with single endpoint with role-specific URL selection maintains clean architecture
+   - API endpoints return appropriate status codes (404 for missing profiles, 200 for successful deletion)
+
+## Bulletin Management Design Patterns
+
+1. **User-Specific Content Filtering**:
+   - Filtering bulletin entries by user email creates personalized content views
+   - Sort capability (newest first) improves user experience for content management
+   - Proper error handling and loading states for asynchronous data operations
+
+2. **CRUD Operations Implementation**:
+   - Modal-based editing provides focused user interaction without page navigation
+   - Confirmation dialogs for destructive operations protect user data
+   - Optimistic UI updates with proper error handling for responsive user experience
+
+3. **Conditional UI Rendering**:
+   - Empty state handling with action button guides users to create content
+   - Dynamic form fields based on entry type (Angebot vs. Gesuch) simplifies the interface
+   - Reusable date and status formatting functions ensure consistent content display 

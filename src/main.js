@@ -87,7 +87,14 @@ const initializeApp = async () => {
     app.use(pinia);
     console.log('Pinia initialized');
     
-    // 2. Versuchen, den Router zu importieren
+    // 2. Auth-Status initialisieren
+    console.log('Initializing auth state...');
+    const { useAuthStore } = await import('@/stores/auth');
+    const authStore = useAuthStore();
+    authStore.initAuth();
+    console.log('Auth state initialized');
+    
+    // 3. Versuchen, den Router zu importieren
     console.log('Loading router...');
     const routerModule = await import('./router');
     const router = routerModule.default;
@@ -98,12 +105,9 @@ const initializeApp = async () => {
       trackPageView(window.location.origin + to.fullPath);
     });
     
-    // 3. Router an die App anhängen
+    // 4. Router an die App anhängen
     app.use(router);
     console.log('Router initialized');
-    
-    // 4. Auth-Status initialisieren (benutzt jetzt lokalen Cache)
-    console.log('Initializing auth state...');
     
     // Initialize outbound link tracking
     initOutboundLinkTracking();

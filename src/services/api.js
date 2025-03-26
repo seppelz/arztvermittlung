@@ -36,7 +36,12 @@ api.interceptors.response.use(
       // Unauthorized - clear token and redirect to login
       localStorage.removeItem('token');
       localStorage.removeItem('user');
-      window.location.href = '/admin/login';
+      
+      // Check if the request was for an admin route to determine which login page to redirect to
+      const isAdminRoute = error.config.url.includes('/admin');
+      if (!window.location.pathname.includes('/login')) {
+        window.location.href = isAdminRoute ? '/admin/login' : '/login';
+      }
     }
     return Promise.reject(error);
   }
