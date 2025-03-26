@@ -118,6 +118,9 @@ mongoose.connect(process.env.MONGODB_URI, mongoOptions)
 })
 .catch(err => {
   console.error('MongoDB connection error details:', err);
+  console.error('Unable to connect to MongoDB with URI:', process.env.MONGODB_URI);
+  // Log the actual URI being used to help diagnose issues with line breaks
+  console.error('Raw MongoDB URI value:', JSON.stringify(process.env.MONGODB_URI));
   // Additional diagnostic information
   console.error('Error name:', err.name);
   console.error('Error message:', err.message);

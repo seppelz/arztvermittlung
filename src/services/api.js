@@ -2,7 +2,13 @@ import axios from 'axios';
 
 // Normalize the API URL to ensure it has the correct format
 const normalizeApiUrl = (url) => {
-  if (!url) return 'https://www.med-match.de/api';
+  if (!url) return 'http://localhost:5000/api';
+  
+  // Development mode should use localhost
+  if (import.meta.env.MODE === 'development' || import.meta.env.DEV) {
+    console.log('Development mode detected, using localhost:5000/api');
+    return 'http://localhost:5000/api';
+  }
   
   // Try to normalize URL by removing common problems
   let normalizedUrl = url.trim();
@@ -36,12 +42,12 @@ const normalizeApiUrl = (url) => {
     console.error('Error:', e);
     
     // Return a default as fallback
-    return 'https://www.med-match.de/api';
+    return 'http://localhost:5000/api';
   }
 };
 
 // Get API URL from global config, environment variable, or use a default
-const rawApiUrl = window.MED_MATCH_CONFIG?.apiUrl || import.meta.env.VITE_API_URL || 'https://www.med-match.de/api';
+const rawApiUrl = window.MED_MATCH_CONFIG?.apiUrl || import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 const apiUrl = normalizeApiUrl(rawApiUrl);
 
 // Log the API URL being used for debugging

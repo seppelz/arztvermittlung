@@ -1,15 +1,15 @@
 const express = require('express');
 const router = express.Router();
-const { auth } = require('../middlewares/auth');
+const authMiddleware = require('../middlewares/auth.middleware');
 const hospitalController = require('../controllers/hospital.controller');
 
 // Get hospital profile
-router.get('/profile', auth, hospitalController.getProfile);
+router.get('/profile', authMiddleware.protect, hospitalController.getProfile);
 
 // Update hospital profile
-router.post('/profile', auth, hospitalController.updateProfile);
+router.post('/profile', authMiddleware.protect, hospitalController.updateProfile);
 
 // Delete hospital profile
-router.delete('/profile', auth, hospitalController.deleteProfile);
+router.delete('/profile', authMiddleware.protect, hospitalController.deleteProfile);
 
 module.exports = router; 
