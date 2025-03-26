@@ -243,14 +243,29 @@ const loadEntries = async () => {
     }
     
     // Fetch all bulletins filtered by user's email using the api instance
-    const response = await api.get(`/bulletin?email=${encodeURIComponent(userEmail)}`)
+    const response = await api.get(`/bulletin`, {
+      params: {
+        email: userEmail
+      }
+    })
     
     // Handle different response structures
-    if (response.data.data) {
-      entries.value = response.data.data
+    let filteredEntries = []
+    if (response.data && response.data.data) {
+      // Extract entries from data property
+      filteredEntries = response.data.data
+    } else if (Array.isArray(response.data)) {
+      // Response is already an array
+      filteredEntries = response.data
     } else {
-      entries.value = response.data
+      console.warn('Unexpected response format:', response.data)
+      filteredEntries = []
     }
+    
+    // Additional filter to ensure only user's entries are shown
+    entries.value = filteredEntries.filter(entry => 
+      entry.email?.toLowerCase() === userEmail.toLowerCase()
+    )
     
     // Sort entries by date (newest first)
     entries.value.sort((a, b) => {
@@ -258,6 +273,8 @@ const loadEntries = async () => {
       const dateB = new Date(b.timestamp || b.createdAt || 0)
       return dateB - dateA
     })
+    
+    console.log(`Loaded ${entries.value.length} entries for user ${userEmail}`)
   } catch (err) {
     console.error('Error loading bulletin entries:', err)
     error.value = err.message || 'Fehler beim Laden der Einträge'

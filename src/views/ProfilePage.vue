@@ -17,7 +17,7 @@
             <p class="text-gray-600">{{ user?.email }}</p>
             <p class="text-gray-600">
               <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                {{ user?.role === 'doctor' ? 'Arzt' : user?.role === 'hospital' ? 'Klinik' : user?.role }}
+                {{ user?.role === 'doctor' ? 'Ärzte' : user?.role === 'hospital' ? 'Kliniken / Einrichtungen' : user?.role }}
               </span>
             </p>
           </div>
@@ -215,6 +215,7 @@ import { useToast } from '@/composables/useToast'
 import HospitalProfileForm from '@/components/profile/HospitalProfileForm.vue'
 import DoctorProfileForm from '@/components/profile/DoctorProfileForm.vue'
 import BulletinEntries from '@/components/profile/BulletinEntries.vue'
+import api from '@/services/api'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -318,54 +319,40 @@ const loadProfile = async () => {
     // If user is a hospital, load hospital profile
     if (user.value.role === 'hospital') {
       try {
-        const response = await fetch('/api/hospital/profile', {
-          headers: {
-            'Authorization': `Bearer ${authStore.token}`
-          }
-        })
-        
-        if (!response.ok) {
-          if (response.status === 404) {
-            // Profile doesn't exist yet, which is fine - we'll show the "complete profile" button
-            console.log('Hospital profile not found - new user needs to complete profile')
-            hospitalProfile.value = null
-          } else {
-            throw new Error('Fehler beim Laden des Profils')
-          }
-        } else {
-          hospitalProfile.value = await response.json()
-        }
+        const response = await api.get('/hospital/profile')
+        console.log('Hospital profile response:', response)
+        hospitalProfile.value = response.data
       } catch (profileErr) {
         console.error('Error loading hospital profile:', profileErr)
-        // Don't set error.value here - just log it, as we still want to show the profile page
-        // with the "complete profile" button for new users
+        if (profileErr.response && profileErr.response.status === 404) {
+          // Profile doesn't exist yet, which is fine - we'll show the "complete profile" button
+          console.log('Hospital profile not found - new user needs to complete profile')
+          hospitalProfile.value = null
+        } else {
+          console.error('Failed to load hospital profile:', profileErr.message)
+          // We still don't set error.value here as we want to show the profile page
+          // with the "complete profile" button for new users
+        }
       }
     }
     
     // If user is a doctor, load doctor profile
     if (user.value.role === 'doctor') {
       try {
-        const response = await fetch('/api/doctor/profile', {
-          headers: {
-            'Authorization': `Bearer ${authStore.token}`
-          }
-        })
-        
-        if (!response.ok) {
-          if (response.status === 404) {
-            // Profile doesn't exist yet, which is fine - we'll show the "complete profile" button
-            console.log('Doctor profile not found - new user needs to complete profile')
-            doctorProfile.value = null
-          } else {
-            throw new Error('Fehler beim Laden des Profils')
-          }
-        } else {
-          doctorProfile.value = await response.json()
-        }
+        const response = await api.get('/doctor/profile')
+        console.log('Doctor profile response:', response)
+        doctorProfile.value = response.data
       } catch (profileErr) {
         console.error('Error loading doctor profile:', profileErr)
-        // Don't set error.value here - just log it, as we still want to show the profile page
-        // with the "complete profile" button for new users
+        if (profileErr.response && profileErr.response.status === 404) {
+          // Profile doesn't exist yet, which is fine - we'll show the "complete profile" button
+          console.log('Doctor profile not found - new user needs to complete profile')
+          doctorProfile.value = null
+        } else {
+          console.error('Failed to load doctor profile:', profileErr.message)
+          // We still don't set error.value here as we want to show the profile page
+          // with the "complete profile" button for new users
+        }
       }
     }
   } catch (err) {
@@ -395,23 +382,14 @@ const deleteProfile = async () => {
   try {
     let url = ''
     if (user.value.role === 'hospital') {
-      url = '/api/hospital/profile'
+      url = '/hospital/profile'
     } else if (user.value.role === 'doctor') {
-      url = '/api/doctor/profile'
+      url = '/doctor/profile'
     } else {
       throw new Error('Ungültiger Benutzertyp')
     }
     
-    const response = await fetch(url, {
-      method: 'DELETE',
-      headers: {
-        'Authorization': `Bearer ${authStore.token}`
-      }
-    })
-    
-    if (!response.ok) {
-      throw new Error('Fehler beim Löschen des Profils')
-    }
+    const response = await api.delete(url)
     
     showToast('Profil erfolgreich gelöscht', 'success')
     showDeleteConfirm.value = false
