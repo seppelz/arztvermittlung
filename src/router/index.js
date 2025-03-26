@@ -288,77 +288,47 @@ const router = createRouter({
 })
 
 // Navigation guard to check authentication for routes that require it
-router.beforeEach(async (to, from, next) => {
+router.beforeEach((to, from, next) => {
   try {
-    // Create a timeout promise to prevent infinite loops or long-running auth checks
-    // Extend timeout to 5 seconds to allow more time for auth checks
-    const timeoutPromise = new Promise((_, reject) => {
-      setTimeout(() => {
-        console.warn('Authentication check timed out - allowing navigation to continue');
-        // Return resolved promise with false instead of rejecting
-        return false;
-      }, 5000);
-    });
-    
-    // If route requires authentication
+    // Simple version - only check localStorage directly without any async operations
+    // to completely avoid potential circular dependencies
     if (to.matched.some(record => record.meta.requiresAuth)) {
-      // Run the auth check with a timeout
-      try {
-        // Use Promise.race to either get the auth result or timeout
-        const authenticated = await Promise.race([
-          isAuthenticated().catch(err => {
-            console.error('Auth check failed:', err);
-            return false;
-          }),
-          timeoutPromise
-        ]);
-        
-        if (!authenticated) {
-          // If route is an admin route, redirect to admin login, otherwise to regular login
-          if (to.path.startsWith('/admin')) {
-            next({ name: 'AdminLogin' });
-          } else {
-            next({ name: 'Login' });
-          }
+      // Check token directly from localStorage
+      const token = localStorage.getItem('token');
+      
+      if (!token) {
+        // Redirect to login based on route path
+        if (to.path.startsWith('/admin')) {
+          next({ name: 'AdminLogin' });
         } else {
-          // Check if the route requires admin rights
-          if (to.matched.some(record => record.meta.requiresAdmin)) {
-            try {
-              const isAdminUser = await Promise.race([
-                isAdmin().catch(err => {
-                  console.error('Admin check failed:', err);
-                  return false;
-                }),
-                timeoutPromise
-              ]);
-              
-              if (!isAdminUser) {
-                // Redirect to home if not admin
-                next({ name: 'Home' });
-              } else {
-                next();
-              }
-            } catch (adminCheckError) {
-              console.error('Admin check failed with error:', adminCheckError);
-              // On error, default to non-admin
-              next({ name: 'Home' });
-            }
-          } else {
-            next();
-          }
+          next({ name: 'Login' });
         }
-      } catch (authCheckError) {
-        console.error('Auth check error:', authCheckError);
-        // On timeout or error, allow navigation to continue to prevent blocking the user
-        next();
+        return;
       }
-    } else {
-      // Route doesn't require authentication
-      next();
+      
+      // For admin routes, check user role directly
+      if (to.matched.some(record => record.meta.requiresAdmin)) {
+        try {
+          const userJson = localStorage.getItem('user');
+          const user = userJson ? JSON.parse(userJson) : null;
+          
+          if (!user || user.role !== 'admin') {
+            next({ name: 'Home' });
+            return;
+          }
+        } catch (err) {
+          console.error('Error checking admin status:', err);
+          next({ name: 'Home' });
+          return;
+        }
+      }
     }
+    
+    // Allow navigation to proceed
+    next();
   } catch (error) {
     console.error('Navigation guard error:', error);
-    // In case of any unexpected error, allow navigation to continue
+    // In case of any error, allow navigation anyway to prevent blocking the user
     next();
   }
 });

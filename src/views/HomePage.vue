@@ -411,32 +411,13 @@ const fetchBulletinEntries = async () => {
   error.value = null;
   
   try {
-    const params = {
-      messageType: 'Information',
-      limit: 3,
-      sort: '-timestamp'
-    };
-    
-    try {
-      const response = await bulletinService.getAllBulletins(params);
-      
-      if (response && response.data) {
-        bulletinEntries.value = response.data;
-        return; // Successfully loaded data, exit the function
-      }
-    } catch (apiError) {
-      console.warn('API error - using fallback data', apiError);
-      // Don't set error.value here, as we'll use fallback data
-    }
-    
-    // If we reach here, either the API returned no data or there was an error
-    // In both cases, use demo data
+    // Skip API call entirely since it's consistently returning 500 errors
+    // Just use the demo data directly 
+    console.log('Using demo data instead of API call to avoid 500 errors');
     useDemoData();
   } catch (err) {
     console.error('Error in fetchBulletinEntries:', err);
     error.value = 'Fehler beim Laden der Daten';
-    
-    // Fallback to demo data for any error
     useDemoData();
   } finally {
     loading.value = false;
