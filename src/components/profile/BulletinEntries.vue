@@ -304,7 +304,7 @@ const updateEntry = async () => {
   isSubmitting.value = true
   
   try {
-    await api.put(`/bulletin/${editingEntry.value._id}`, editingEntry.value)
+    await api.patch(`/bulletin/${editingEntry.value._id}`, editingEntry.value)
     
     showToast('Eintrag erfolgreich aktualisiert', 'success')
     showEditModal.value = false
