@@ -162,11 +162,13 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useToast } from '@/composables/useToast'
 import { useAnalytics } from '@/composables/useAnalytics'
+import { useAuthStore } from '@/stores/auth'
 import api from '@/services/api'
 
 const router = useRouter()
 const { showToast } = useToast()
 const { trackForm } = useAnalytics()
+const authStore = useAuthStore()
 
 const emit = defineEmits(['close', 'profile-updated'])
 
@@ -206,6 +208,17 @@ const formData = ref({
 
 // Load existing profile data if available
 onMounted(async () => {
+  // Initialize form with user data from auth store if available
+  const currentUser = authStore.user;
+  if (currentUser) {
+    formData.value.name = currentUser.name || '';
+    
+    // Pre-populate email from user data
+    if (currentUser.email && formData.value.contact) {
+      formData.value.contact.email = currentUser.email;
+    }
+  }
+
   try {
     const response = await api.get('/doctor/profile')
     
@@ -213,12 +226,12 @@ onMounted(async () => {
       console.log('Loading existing doctor profile:', response.data)
       // Map the data to our form structure, with fallbacks for missing properties
       formData.value = {
-        name: response.data.name || '',
+        name: response.data.name || currentUser?.name || '',
         specialty: response.data.specialty || '',
         qualifications: response.data.qualifications || [],
         otherQualifications: response.data.otherQualifications || '',
         contact: {
-          email: response.data.contact?.email || '',
+          email: response.data.contact?.email || currentUser?.email || '',
           phone: response.data.contact?.phone || ''
         },
         availability: {
