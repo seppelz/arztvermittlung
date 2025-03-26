@@ -190,7 +190,7 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useToast } from '@/composables/useToast'
 import { useAuthStore } from '@/stores/auth'
-import { api } from '@/services/api'
+import api from '@/services/api'
 
 const router = useRouter()
 const { showToast } = useToast()
