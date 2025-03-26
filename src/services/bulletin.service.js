@@ -11,29 +11,56 @@ class BulletinService {
    */
   async getAllBulletins(params = {}) {
     try {
-      console.log('BulletinService: Fetching all bulletins with params:', params);
-      console.log('BulletinService: Using API URL:', api.defaults.baseURL);
+      console.log('BulletinService: Fetching bulletins with params:', params);
       
-      const response = await api.get('/bulletin', { params });
-      console.log('BulletinService: Response received:', response);
+      // Direct approach with proper error handling
+      const response = await api.get('/bulletin', { 
+        params,
+        // Add explicit timeout for this request
+        timeout: 10000,
+        // Add additional headers if needed
+        headers: {
+          'Accept': 'application/json'
+        }
+      });
       
+      console.log('BulletinService: Response received successfully');
+      
+      // Handle different response formats consistently
       if (!response.data) {
-        console.warn('BulletinService: No data in response');
+        console.warn('BulletinService: Empty response data');
         return { data: [] };
       }
       
-      if (response.data.data) {
-        // Handle response structure from backend (data property contains bulletins)
-        console.log('BulletinService: Found nested data structure with', response.data.data.length, 'items');
-        return response.data;
-      } else {
-        // Direct array response
-        console.log('BulletinService: Found direct data array with', response.data.length, 'items');
+      // Check if response.data is already an array
+      if (Array.isArray(response.data)) {
+        console.log('BulletinService: Response is an array with', response.data.length, 'items');
         return { data: response.data };
       }
+      
+      // Check if response.data.data exists (nested structure)
+      if (response.data.data && Array.isArray(response.data.data)) {
+        console.log('BulletinService: Found nested data array with', response.data.data.length, 'items');
+        return response.data;
+      }
+      
+      // Handle any other structure by defaulting to an empty array
+      console.warn('BulletinService: Unexpected response format', response.data);
+      return { data: [] };
+      
     } catch (error) {
       console.error('BulletinService: Error fetching bulletins:', error);
-      console.error('BulletinService: Error details:', error.response || error.message);
+      
+      // Attempt to extract meaningful error info
+      const errorInfo = {
+        message: error.message,
+        status: error.response?.status,
+        data: error.response?.data
+      };
+      
+      console.error('BulletinService: Error details:', errorInfo);
+      
+      // Re-throw with more context
       throw error;
     }
   }

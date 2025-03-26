@@ -1,10 +1,29 @@
 import axios from 'axios';
 
-// Get API URL from global config, environment variable, or use a default
-const apiUrl = window.MED_MATCH_CONFIG?.apiUrl || import.meta.env.VITE_API_URL || 'https://www.med-match.de/api';
+// Normalize the API URL to ensure it has the correct format
+const normalizeApiUrl = (url) => {
+  if (!url) return 'https://www.med-match.de/api';
+  
+  // Remove trailing slash if present
+  let normalizedUrl = url.endsWith('/') ? url.slice(0, -1) : url;
+  
+  // Ensure the URL ends with /api
+  if (!normalizedUrl.endsWith('/api')) {
+    normalizedUrl = normalizedUrl.includes('/api/') 
+      ? normalizedUrl.split('/api/')[0] + '/api'
+      : normalizedUrl + '/api';
+  }
+  
+  return normalizedUrl;
+};
 
-// Log the API URL being used
-console.log('API Service using URL:', apiUrl);
+// Get API URL from global config, environment variable, or use a default
+const rawApiUrl = window.MED_MATCH_CONFIG?.apiUrl || import.meta.env.VITE_API_URL || 'https://www.med-match.de/api';
+const apiUrl = normalizeApiUrl(rawApiUrl);
+
+// Log the API URL being used for debugging
+console.log('API Service original URL:', rawApiUrl);
+console.log('API Service normalized URL:', apiUrl);
 
 // Base API configuration
 const api = axios.create({
@@ -12,11 +31,17 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+  // Add a timeout to prevent hanging requests
+  timeout: 15000,
 });
 
 // Request interceptor for adding the auth token
 api.interceptors.request.use(
   (config) => {
+    // Log outgoing requests for debugging
+    console.log(`API Request: ${config.method.toUpperCase()} ${config.baseURL}${config.url}`, 
+      config.params ? `with params: ${JSON.stringify(config.params)}` : '');
+    
     const token = localStorage.getItem('token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -24,14 +49,30 @@ api.interceptors.request.use(
     return config;
   },
   (error) => {
+    console.error('API Request Error:', error);
     return Promise.reject(error);
   }
 );
 
 // Response interceptor for error handling
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    console.log(`API Response from ${response.config.url}:`, 
+      response.status, 
+      response.data ? 'Data received' : 'No data');
+    return response;
+  },
   (error) => {
+    // Enhanced error logging
+    console.error('API Response Error:', {
+      url: error.config?.url,
+      method: error.config?.method,
+      status: error.response?.status,
+      statusText: error.response?.statusText,
+      data: error.response?.data,
+      message: error.message
+    });
+    
     if (error.response && error.response.status === 401) {
       // Unauthorized - clear token and redirect to login
       localStorage.removeItem('token');
@@ -42,6 +83,15 @@ api.interceptors.response.use(
       if (!window.location.pathname.includes('/login')) {
         window.location.href = isAdminRoute ? '/admin/login' : '/login';
       }
+    } else if (error.response && error.response.status === 500) {
+      // For 500 errors, provide more detailed logging
+      console.error('Server error (500):', error.response.data);
+      console.error('Request that caused 500:', {
+        url: error.config.url,
+        method: error.config.method,
+        params: error.config.params,
+        data: error.config.data
+      });
     }
     return Promise.reject(error);
   }
