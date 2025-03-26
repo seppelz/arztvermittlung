@@ -171,6 +171,10 @@ All notable changes to this project will be documented in this file.
   - Added computed properties to centralize user type detection logic
   - Fixed display of user role in profile badge (shows "Ärzte" or "Kliniken / Einrichtungen")
   - Ensures "Complete Profile" button appears correctly for all account types
+- Fixed user registration by using proper role values:
+  - Fixed backend validation error when registering new users
+  - Maintained role="user" for database compatibility while using userType="Arzt"/"Klinik" for UI
+  - Adapted frontend logic to support dual-checking of both role and userType fields
 
 ### Added
 - Created test scripts for MongoDB Atlas connection testing
