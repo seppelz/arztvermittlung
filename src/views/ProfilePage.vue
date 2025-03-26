@@ -17,20 +17,20 @@
             <p class="text-gray-600">{{ user?.email }}</p>
             <p class="text-gray-600">
               <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                {{ user?.role === 'doctor' ? 'Ärzte' : user?.role === 'hospital' ? 'Kliniken / Einrichtungen' : user?.role }}
+                {{ isDoctor ? 'Ärzte' : isHospital ? 'Kliniken / Einrichtungen' : user?.role }}
               </span>
             </p>
           </div>
           <div class="flex items-center space-x-4">
             <button
-              v-if="(user?.role === 'hospital' && !isHospitalProfileComplete) || (user?.role === 'doctor' && !isDoctorProfileComplete)"
+              v-if="(isHospital && !isHospitalProfileComplete) || (isDoctor && !isDoctorProfileComplete)"
               @click="showProfileForm = true"
               class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             >
               Profil vervollständigen
             </button>
             <button
-              v-if="(user?.role === 'hospital' && isHospitalProfileComplete) || (user?.role === 'doctor' && isDoctorProfileComplete)"
+              v-if="(isHospital && isHospitalProfileComplete) || (isDoctor && isDoctorProfileComplete)"
               @click="showDeleteConfirm = true"
               class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-red-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
             >
@@ -47,7 +47,7 @@
       </div>
 
       <!-- Hospital Profile Content -->
-      <div v-if="user?.role === 'hospital' && hospitalProfile" class="bg-white shadow rounded-lg p-6 mb-6">
+      <div v-if="isHospital && hospitalProfile" class="bg-white shadow rounded-lg p-6 mb-6">
         <div class="flex justify-between items-center mb-4">
           <h2 class="text-xl font-semibold text-gray-900">Klinik-Informationen</h2>
           <button 
@@ -118,7 +118,7 @@
       </div>
 
       <!-- Doctor Profile Content -->
-      <div v-if="user?.role === 'doctor' && doctorProfile" class="bg-white shadow rounded-lg p-6 mb-6">
+      <div v-if="isDoctor && doctorProfile" class="bg-white shadow rounded-lg p-6 mb-6">
         <div class="flex justify-between items-center mb-4">
           <h2 class="text-xl font-semibold text-gray-900">Arzt-Informationen</h2>
           <button 
@@ -191,13 +191,13 @@
       
       <!-- Profile Completion Form -->
       <HospitalProfileForm
-        v-if="showProfileForm && user?.role === 'hospital'"
+        v-if="showProfileForm && isHospital"
         @close="showProfileForm = false"
         @profile-updated="handleProfileUpdate"
       />
       
       <DoctorProfileForm
-        v-if="showProfileForm && user?.role === 'doctor'"
+        v-if="showProfileForm && isDoctor"
         @close="showProfileForm = false"
         @profile-updated="handleDoctorProfileUpdate"
       />
@@ -260,6 +260,16 @@ const isHospitalProfileComplete = computed(() => {
 // Computed property to determine if doctor profile is complete
 const isDoctorProfileComplete = computed(() => {
   return !!doctorProfile.value && Object.keys(doctorProfile.value).length > 0
+})
+
+// Computed property to determine if user is a doctor
+const isDoctor = computed(() => {
+  return user.value && (user.value.role === 'doctor' || (user.value.role === 'user' && user.value.userType === 'Arzt'))
+})
+
+// Computed property to determine if user is a hospital
+const isHospital = computed(() => {
+  return user.value && (user.value.role === 'hospital' || (user.value.role === 'user' && user.value.userType === 'Klinik'))
 })
 
 // Format hospital type for display
