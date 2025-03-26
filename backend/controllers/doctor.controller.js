@@ -37,8 +37,8 @@ exports.updateProfile = async (req, res) => {
       additionalInfo
     } = req.body;
 
-    // Validate required fields
-    if (!name || !specialty || !contact || !availability) {
+    // Validate only name and availability as required fields
+    if (!name || !availability || !availability.availableFrom || !contact || !contact.email) {
       return res.status(400).json({ message: 'Required fields are missing' });
     }
 
@@ -49,20 +49,26 @@ exports.updateProfile = async (req, res) => {
       doctor = new Doctor({
         userId: req.user.id,
         name,
-        specialty,
+        specialty: specialty || '',
         qualifications: qualifications || [],
         otherQualifications: otherQualifications || '',
-        contact,
+        contact: {
+          email: contact.email,
+          phone: contact.phone || ''
+        },
         availability,
         additionalInfo: additionalInfo || ''
       });
     } else {
       // Update existing profile
       doctor.name = name;
-      doctor.specialty = specialty;
+      doctor.specialty = specialty || '';
       doctor.qualifications = qualifications || doctor.qualifications;
       doctor.otherQualifications = otherQualifications || doctor.otherQualifications;
-      doctor.contact = contact;
+      doctor.contact = {
+        email: contact.email,
+        phone: contact.phone || doctor.contact?.phone || ''
+      };
       doctor.availability = availability;
       doctor.additionalInfo = additionalInfo || doctor.additionalInfo;
     }

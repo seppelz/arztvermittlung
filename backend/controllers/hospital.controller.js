@@ -37,8 +37,8 @@ exports.updateProfile = async (req, res) => {
       website
     } = req.body;
 
-    // Validate required fields
-    if (!name || !type || !address || !contact) {
+    // Validate only essential fields
+    if (!name || !type || !address || !address.street || !address.city || !address.postalCode) {
       return res.status(400).json({ message: 'Required fields are missing' });
     }
 
@@ -51,7 +51,9 @@ exports.updateProfile = async (req, res) => {
         name,
         type,
         address,
-        contact,
+        contact: {
+          phone: contact?.phone || ''
+        },
         specialties: specialties || [],
         description: description || '',
         website: website || ''
@@ -61,7 +63,9 @@ exports.updateProfile = async (req, res) => {
       hospital.name = name;
       hospital.type = type;
       hospital.address = address;
-      hospital.contact = contact;
+      hospital.contact = {
+        phone: contact?.phone || hospital.contact?.phone || ''
+      };
       hospital.specialties = specialties || hospital.specialties;
       hospital.description = description || hospital.description;
       hospital.website = website || hospital.website;
