@@ -147,6 +147,7 @@ All notable changes to this project will be documented in this file.
 - Fixed auth middleware imports in doctor.routes.js and hospital.routes.js
 - Enhanced API URL configuration to properly use localhost:5000 in development mode
 - Added better MongoDB connection error logging in server.js
+- Fixed homepage to only display active bulletin entries with appropriate status filter
 
 ### Added
 - Created test scripts for MongoDB Atlas connection testing

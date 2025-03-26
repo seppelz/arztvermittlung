@@ -204,6 +204,11 @@
 - Vue.js 3 with Composition API provides a clean and maintainable structure for component development
 - Tailwind CSS enables rapid UI development with utility classes
 - Vue Router handles navigation with lazy-loaded components for better performance
+- Backend routes use `auth.middleware.js` for authentication, not `auth.js`
+- The middleware export is structured as `authMiddleware.protect` not `{ auth }`
+- The backend's MongoDB connection includes helpful logging for diagnostics
+- Bulletin entries have a status field with possible values: 'active', 'pending', 'archived'
+- Homepage should only display 'active' bulletin entries by using status filter parameter
 
 ## Design Patterns
 - Using reactive forms with validation for user input
@@ -665,6 +670,8 @@ This file contains important learnings about the codebase that help improve prod
 - Backend routes use `auth.middleware.js` for authentication, not `auth.js`
 - The middleware export is structured as `authMiddleware.protect` not `{ auth }`
 - The backend's MongoDB connection includes helpful logging for diagnostics
+- Bulletin entries have a status field with possible values: 'active', 'pending', 'archived'
+- Homepage should only display 'active' bulletin entries by using status filter parameter
 
 ## Deployment
 - The project uses Vercel for deployment, triggered by pushing to the main branch
