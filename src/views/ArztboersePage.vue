@@ -340,8 +340,7 @@
 
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
-import bulletinService from '@/services/bulletin.service';
-import axios from 'axios';
+import bulletinProxyService from '@/services/bulletinProxyService';
 
 // Helper function to get API URL (copied from BulletinBoardPage)
 function getApiUrl(endpoint) {
@@ -447,21 +446,22 @@ async function submitMessage() {
   }
   
   try {
-    // Prepare the data for submission
-    const bulletinData = {
+    console.log('Submitting job listing via proxy service');
+    
+    // Create the job listing via the proxy service
+    const response = await bulletinProxyService.createBulletin({
       ...newMessage,
       title: generatedTitle,
       timestamp: new Date(),
       privacyPolicyAccepted: true,
       status: 'pending' // Ensure entries start as pending for moderation
-    };
-    
-    // Use the bulletinService to create a new entry
-    const response = await bulletinService.createBulletin(bulletinData);
+    });
     
     if (response && response.data) {
-      // Add the new bulletin to the local array with consistent id format
+      // If successful, add the new listing to our local list
       const newEntry = response.data;
+      
+      // Convert _id to id if needed for consistency
       const formattedEntry = {
         ...newEntry,
         id: newEntry._id || newEntry.id
@@ -482,14 +482,19 @@ async function submitMessage() {
       
       messageSent.value = true;
       
+      // Show warning if using demo data
+      if (response.isDemoData) {
+        alert('Ihr Eintrag wurde erstellt, aber der Server konnte nicht erreicht werden. Der Eintrag wird lokal angezeigt, aber nicht dauerhaft gespeichert. Bitte versuchen Sie es später erneut.');
+      }
+      
       // Hide success message after 3 seconds
       setTimeout(() => {
         messageSent.value = false;
       }, 3000);
     }
-  } catch (error) {
-    console.error('Error submitting job listing:', error);
-    alert('Fehler beim Speichern: ' + (error.message || 'Unbekannter Fehler'));
+  } catch (err) {
+    console.error('Error submitting job listing:', err);
+    alert('Fehler beim Speichern: ' + (err.message || 'Unbekannter Fehler'));
   } finally {
     isSubmitting.value = false;
   }
@@ -569,29 +574,39 @@ async function fetchMessages() {
   loadError.value = null;
   
   try {
-    // Get bulletins with messageType 'Angebot' or 'Gesuch'
-    const response = await bulletinService.getAllBulletins({
-      messageType: ['Angebot', 'Gesuch']
-    });
+    console.log('Fetching job listings via proxy service');
+    
+    // Fetch both types of job listings - offers and requests
+    const params = {
+      messageType: currentFilter.value
+    };
+    if (newMessage.specialty) {
+      params.specialty = newMessage.specialty;
+    }
+    if (newMessage.federalState) {
+      params.federalState = newMessage.federalState;
+    }
+    
+    const response = await bulletinProxyService.getAllBulletins(params);
     
     if (response && response.data) {
-      // Format the data to use consistent id property (either id or _id)
-      const formattedData = response.data.map(item => ({
+      // Store filtered job listings
+      messages.value = response.data.map(item => ({
         ...item,
-        id: item._id || item.id
+        id: item._id || item.id // Handle MongoDB _id vs id
       }));
       
-      // Use only real data from database
-      messages.value = formattedData;
-      console.log('Loaded', messages.value.length, 'job listings from API');
-    } else {
-      messages.value = [];
-      console.warn('No job listings found or empty response');
+      if (response.isDemoData) {
+        console.log('Using demo job listings:', messages.value.length);
+        loadError.value = 'Server nicht erreichbar. Zeige Beispieldaten an.';
+      } else {
+        console.log('Loaded real job listings from API:', messages.value.length);
+      }
     }
-  } catch (error) {
-    console.error('Error loading job listings:', error);
-    loadError.value = 'Fehler beim Laden der Daten. Bitte versuchen Sie es später erneut.';
-    messages.value = []; // Reset to empty array on error
+  } catch (err) {
+    console.error('Error fetching job listings:', err);
+    loadError.value = 'Fehler beim Laden der Stellenangebote: ' + (err.message || 'Unbekannter Fehler');
+    messages.value = [];
   } finally {
     isLoading.value = false;
   }

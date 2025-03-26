@@ -398,103 +398,53 @@
 
 <script setup>
 import { onMounted, ref } from 'vue';
-import bulletinService from '@/services/bulletin.service';
+import bulletinProxyService from '@/services/bulletinProxyService';
 
 // State for bulletin board entries
 const bulletinEntries = ref([]);
 const loading = ref(true);
 const error = ref(null);
+const usingDemoData = ref(false);
 
-// Fetch bulletin board entries from the API
+// Fetch bulletin board entries from the API with graceful fallback
 const fetchBulletinEntries = async () => {
   loading.value = true;
   error.value = null;
   
   try {
     const params = {
-      // Try without the messageType filter, which might be causing issues
       limit: 3,
       sort: '-timestamp'
     };
     
-    console.log('Attempting to fetch bulletin entries from API');
+    console.log('Attempting to fetch bulletin entries with proxy service');
     
-    // First attempt - simple request with minimal params
-    try {
-      const response = await bulletinService.getAllBulletins(params);
-      
-      if (response && response.data && response.data.length) {
-        bulletinEntries.value = response.data;
-        console.log('Successfully loaded data from database:', bulletinEntries.value.length, 'entries');
-        return; // Success, exit the function
-      } else {
-        console.warn('API returned empty data on first attempt');
-      }
-    } catch (firstError) {
-      console.warn('First API attempt failed:', firstError.message);
-    }
+    // The proxy service will handle API failures and return demo data if needed
+    const response = await bulletinProxyService.getAllBulletins(params);
     
-    // Second attempt - try with no parameters at all
-    try {
-      console.log('Trying second attempt with no parameters');
-      const response = await bulletinService.getAllBulletins({});
+    if (response && response.data) {
+      bulletinEntries.value = response.data;
+      usingDemoData.value = bulletinProxyService.isUsingDemoData();
       
-      if (response && response.data && response.data.length) {
-        // If we get more than we need, just take the first 3
-        bulletinEntries.value = response.data.slice(0, 3);
-        console.log('Second attempt successful, loaded', bulletinEntries.value.length, 'entries');
-        return; // Success, exit the function
+      if (usingDemoData.value) {
+        console.log('Using demo data for bulletin entries');
+        error.value = 'Verbindung zum Server nicht möglich. Zeige Beispieldaten an.';
       } else {
-        console.warn('API returned empty data on second attempt');
+        console.log('Successfully loaded real data from database:', bulletinEntries.value.length, 'entries');
       }
-    } catch (secondError) {
-      console.error('Second API attempt also failed:', secondError.message);
-      // Fall back to demo data
-      useDemoData();
     }
   } catch (err) {
-    console.error('All attempts to fetch bulletin entries failed:', err);
+    console.error('Failed to fetch bulletin entries even with fallbacks:', err);
     error.value = 'Fehler beim Laden der Daten. Verwende temporär lokale Daten.';
     
-    // Fallback to demo data as last resort
-    useDemoData();
+    // In case of total failure, ensure we have some data to display
+    if (!bulletinEntries.value || !bulletinEntries.value.length) {
+      bulletinEntries.value = bulletinProxyService.getDemoData({ limit: 3 }).data;
+      usingDemoData.value = true;
+    }
   } finally {
     loading.value = false;
   }
-};
-
-// Use demo data as fallback
-const useDemoData = () => {
-  bulletinEntries.value = [
-    {
-      id: 4,
-      messageType: 'Information',
-      title: 'Fachärztliche Vertretungs-Pool Radiologie',
-      content: 'Organisiere Vertretungs-Pool für kurzfristige Radiologie-Einsätze (max. 3 Monate).',
-      timestamp: new Date('2025-05-08T11:20:00')
-    },
-    {
-      id: 7,
-      messageType: 'Information',
-      title: '131. Kongress der DGIM in Wiesbaden',
-      content: 'Der 131. Kongress der Deutschen Gesellschaft für Innere Medizin (DGIM) findet vom 03. bis 06. Mai 2025 in Wiesbaden statt. Schwerpunktthemen: Digitalisierung und Präzisionsmedizin.',
-      timestamp: new Date('2025-01-15T10:00:00')
-    },
-    {
-      id: 8,
-      messageType: 'Information',
-      title: 'Hannover Herz Lungen Messe 2025',
-      content: 'Die Hannover Herz Lungen Messe 2025 wird am 21. und 22. März 2025 an der Medizinischen Hochschule Hannover veranstaltet. Aktuelle Fortschritte in Kardiologie und Pneumologie.',
-      timestamp: new Date('2024-12-10T14:30:00')
-    },
-    {
-      id: 9,
-      messageType: 'Information',
-      title: '23. Europäischer Kongress für Innere Medizin',
-      content: 'Der 23. Europäische Kongress für Innere Medizin (ECIM 2025) findet vom 5. bis 8. März 2025 in Florenz, Italien, statt. Internationale Experten diskutieren neueste Erkenntnisse.',
-      timestamp: new Date('2025-01-20T09:15:00')
-    }
-  ];
 };
 
 // Format date

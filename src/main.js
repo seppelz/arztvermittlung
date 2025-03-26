@@ -77,6 +77,69 @@ app.config.errorHandler = (err, vm, info) => {
 // Dies verhindert implizite zirkuläre Abhängigkeiten
 export { app };
 
+// Add more enhanced handling for Router errors with recovery
+const loadRouter = async () => {
+  try {
+    console.log('Loading router...');
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error('Router loading timeout')), 3000);
+    });
+    
+    // Race condition to detect slow loading
+    const routerModule = await Promise.race([
+      import('./router'),
+      timeoutPromise
+    ]);
+    
+    const router = routerModule.default;
+    
+    // Setup analytics page tracking with router
+    router.afterEach((to) => {
+      // Track page view on route change
+      trackPageView(window.location.origin + to.fullPath);
+    });
+    
+    return router;
+  } catch (error) {
+    console.error('Router loading error:', error);
+    
+    // Try one more time with a simplified import approach
+    try {
+      // Use the direct path to avoid any potential dynamic import issues
+      const { createRouter, createWebHistory } = await import('vue-router');
+      const HomePage = (await import('./views/HomePage.vue')).default;
+      
+      // Create minimal router with only essential routes
+      const router = createRouter({
+        history: createWebHistory(),
+        routes: [
+          {
+            path: '/',
+            name: 'Home',
+            component: HomePage
+          },
+          {
+            path: '/login',
+            name: 'Login',
+            component: () => import('./views/LoginPage.vue')
+          },
+          {
+            path: '/:pathMatch(.*)*',
+            name: 'NotFound',
+            component: () => import('./views/NotFoundPage.vue')
+          }
+        ]
+      });
+      
+      console.warn('Using fallback router with minimal routes');
+      return router;
+    } catch (fallbackError) {
+      console.error('Failed to create fallback router:', fallbackError);
+      throw new Error('Router initialization failed completely');
+    }
+  }
+};
+
 // Optimierte Initialisierungssequenz
 const initializeApp = async () => {
   try {
@@ -94,16 +157,8 @@ const initializeApp = async () => {
     authStore.initAuth();
     console.log('Auth state initialized');
     
-    // 3. Versuchen, den Router zu importieren
-    console.log('Loading router...');
-    const routerModule = await import('./router');
-    const router = routerModule.default;
-    
-    // Setup analytics page tracking with router
-    router.afterEach((to) => {
-      // Track page view on route change
-      trackPageView(window.location.origin + to.fullPath);
-    });
+    // 3. Versuchen, den Router zu importieren und zu verwenden
+    const router = await loadRouter();
     
     // 4. Router an die App anhängen
     app.use(router);

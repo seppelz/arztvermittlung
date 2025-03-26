@@ -268,7 +268,7 @@
 
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
-import axios from 'axios'
+import bulletinProxyService from '@/services/bulletinProxyService'
 
 // Beispieldaten für die Demonstration - nur als Fallback verwendet
 const demoMessages = [
@@ -318,51 +318,46 @@ const showContactModal = ref(false);
 const selectedMessage = ref({});
 const isLoading = ref(true);
 const loadError = ref(null);
+const usingDemoData = ref(false);
 
-// API URL construction helper
-const getApiUrl = (endpoint) => {
-  const baseUrl = window.MED_MATCH_CONFIG?.apiUrl || 
-    import.meta.env.VITE_API_URL ||
-    'http://localhost:5000/api';
-  
-  console.log(`Using API URL from ${window.MED_MATCH_CONFIG?.apiUrl ? 'global config' : 'environment'}: ${baseUrl}`);
-  
-  return `${baseUrl}/${endpoint}`;
-};
-
-// Fetch actual bulletin board entries from the API
+// Fetch actual bulletin board entries using the proxy service
 const fetchBulletins = async () => {
   isLoading.value = true;
   loadError.value = null;
   
   try {
-    const apiUrl = getApiUrl('bulletin');
-    console.log('Fetching bulletins from:', apiUrl);
+    console.log('Fetching bulletins via proxy service');
     
-    const response = await axios.get(apiUrl, {
-      params: {
-        messageType: 'Information',
-        sort: '-timestamp'
-      }
+    const response = await bulletinProxyService.getAllBulletins({
+      messageType: 'Information',
+      sort: '-timestamp'
     });
     
-    if (response.data && response.data.data) {
-      // If we get actual data from the API, use it
-      messages.value = response.data.data.map(item => ({
+    if (response && response.data) {
+      // If we get data from the service, use it
+      messages.value = response.data.map(item => ({
         ...item,
         id: item._id || item.id // Handle MongoDB _id vs id
       }));
-      console.log('Loaded bulletins:', messages.value.length);
-    } else {
-      // If no data, use demo data
-      console.log('No bulletins found in database, using demo data');
-      messages.value = [...demoMessages];
+      
+      usingDemoData.value = bulletinProxyService.isUsingDemoData();
+      
+      if (usingDemoData.value) {
+        console.log('Using demo bulletins:', messages.value.length);
+        loadError.value = 'Server nicht erreichbar. Zeige Beispieldaten an.';
+      } else {
+        console.log('Loaded real bulletins from API:', messages.value.length);
+      }
     }
   } catch (err) {
     console.error('Error fetching bulletins:', err);
     loadError.value = 'Fehler beim Laden der Daten: ' + (err.message || 'Unbekannter Fehler');
-    // Fallback to demo data on error
-    messages.value = [...demoMessages];
+    
+    // Ensure we always have data to display
+    if (!messages.value.length) {
+      messages.value = [...demoMessages];
+      usingDemoData.value = true;
+    }
   } finally {
     isLoading.value = false;
   }
@@ -397,9 +392,9 @@ const filteredMessages = computed(() => {
   // Sortieren
   result.sort((a, b) => {
     if (sortOrder.value === 'newest') {
-      return b.timestamp - a.timestamp;
+      return new Date(b.timestamp) - new Date(a.timestamp);
     } else {
-      return a.timestamp - b.timestamp;
+      return new Date(a.timestamp) - new Date(b.timestamp);
     }
   });
   
@@ -422,18 +417,17 @@ async function submitMessage() {
   newMessage.messageType = 'Information';
   
   try {
-    const apiUrl = getApiUrl('bulletin');
-    console.log('Submitting bulletin to:', apiUrl);
+    console.log('Submitting bulletin via proxy service');
     
-    // Send the actual API request to create a bulletin entry
-    const response = await axios.post(apiUrl, {
+    // Send the request through our proxy service for better error handling
+    const response = await bulletinProxyService.createBulletin({
       ...newMessage,
       timestamp: new Date()
     });
     
-    if (response.data && response.data.data) {
+    if (response && response.data) {
       // If successful, add the new message to our local list
-      const newEntry = response.data.data;
+      const newEntry = response.data;
       
       // Convert _id to id if needed for consistency
       const formattedEntry = {
@@ -455,6 +449,11 @@ async function submitMessage() {
       });
       
       messageSent.value = true;
+      
+      // Show warning if using demo data
+      if (response.isDemoData) {
+        alert('Ihre Nachricht wurde gespeichert, aber der Server konnte nicht erreicht werden. Die Nachricht wird lokal angezeigt, aber nicht dauerhaft gespeichert. Bitte versuchen Sie es später erneut.');
+      }
       
       // Erfolgsmeldung nach 3 Sekunden ausblenden
       setTimeout(() => {
