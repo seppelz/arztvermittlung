@@ -398,7 +398,7 @@
 
 <script setup>
 import { onMounted, ref } from 'vue';
-import axios from 'axios';
+import bulletinService from '@/services/bulletin.service';
 
 // State for bulletin board entries
 const bulletinEntries = ref([]);
@@ -411,36 +411,18 @@ const fetchBulletinEntries = async () => {
   error.value = null;
   
   try {
-    // Fix URL construction for production vs development
-    let apiUrl = '';
+    const params = {
+      messageType: 'Information',
+      limit: 3,
+      sort: '-timestamp'
+    };
     
-    // Use the global configuration if available
-    const baseUrl = window.MED_MATCH_CONFIG?.apiUrl || 
-                   (import.meta.env.VITE_API_URL || 'http://localhost:5000/api');
+    const response = await bulletinService.getAllBulletins(params);
     
-    // Log for debugging
-    console.log(`Base URL from config: ${baseUrl}`);
-    console.log(`Hostname: ${window.location.hostname}`);
-    
-    // Properly construct API URL based on if it already contains /api
-    if (baseUrl.includes('/api')) {
-      apiUrl = `${baseUrl}/bulletin`;
+    if (response && response.data) {
+      bulletinEntries.value = response.data;
     } else {
-      apiUrl = `${baseUrl}/api/bulletin`;
-    }
-    
-    console.log('Fetching from URL:', apiUrl); // For debugging
-    
-    const response = await axios.get(apiUrl, {
-      params: {
-        messageType: 'Information',
-        limit: 3,
-        sort: '-timestamp'
-      }
-    });
-    
-    if (response.data && response.data.data) {
-      bulletinEntries.value = response.data.data;
+      throw new Error('Keine Daten verfügbar');
     }
   } catch (err) {
     console.error('Error fetching bulletin entries:', err);

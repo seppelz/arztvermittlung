@@ -287,58 +287,67 @@ const router = createRouter({
   }
 })
 
-// Navigation Guards - verbessert mit robusterer Fehlerbehandlung
+// Navigation guard to check authentication for routes that require it
 router.beforeEach(async (to, from, next) => {
   try {
-    // Maximale Ausführungszeit für die Navigation setzen, um Endlosschleifen zu verhindern
+    // Create a timeout promise to prevent infinite loops or long-running auth checks
     const timeoutPromise = new Promise((_, reject) => {
-      setTimeout(() => reject(new Error('Navigation guard timeout exceeded')), 2000);
+      setTimeout(() => reject(new Error('Authentication check timed out')), 2000);
     });
     
-    // Navigation Guard Logik mit Timeout-Schutz
-    const navigationCheck = async () => {
-      // Prüfen, ob die Route Authentifizierung erfordert
-      if (to.matched.some(record => record.meta.requiresAuth)) {
-        const authenticated = await isAuthenticated();
+    // If route requires authentication
+    if (to.matched.some(record => record.meta.requiresAuth)) {
+      // Run the auth check with a timeout
+      try {
+        // Use Promise.race to either get the auth result or timeout
+        const authenticated = await Promise.race([
+          isAuthenticated(),
+          timeoutPromise
+        ]);
         
         if (!authenticated) {
-          // Nicht eingeloggt -> Zur Login-Seite umleiten
-          return {
-            name: 'AdminLogin',
-            query: { redirect: to.fullPath }
-          };
-        } 
-        
-        if (to.path.startsWith('/admin')) {
-          const admin = await isAdmin();
-          if (!admin) {
-            // Versucht, auf Admin-Bereich zuzugreifen, ist aber kein Admin
-            return { name: 'Home' };
+          // If route is an admin route, redirect to admin login, otherwise to regular login
+          if (to.path.startsWith('/admin')) {
+            next({ name: 'AdminLogin' });
+          } else {
+            next({ name: 'Login' });
+          }
+        } else {
+          // Check if the route requires admin rights
+          if (to.matched.some(record => record.meta.requiresAdmin)) {
+            try {
+              const isAdminUser = await Promise.race([
+                isAdmin(),
+                timeoutPromise
+              ]);
+              
+              if (!isAdminUser) {
+                // Redirect to home if not admin
+                next({ name: 'Home' });
+              } else {
+                next();
+              }
+            } catch (adminCheckError) {
+              console.error('Admin check failed with error:', adminCheckError);
+              next({ name: 'Home' });
+            }
+          } else {
+            next();
           }
         }
-        
-        // Authentifiziert und autorisiert -> Zugriff erlauben
-        return true;
-      } else {
-        // Keine Authentifizierung erforderlich -> Zugriff erlauben
-        return true;
+      } catch (authCheckError) {
+        console.error('Auth check error:', authCheckError);
+        // On timeout or error, allow navigation to continue to prevent blocking the user
+        next();
       }
-    };
-    
-    // Promise.race, um entweder die Navigation abzuschließen oder Timeout auszulösen
-    const result = await Promise.race([navigationCheck(), timeoutPromise]);
-    
-    // Wenn das Ergebnis ein Weiterleitungsobjekt ist
-    if (result !== true && typeof result === 'object') {
-      next(result);
     } else {
+      // Route doesn't require authentication
       next();
     }
   } catch (error) {
     console.error('Navigation guard error:', error);
-    // Bei Fehler zur Startseite umleiten
-    clearAuthCache(); // Cache im Fehlerfall zurücksetzen
-    next({ name: 'Home' });
+    // In case of any unexpected error, allow navigation to continue
+    next();
   }
 });
 
