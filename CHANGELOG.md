@@ -148,6 +148,10 @@ All notable changes to this project will be documented in this file.
 - Enhanced API URL configuration to properly use localhost:5000 in development mode
 - Added better MongoDB connection error logging in server.js
 - Fixed homepage to only display active bulletin entries with appropriate status filter
+- Fixed profile page issues:
+  - Ensured bulletin entries are properly filtered by user's email
+  - Corrected user type labels to show proper role names ("Ärzte", "Kliniken / Einrichtungen")
+  - Fixed profile data loading by using the API service correctly
 
 ### Added
 - Created test scripts for MongoDB Atlas connection testing
