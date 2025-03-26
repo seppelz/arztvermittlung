@@ -166,6 +166,11 @@ All notable changes to this project will be documented in this file.
   - Updated code to support both new (role-based) and existing (userType-based) accounts
   - Added dual-checking logic for doctor/hospital detection that works with both data structures
   - Ensures backward compatibility with existing database records
+- Fixed profile page UI components to correctly identify user types:
+  - Updated all conditional UI rendering to check both role and userType fields
+  - Added computed properties to centralize user type detection logic
+  - Fixed display of user role in profile badge (shows "Ärzte" or "Kliniken / Einrichtungen")
+  - Ensures "Complete Profile" button appears correctly for all account types
 
 ### Added
 - Created test scripts for MongoDB Atlas connection testing
