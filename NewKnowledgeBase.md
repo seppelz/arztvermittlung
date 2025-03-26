@@ -864,3 +864,16 @@ Um die Anforderungen der DSGVO (Datenschutz-Grundverordnung) zu erfüllen, wurde
    - Modular und erweiterbar für zusätzliche Cookie-Kategorien (notwendig, Funktional, Analytisch, etc.)
 
 Diese Implementierung stellt sicher, dass die Website den aktuellen Datenschutzrichtlinien entspricht und Nutzern die volle Kontrolle über ihre Cookie-Präferenzen gibt. 
+
+## Profile System
+- The profile system uses a role-based approach, with specific handling for hospital profiles
+- Hospital profiles include detailed information such as clinic type, specialties, and contact details
+- Profile completion status is tracked automatically based on required fields
+- The system uses a separate hospital model to store additional profile information
+- Profile updates are handled through a dedicated API endpoint with proper authentication
+
+## Authentication
+- The system uses token-based authentication with Bearer tokens
+- Authentication state is managed through a central auth store
+- Protected routes require valid authentication tokens
+- Profile data is loaded only after successful authentication 
