@@ -680,3 +680,10 @@ This file contains important learnings about the codebase that help improve prod
 ## Deployment
 - The project uses Vercel for deployment, triggered by pushing to the main branch
 - Both development and production environments need separate environment configurations 
+
+## API Integration
+- Backend routes use PATCH for updates, not PUT - all frontend services should be consistent with this
+- Bulletin entries have a status field with possible values: 'active', 'pending', 'archived'
+- Homepage should only display 'active' bulletin entries by using status filter parameter
+- User-specific bulletin entries should be filtered by email to ensure users only see their own entries
+- Axios API service should be used consistently instead of fetch API for better error handling 

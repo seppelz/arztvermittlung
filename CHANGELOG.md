@@ -152,6 +152,11 @@ All notable changes to this project will be documented in this file.
   - Ensured bulletin entries are properly filtered by user's email
   - Corrected user type labels to show proper role names ("Ärzte", "Kliniken / Einrichtungen")
   - Fixed profile data loading by using the API service correctly
+- Fixed bulletin update functionality by changing HTTP method from PUT to PATCH to match backend endpoint
+- Fixed HTTP method mismatches in multiple services:
+  - Updated user.service.js to use PATCH instead of PUT for profile updates
+  - Updated contact.service.js to use PATCH instead of PUT for contact updates
+  - Updated auth.service.js to use PATCH instead of PUT for profile updates
 
 ### Added
 - Created test scripts for MongoDB Atlas connection testing
