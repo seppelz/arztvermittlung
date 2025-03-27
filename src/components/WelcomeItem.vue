@@ -1,3 +1,7 @@
+<script setup lang="ts">
+// WelcomeItem component with named slots for icon, heading, and default content
+</script>
+
 <template>
   <div class="item">
     <i>

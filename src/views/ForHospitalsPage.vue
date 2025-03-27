@@ -173,11 +173,25 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, reactive } from 'vue'
 import bulletinProxyService from '@/services/bulletinProxyService'
+import { Bulletin } from '@/types'
 
-const form = reactive({
+interface HospitalForm {
+  hospitalName: string;
+  contactEmail: string;
+  federalState: string;
+  specialty: string;
+  requiredQualifications: string;
+  jobDescription: string;
+  startDate: string;
+  salary: string;
+  privacyPolicyAccepted: boolean;
+  termsAccepted: boolean;
+}
+
+const form = reactive<HospitalForm>({
   hospitalName: '',
   contactEmail: '',
   federalState: '',
@@ -190,11 +204,11 @@ const form = reactive({
   termsAccepted: false
 })
 
-const formSubmitted = ref(false)
-const submitError = ref(null)
-const isSubmitting = ref(false)
+const formSubmitted = ref<boolean>(false)
+const submitError = ref<string | null>(null)
+const isSubmitting = ref<boolean>(false)
 
-async function submitForm() {
+async function submitForm(): Promise<void> {
   isSubmitting.value = true
   submitError.value = null
   
@@ -222,22 +236,29 @@ async function submitForm() {
     const generatedTitle = `Klinik sucht ab ${formattedDate}${form.specialty ? ' Arzt der Fachrichtung ' + form.specialty : ' Arzt'}`
     
     // Prepare the bulletin data
-    const bulletinData = {
+    const bulletinData: Partial<Bulletin> = {
       title: generatedTitle,
       name: form.hospitalName,
       email: form.contactEmail,
       content: form.jobDescription,
       specialty: form.specialty,
-      userType: 'Klinik',
       messageType: 'Angebot',
-      startDate: form.startDate,
-      federalState: form.federalState,
-      phone: '',
-      requiredQualifications: form.requiredQualifications || '',
-      salary: form.salary || '',
+      startDate: new Date(form.startDate),
       privacyPolicyAccepted: form.privacyPolicyAccepted,
-      status: 'pending',
-      timestamp: new Date()
+      status: 'pending'
+    }
+    
+    // Add optional fields
+    if (form.requiredQualifications) {
+      (bulletinData as any).requiredQualifications = form.requiredQualifications;
+    }
+    
+    if (form.salary) {
+      (bulletinData as any).salary = form.salary;
+    }
+    
+    if (form.federalState) {
+      (bulletinData as any).federalState = form.federalState;
     }
     
     console.log('Submitting data to backend:', bulletinData)
@@ -249,18 +270,10 @@ async function submitForm() {
     // Show success message
     formSubmitted.value = true
     
-    // Reset form after submission
-    Object.keys(form).forEach(key => {
-      if (typeof form[key] === 'boolean') {
-        form[key] = false
-      } else if (key === 'startDate') {
-        form[key] = new Date().toISOString().split('T')[0] // Reset to today's date
-      } else {
-        form[key] = ''
-      }
-    })
+    // Reset form
+    resetForm();
     
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error submitting form:', error)
     
     // Extract detailed error message if available
@@ -284,5 +297,18 @@ async function submitForm() {
   } finally {
     isSubmitting.value = false
   }
+}
+
+function resetForm(): void {
+  form.hospitalName = '';
+  form.contactEmail = '';
+  form.federalState = '';
+  form.specialty = '';
+  form.requiredQualifications = '';
+  form.jobDescription = '';
+  form.startDate = new Date().toISOString().split('T')[0];
+  form.salary = '';
+  form.privacyPolicyAccepted = false;
+  form.termsAccepted = false;
 }
 </script> 

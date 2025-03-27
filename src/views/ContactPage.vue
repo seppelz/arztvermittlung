@@ -100,11 +100,19 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, reactive } from 'vue'
 import contactService from '@/services/contact.service'
 
-const form = reactive({
+interface ContactForm {
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+  privacyPolicyAccepted: boolean;
+}
+
+const form = reactive<ContactForm>({
   name: '',
   email: '',
   subject: '',
@@ -112,11 +120,11 @@ const form = reactive({
   privacyPolicyAccepted: false
 })
 
-const formSubmitted = ref(false)
-const isSubmitting = ref(false)
-const errorMessage = ref('')
+const formSubmitted = ref<boolean>(false)
+const isSubmitting = ref<boolean>(false)
+const errorMessage = ref<string>('')
 
-const submitForm = async () => {
+const submitForm = async (): Promise<void> => {
   try {
     isSubmitting.value = true
     errorMessage.value = ''
@@ -126,14 +134,13 @@ const submitForm = async () => {
       name: form.name,
       email: form.email,
       subject: form.subject,
-      message: form.message,
-      privacyPolicyAccepted: form.privacyPolicyAccepted
+      message: form.message
     }
     
     console.log('Submitting contact form:', contactData)
     
     // Send to backend using contact service
-    await contactService.createContact(contactData)
+    await contactService.sendMessage(contactData)
     
     // Show success message
     formSubmitted.value = true
@@ -145,7 +152,7 @@ const submitForm = async () => {
     form.message = ''
     form.privacyPolicyAccepted = false
     
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error submitting contact form:', error)
     errorMessage.value = 'Es ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut.'
   } finally {

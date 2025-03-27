@@ -1,6 +1,42 @@
-import api from './api';
 import userService from './user.service';
 import bulletinProxyService from './bulletinProxyService';
+import { Bulletin } from '@/types';
+
+interface User {
+  name?: string;
+  email?: string;
+  userType?: string;
+  createdAt?: string;
+  created?: string;
+}
+
+interface DashboardStats {
+  users: {
+    total: number;
+    doctors: number;
+    hospitals: number;
+    admins: number;
+  };
+  bulletins: {
+    total: number;
+    active: number;
+    pending: number;
+    archived: number;
+  };
+  contacts: {
+    total: number;
+    pending: number;
+    viewed: number;
+    responded: number;
+  };
+}
+
+interface Activity {
+  type: string;
+  description: string;
+  user: string;
+  date: Date;
+}
 
 /**
  * Service für Admin-Dashboard-Funktionen
@@ -10,10 +46,10 @@ class DashboardService {
    * Dashboard-Statistiken abrufen
    * @returns {Promise} Statistiken für das Dashboard
    */
-  async getDashboardStats() {
+  async getDashboardStats(): Promise<DashboardStats> {
     try {
       // Standardwerte für Statistiken
-      const statsDefault = {
+      const statsDefault: DashboardStats = {
         users: {
           total: 0,
           doctors: 0,
@@ -111,17 +147,17 @@ class DashboardService {
    * @param {number} limit - Maximale Anzahl der zurückzugebenden Aktivitäten
    * @returns {Promise} Array mit den letzten Aktivitäten
    */
-  async getRecentActivities(limit = 10) {
+  async getRecentActivities(limit = 10): Promise<Activity[]> {
     try {
-      let userActivities = [];
-      let bulletinActivities = [];
+      let userActivities: Activity[] = [];
+      let bulletinActivities: Activity[] = [];
       
       // Benutzer laden (für Neuregistrierungen)
       try {
         const usersResponse = await userService.getAllUsers();
         
         // Sicherstellen, dass wir ein Array haben
-        const users = Array.isArray(usersResponse.data) ? usersResponse.data : [];
+        const users: User[] = Array.isArray(usersResponse.data) ? usersResponse.data : [];
         console.log('Dashboard: Loaded users for activities:', users.length);
         
         // Aktivitäten aus Benutzerregistrierungen erstellen
@@ -147,7 +183,7 @@ class DashboardService {
         const bulletinsResponse = await bulletinProxyService.getAllBulletins();
         
         // Sicherstellen, dass wir ein Array haben
-        const bulletins = Array.isArray(bulletinsResponse.data) ? bulletinsResponse.data : [];
+        const bulletins: Bulletin[] = Array.isArray(bulletinsResponse.data) ? bulletinsResponse.data : [];
         console.log('Dashboard: Loaded bulletins for activities:', bulletins.length);
         
         // Aktivitäten aus Pinnwand-Einträgen erstellen
@@ -171,7 +207,7 @@ class DashboardService {
               type: activityType,
               description: description,
               user: bulletin.name || bulletin.email || 'Unbenannter Benutzer',
-              date: new Date(bulletin.timestamp || bulletin.createdAt || bulletin.created || Date.now())
+              date: new Date(bulletin.createdAt || Date.now())
             };
           });
         }
@@ -181,11 +217,11 @@ class DashboardService {
       }
       
       // Alle Aktivitäten zusammenführen
-      const allActivities = [...userActivities, ...bulletinActivities];
+      const allActivities: Activity[] = [...userActivities, ...bulletinActivities];
       
       // Nach Datum sortieren (neueste zuerst)
       if (allActivities.length > 0) {
-        allActivities.sort((a, b) => b.date - a.date);
+        allActivities.sort((a, b) => b.date.getTime() - a.date.getTime());
       }
       
       // Auf gewünschte Anzahl begrenzen

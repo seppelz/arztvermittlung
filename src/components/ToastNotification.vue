@@ -50,34 +50,48 @@
   </div>
 </template>
 
-<script setup>
-import { useToast } from '@/composables/useToast'
+<script setup lang="ts">
+import { useToast } from '@/composables/useToast';
 
-const { toasts, removeToast } = useToast()
+// Get toast utilities from the composable
+const { toasts, removeToast } = useToast();
 
-const getBackgroundColor = (type) => {
+// Type for toast types
+type ToastType = 'success' | 'error' | 'warning' | 'info';
+
+/**
+ * Get the appropriate background color based on toast type
+ * @param type - The type of toast
+ * @returns Tailwind background color class
+ */
+function getBackgroundColor(type: ToastType): string {
   switch (type) {
     case 'success':
-      return 'bg-green-50'
+      return 'bg-green-50';
     case 'error':
-      return 'bg-red-50'
+      return 'bg-red-50';
     case 'warning':
-      return 'bg-yellow-50'
+      return 'bg-yellow-50';
     default:
-      return 'bg-blue-50'
+      return 'bg-blue-50';
   }
 }
 
-const getTextColor = (type) => {
+/**
+ * Get the appropriate text color based on toast type
+ * @param type - The type of toast
+ * @returns Tailwind text color class
+ */
+function getTextColor(type: ToastType): string {
   switch (type) {
     case 'success':
-      return 'text-green-800'
+      return 'text-green-800';
     case 'error':
-      return 'text-red-800'
+      return 'text-red-800';
     case 'warning':
-      return 'text-yellow-800'
+      return 'text-yellow-800';
     default:
-      return 'text-blue-800'
+      return 'text-blue-800';
   }
 }
 </script>

@@ -62,14 +62,22 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useAnalytics } from '../composables/useAnalytics'
+
+// Form data interface
+interface FormData {
+  name: string;
+  email: string;
+  message: string;
+  terms: boolean;
+}
 
 // Initialize our analytics composable
 const { trackForm, trackInteraction, trackFeatureUsage } = useAnalytics()
 
-const formData = ref({
+const formData = ref<FormData>({
   name: '',
   email: '',
   message: '',
@@ -77,7 +85,7 @@ const formData = ref({
 })
 
 // Computed property to check if form is valid
-const formValid = computed(() => {
+const formValid = computed((): boolean => {
   return (
     formData.value.name.trim() !== '' && 
     formData.value.email.trim() !== '' && 
@@ -87,24 +95,24 @@ const formValid = computed(() => {
 })
 
 // Track when user focuses on a field
-const trackFieldFocus = (fieldName) => {
+const trackFieldFocus = (fieldName: string): void => {
   trackInteraction('Field Focus', { field: fieldName })
 }
 
 // Track when user toggles terms checkbox
-const trackTermsToggle = () => {
+const trackTermsToggle = (): void => {
   trackInteraction('Terms Toggle', { 
     action: formData.value.terms ? 'unchecked' : 'checked'
   })
 }
 
 // Track when user views terms
-const viewTerms = () => {
+const viewTerms = (): void => {
   trackFeatureUsage('View Terms', { source: 'contact-form' })
 }
 
 // Submit the form and track the submission
-const submitForm = () => {
+const submitForm = (): void => {
   if (formValid.value) {
     // Here you would normally send the form data to your backend
     console.log('Form submitted:', formData.value)

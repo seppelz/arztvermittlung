@@ -276,25 +276,79 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, reactive, computed, onMounted } from 'vue'
 import bulletinProxyService from '@/services/bulletinProxyService'
 import ReplySection from '@/components/bulletin/ReplySection.vue'
+import { Bulletin, BulletinReply as ServerBulletinReply, ApiResponse } from '@/types'
+
+// Define interfaces for type safety
+interface BulletinMessage extends Omit<Bulletin, 'replies'> {
+  id: string;
+  timestamp: string | Date;
+  userType: string;
+  replies?: UIBulletinReply[];
+  [key: string]: any; // Allow other properties
+}
+
+// UI-specific bulletin reply that includes bulletinId
+interface UIBulletinReply {
+  _id: string;
+  bulletinId: string;
+  content: string;
+  name: string;
+  timestamp: string | Date;
+  email?: string;
+}
+
+interface NewMessage {
+  name: string;
+  email: string;
+  phone: string;
+  title: string;
+  specialty: string;
+  content: string;
+  userType: string;
+  privacyPolicyAccepted: boolean;
+  messageType: string;
+}
+
+interface ContactForm {
+  name: string;
+  email: string;
+  message: string;
+}
 
 // Zustandsvariablen
-const messages = ref([]);
-const sortOrder = ref('newest');
-const currentPage = ref(1);
+const messages = ref<BulletinMessage[]>([]);
+const sortOrder = ref<'newest' | 'oldest'>('newest');
+const currentPage = ref<number>(1);
 const itemsPerPage = 6;
-const isSubmitting = ref(false);
-const messageSent = ref(false);
-const showContactModal = ref(false);
-const selectedMessage = ref({});
-const isLoading = ref(true);
-const loadError = ref(null);
+const isSubmitting = ref<boolean>(false);
+const messageSent = ref<boolean>(false);
+const showContactModal = ref<boolean>(false);
+const selectedMessage = ref<BulletinMessage>({} as BulletinMessage);
+const isLoading = ref<boolean>(true);
+const loadError = ref<string | null>(null);
+
+// Helper function to convert server replies to UI replies
+function convertServerReplies(bulletin: Bulletin): UIBulletinReply[] {
+  if (!bulletin.replies || bulletin.replies.length === 0) {
+    return [];
+  }
+  
+  return bulletin.replies.map(reply => ({
+    _id: reply._id,
+    bulletinId: bulletin._id, // Add bulletinId from parent
+    content: reply.content,
+    name: reply.name,
+    email: reply.email,
+    timestamp: reply.timestamp instanceof Date ? reply.timestamp : new Date(reply.timestamp)
+  }));
+}
 
 // Fetch actual bulletin board entries using the proxy service that now only uses real data
-const fetchBulletins = async () => {
+const fetchBulletins = async (): Promise<void> => {
   isLoading.value = true;
   loadError.value = null;
   
@@ -308,10 +362,18 @@ const fetchBulletins = async () => {
     
     if (response && response.data) {
       // Process real API data
-      messages.value = response.data.map(item => ({
-        ...item,
-        id: item._id || item.id // Handle MongoDB _id vs id
-      }));
+      messages.value = response.data.map((item: Bulletin) => {
+        // Convert replies for UI usage
+        const uiReplies = convertServerReplies(item);
+        
+        return {
+          ...item,
+          id: item._id, // Add id field based on _id
+          userType: item.userId ? 'registered' : 'anonymous', // Derive userType
+          timestamp: item.createdAt || new Date(), // Use createdAt as timestamp
+          replies: uiReplies
+        };
+      });
       
       console.log('Loaded bulletins from database:', messages.value.length);
     } else {
@@ -319,9 +381,10 @@ const fetchBulletins = async () => {
       messages.value = [];
       loadError.value = 'Keine Einträge gefunden.';
     }
-  } catch (err) {
+  } catch (err: unknown) {
     console.error('Error fetching bulletins:', err);
-    loadError.value = 'Fehler beim Laden der Daten: ' + (err.message || 'Unbekannter Fehler');
+    const error = err as Error;
+    loadError.value = 'Fehler beim Laden der Daten: ' + (error.message || 'Unbekannter Fehler');
     messages.value = [];
   } finally {
     isLoading.value = false;
@@ -329,7 +392,7 @@ const fetchBulletins = async () => {
 };
 
 // Formulare
-const newMessage = reactive({
+const newMessage = reactive<NewMessage>({
   name: '',
   email: '',
   phone: '',
@@ -341,14 +404,14 @@ const newMessage = reactive({
   messageType: 'Information',
 })
 
-const contactForm = reactive({
+const contactForm = reactive<ContactForm>({
   name: '',
   email: '',
   message: ''
 });
 
 // Berechnete Eigenschaften
-const filteredMessages = computed(() => {
+const filteredMessages = computed<BulletinMessage[]>(() => {
   let result = [...messages.value];
   
   // Only show Information messages
@@ -357,9 +420,9 @@ const filteredMessages = computed(() => {
   // Sortieren
   result.sort((a, b) => {
     if (sortOrder.value === 'newest') {
-      return new Date(b.timestamp) - new Date(a.timestamp);
+      return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
     } else {
-      return new Date(a.timestamp) - new Date(b.timestamp);
+      return new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime();
     }
   });
   
@@ -369,13 +432,13 @@ const filteredMessages = computed(() => {
   return result.slice(startIndex, endIndex);
 });
 
-const totalPages = computed(() => {
+const totalPages = computed<number>(() => {
   let filteredTotal = messages.value.filter(msg => msg.messageType === 'Information');
   return Math.ceil(filteredTotal.length / itemsPerPage);
 });
 
 // Methoden
-async function submitMessage() {
+async function submitMessage(): Promise<void> {
   isSubmitting.value = true;
   
   // Always set messageType to Information
@@ -384,39 +447,52 @@ async function submitMessage() {
   try {
     console.log('Submitting bulletin via proxy service');
     
+    // Prepare the bulletin data with properties matching the Bulletin interface
+    const bulletinData: Partial<Bulletin> = {
+      name: newMessage.name,
+      email: newMessage.email,
+      title: newMessage.title,
+      specialty: newMessage.specialty,
+      content: newMessage.content,
+      messageType: newMessage.messageType,
+      privacyPolicyAccepted: newMessage.privacyPolicyAccepted,
+      // Additional fields that might be needed
+      status: 'pending', // Assuming new bulletins are pending by default
+    };
+    
     // Send the request through our proxy service for better error handling
-    const response = await bulletinProxyService.createBulletin({
-      ...newMessage,
-      timestamp: new Date()
-    });
+    const response = await bulletinProxyService.createBulletin(bulletinData);
     
     if (response && response.data) {
       // If successful, add the new message to our local list
       const newEntry = response.data;
       
-      // Convert _id to id if needed for consistency
-      const formattedEntry = {
+      // Convert and add the new entry to our messages list
+      const formattedEntry: BulletinMessage = {
         ...newEntry,
-        id: newEntry._id || newEntry.id
+        id: newEntry._id,
+        userType: newEntry.userId ? 'registered' : 'anonymous',
+        timestamp: newEntry.createdAt || new Date(),
+        replies: convertServerReplies(newEntry)
       };
       
       messages.value.unshift(formattedEntry);
       
       // Formular zurücksetzen
       Object.keys(newMessage).forEach(key => {
-        if (typeof newMessage[key] === 'boolean') {
-          newMessage[key] = false;
+        if (key === 'privacyPolicyAccepted') {
+          newMessage.privacyPolicyAccepted = false;
         } else if (key === 'messageType') {
-          newMessage[key] = 'Information';
+          newMessage.messageType = 'Information';
         } else {
-          newMessage[key] = '';
+          (newMessage as any)[key] = '';
         }
       });
       
       messageSent.value = true;
       
       // Show warning if using demo data
-      if (response.isDemoData) {
+      if ((response as any).isDemoData) {
         alert('Ihre Nachricht wurde gespeichert, aber der Server konnte nicht erreicht werden. Die Nachricht wird lokal angezeigt, aber nicht dauerhaft gespeichert. Bitte versuchen Sie es später erneut.');
       }
       
@@ -425,20 +501,21 @@ async function submitMessage() {
         messageSent.value = false;
       }, 3000);
     }
-  } catch (err) {
+  } catch (err: unknown) {
     console.error('Error submitting bulletin:', err);
-    alert('Fehler beim Speichern: ' + (err.message || 'Unbekannter Fehler'));
+    const error = err as Error;
+    alert('Fehler beim Speichern: ' + (error.message || 'Unbekannter Fehler'));
   } finally {
     isSubmitting.value = false;
   }
 }
 
-function sortMessages() {
+function sortMessages(): void {
   // Sortierung wird in der computed property angewendet
   currentPage.value = 1; // Zurück zur ersten Seite
 }
 
-function formatDate(date) {
+function formatDate(date: string | Date): string {
   return new Date(date).toLocaleDateString('de-DE', {
     day: '2-digit',
     month: '2-digit',
@@ -446,28 +523,28 @@ function formatDate(date) {
   });
 }
 
-function prevPage() {
+function prevPage(): void {
   if (currentPage.value > 1) {
     currentPage.value--;
   }
 }
 
-function nextPage() {
+function nextPage(): void {
   if (currentPage.value < totalPages.value) {
     currentPage.value++;
   }
 }
 
-function goToPage(page) {
+function goToPage(page: number): void {
   currentPage.value = page;
 }
 
-function contactPoster(message) {
+function contactPoster(message: BulletinMessage): void {
   selectedMessage.value = message;
   showContactModal.value = true;
 }
 
-function closeContactModal() {
+function closeContactModal(): void {
   showContactModal.value = false;
   // Formular zurücksetzen
   contactForm.name = '';
@@ -475,7 +552,7 @@ function closeContactModal() {
   contactForm.message = '';
 }
 
-function sendContact() {
+function sendContact(): void {
   // Hier würden wir normalerweise eine API-Anfrage senden
   console.log('Kontaktanfrage gesendet:', {
     to: selectedMessage.value.email,
@@ -487,7 +564,7 @@ function sendContact() {
   closeContactModal();
 }
 
-const handleReplyAdded = (reply) => {
+const handleReplyAdded = (reply: UIBulletinReply): void => {
   // Find the message and add the reply to its replies array
   const message = messages.value.find(m => m.id === reply.bulletinId)
   if (message) {
@@ -498,7 +575,7 @@ const handleReplyAdded = (reply) => {
   }
 }
 
-const handleReplyDeleted = (replyId) => {
+const handleReplyDeleted = (replyId: string): void => {
   // Find the message and remove the reply from its replies array
   messages.value.forEach(message => {
     if (message.replies) {
@@ -507,7 +584,7 @@ const handleReplyDeleted = (replyId) => {
   })
 }
 
-const handleReplyUpdated = (updatedReply) => {
+const handleReplyUpdated = (updatedReply: UIBulletinReply): void => {
   // Find the message and update the reply in its replies array
   messages.value.forEach(message => {
     if (message.replies) {

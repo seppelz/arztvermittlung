@@ -134,7 +134,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useVuelidate } from '@vuelidate/core';
@@ -142,6 +142,15 @@ import { required, email as emailValidator, helpers } from '@vuelidate/validator
 import authService from '@/services/auth.service';
 import { useAuthStore } from '@/stores/auth';
 import { useToast } from '@/composables/useToast';
+
+interface LoginError {
+  response?: {
+    data?: {
+      message?: string;
+    };
+  };
+  message?: string;
+}
 
 const router = useRouter();
 const authStore = useAuthStore();
@@ -165,7 +174,7 @@ const rules = {
 
 const v$ = useVuelidate(rules, { email, password });
 
-const handleLogin = async () => {
+const handleLogin = async (): Promise<void> => {
   error.value = '';
   
   // Form validation
@@ -180,16 +189,14 @@ const handleLogin = async () => {
       password: password.value
     });
     
-    const userData = response.data;
-    
     // Store user data in Pinia store
-    authStore.setAuth(userData);
+    authStore.setAuth(response);
     
     // Show success toast
     showToast('Erfolgreich angemeldet!', 'success');
     
     // Redirect based on role
-    if (userData.user.role === 'admin') {
+    if (response.user.role === 'admin') {
       router.push('/admin');
     } else {
       router.push('/profile');
@@ -197,9 +204,11 @@ const handleLogin = async () => {
     
   } catch (err) {
     console.error('Login error:', err);
-    if (err.response && err.response.data && err.response.data.message) {
-      error.value = err.response.data.message;
-      showToast(err.response.data.message, 'error');
+    const error_obj = err as LoginError;
+    
+    if (error_obj.response?.data?.message) {
+      error.value = error_obj.response.data.message;
+      showToast(error_obj.response.data.message, 'error');
     } else {
       error.value = 'Anmeldung fehlgeschlagen. Bitte überprüfen Sie Ihre Anmeldedaten und versuchen Sie es erneut.';
       showToast('Anmeldung fehlgeschlagen', 'error');
@@ -209,7 +218,7 @@ const handleLogin = async () => {
   }
 };
 
-const handleLoginAs = async (testEmail, testPassword) => {
+const handleLoginAs = async (testEmail: string, testPassword: string): Promise<void> => {
   email.value = testEmail;
   password.value = testPassword;
   await handleLogin();

@@ -109,8 +109,9 @@
   </footer>
 </template>
 
-<script setup>
-// No additional script needed
+<script setup lang="ts">
+// Component for application footer
+// Uses Vue Router for navigation links
 </script>
 
 <style scoped>

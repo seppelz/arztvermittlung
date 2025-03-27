@@ -258,26 +258,35 @@
   </header>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue';
 import { useAuthStore } from '@/stores/auth';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
 const authStore = useAuthStore();
-const mobileMenuOpen = ref(false);
-const isScrolled = ref(false);
+const mobileMenuOpen = ref<boolean>(false);
+const isScrolled = ref<boolean>(false);
 
-const handleScroll = () => {
+/**
+ * Update the scroll state based on window scroll position
+ */
+const handleScroll = (): void => {
   isScrolled.value = window.scrollY > 10;
 };
 
-const logout = () => {
+/**
+ * Log the user out and redirect to home page
+ */
+const logout = (): void => {
   authStore.clearAuth();
   router.push('/');
 };
 
-const logoutMobile = () => {
+/**
+ * Log the user out from mobile menu and close the menu
+ */
+const logoutMobile = (): void => {
   mobileMenuOpen.value = false;
   logout();
 };

@@ -157,7 +157,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useToast } from '@/composables/useToast'
@@ -165,16 +165,58 @@ import { useAnalytics } from '@/composables/useAnalytics'
 import { useAuthStore } from '@/stores/auth'
 import api from '@/services/api'
 
+// Define types for the form data
+interface ContactInfo {
+  email: string;
+  phone: string;
+}
+
+interface Availability {
+  availableFrom: string;
+  federalState: string;
+}
+
+interface Qualification {
+  id: string;
+  name: string;
+}
+
+interface FormData {
+  name: string;
+  specialty: string;
+  qualifications: string[];
+  otherQualifications: string;
+  contact: ContactInfo;
+  availability: Availability;
+  additionalInfo: string;
+}
+
+interface FormErrors {
+  name: string;
+  specialty: string;
+  contact: {
+    email: string;
+    phone: string;
+  };
+  availability: {
+    availableFrom: string;
+    federalState: string;
+  };
+}
+
 const router = useRouter()
 const { showToast } = useToast()
 const { trackForm } = useAnalytics()
 const authStore = useAuthStore()
 
-const emit = defineEmits(['close', 'profile-updated'])
+const emit = defineEmits<{
+  (e: 'close'): void;
+  (e: 'profile-updated', profile: any): void;
+}>()
 
-const isSubmitting = ref(false)
+const isSubmitting = ref<boolean>(false)
 
-const qualificationsList = ref([
+const qualificationsList = ref<Qualification[]>([
   { id: 'facharzt', name: 'Facharzt' },
   { id: 'oberarzt', name: 'Oberarzt' },
   { id: 'chefarzt', name: 'Chefarzt' },
@@ -183,14 +225,14 @@ const qualificationsList = ref([
   { id: 'habilitation', name: 'Habilitation' }
 ])
 
-const federalStates = [
+const federalStates: string[] = [
   'Baden-Württemberg', 'Bayern', 'Berlin', 'Brandenburg', 'Bremen',
   'Hamburg', 'Hessen', 'Mecklenburg-Vorpommern', 'Niedersachsen',
   'Nordrhein-Westfalen', 'Rheinland-Pfalz', 'Saarland', 'Sachsen',
   'Sachsen-Anhalt', 'Schleswig-Holstein', 'Thüringen'
 ]
 
-const formData = ref({
+const formData = ref<FormData>({
   name: '',
   specialty: '',
   qualifications: [],
@@ -206,7 +248,7 @@ const formData = ref({
   additionalInfo: ''
 })
 
-const errors = ref({
+const errors = ref<FormErrors>({
   name: '',
   specialty: '',
   contact: {
@@ -260,16 +302,17 @@ onMounted(async () => {
           .toISOString().split('T')[0]
       }
     }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error loading doctor profile:', error)
     // Don't show an error toast here, as this might be a new user with no profile yet
-    if (error.response && error.response.status !== 404) {
+    const errorResponse = error as { response?: { status?: number } }
+    if (errorResponse.response && errorResponse.response.status !== 404) {
       showToast('Fehler beim Laden des Profils', 'error')
     }
   }
 })
 
-const validateForm = () => {
+const validateForm = (): boolean => {
   errors.value = {
     name: '',
     specialty: '',
@@ -303,7 +346,7 @@ const validateForm = () => {
   return isValid
 }
 
-const submitProfile = async () => {
+const submitProfile = async (): Promise<void> => {
   try {
     if (!validateForm()) {
       return
@@ -312,7 +355,7 @@ const submitProfile = async () => {
     isSubmitting.value = true
     
     // Track the form submission
-    trackForm('doctor_profile', 'submit')
+    trackForm('doctor_profile')
     
     const response = await api.post('/doctor/profile', formData.value)
     
@@ -320,12 +363,13 @@ const submitProfile = async () => {
       emit('profile-updated', response.data)
       showToast('Profil wurde erfolgreich aktualisiert', 'success')
     }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error submitting doctor profile:', error)
     
     // Handle validation errors
-    if (error.response?.data?.required) {
-      const required = error.response.data.required
+    const errorResponse = error as { response?: { data?: { required?: any }, status?: number } }
+    if (errorResponse.response?.data?.required) {
+      const required = errorResponse.response.data.required
       if (required.name) errors.value.name = 'Name ist erforderlich'
       if (required.specialty) errors.value.specialty = 'Fachrichtung ist erforderlich'
       if (required.contact) errors.value.contact.email = 'E-Mail ist erforderlich'

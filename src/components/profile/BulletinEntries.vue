@@ -193,31 +193,45 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useToast } from '@/composables/useToast'
 import { useAuthStore } from '@/stores/auth'
 import api from '@/services/api'
 
+// Define interfaces for bulletin entries
+interface BulletinEntry {
+  _id: string;
+  title: string;
+  content: string;
+  messageType: string;
+  email?: string;
+  timestamp?: string;
+  createdAt?: string;
+  specialty?: string;
+  federalState?: string;
+  startDate?: string;
+}
+
 const router = useRouter()
 const { showToast } = useToast()
 const authStore = useAuthStore()
 
-const isLoading = ref(true)
-const isSubmitting = ref(false)
-const error = ref(null)
-const entries = ref([])
-const showEditModal = ref(false)
-const showDeleteModal = ref(false)
-const editingEntry = ref({})
-const deletingEntryId = ref(null)
+const isLoading = ref<boolean>(true)
+const isSubmitting = ref<boolean>(false)
+const error = ref<string | null>(null)
+const entries = ref<BulletinEntry[]>([])
+const showEditModal = ref<boolean>(false)
+const showDeleteModal = ref<boolean>(false)
+const editingEntry = ref<BulletinEntry>({} as BulletinEntry)
+const deletingEntryId = ref<string | null>(null)
 
-const isHospital = computed(() => {
+const isHospital = computed<boolean>(() => {
   return authStore.user?.userType === 'hospital'
 })
 
-const federalStates = [
+const federalStates: string[] = [
   'Baden-Württemberg', 'Bayern', 'Berlin', 'Brandenburg', 'Bremen',
   'Hamburg', 'Hessen', 'Mecklenburg-Vorpommern', 'Niedersachsen',
   'Nordrhein-Westfalen', 'Rheinland-Pfalz', 'Saarland', 'Sachsen',
@@ -225,7 +239,7 @@ const federalStates = [
 ]
 
 // Format date for display
-const formatDate = (dateString) => {
+const formatDate = (dateString?: string): string => {
   if (!dateString) return 'Nicht angegeben'
   
   const date = new Date(dateString)
@@ -237,17 +251,17 @@ const formatDate = (dateString) => {
 }
 
 // Navigate to bulletin board page
-const goToBulletinBoard = () => {
+const goToBulletinBoard = (): void => {
   router.push('/bulletin-board')
 }
 
 // Navigate to job board page
-const goToJobBoard = () => {
+const goToJobBoard = (): void => {
   router.push('/arztboerse')
 }
 
 // Load user's bulletin entries
-const loadEntries = async () => {
+const loadEntries = async (): Promise<void> => {
   isLoading.value = true
   error.value = null
   
@@ -267,7 +281,7 @@ const loadEntries = async () => {
     })
     
     // Handle different response structures
-    let filteredEntries = []
+    let filteredEntries: BulletinEntry[] = []
     if (response.data && response.data.data) {
       // Extract entries from data property
       filteredEntries = response.data.data
@@ -286,22 +300,23 @@ const loadEntries = async () => {
     
     // Sort entries by date (newest first)
     entries.value.sort((a, b) => {
-      const dateA = new Date(a.timestamp || a.createdAt || 0)
-      const dateB = new Date(b.timestamp || b.createdAt || 0)
+      const dateA = new Date(a.timestamp || a.createdAt || 0).getTime()
+      const dateB = new Date(b.timestamp || b.createdAt || 0).getTime()
       return dateB - dateA
     })
     
     console.log(`Loaded ${entries.value.length} entries for user ${userEmail}`)
-  } catch (err) {
+  } catch (err: unknown) {
     console.error('Error loading bulletin entries:', err)
-    error.value = err.message || 'Fehler beim Laden der Einträge'
+    const error_ = err as Error
+    error.value = error_.message || 'Fehler beim Laden der Einträge'
   } finally {
     isLoading.value = false
   }
 }
 
 // Edit an entry
-const editEntry = (entry) => {
+const editEntry = (entry: BulletinEntry): void => {
   // Create a deep copy of the entry to avoid mutating the original
   editingEntry.value = JSON.parse(JSON.stringify(entry))
   
@@ -317,7 +332,7 @@ const editEntry = (entry) => {
 }
 
 // Update an entry
-const updateEntry = async () => {
+const updateEntry = async (): Promise<void> => {
   isSubmitting.value = true
   
   try {
@@ -328,25 +343,30 @@ const updateEntry = async () => {
     
     // Reload entries to get the updated list
     await loadEntries()
-  } catch (err) {
+  } catch (err: unknown) {
     console.error('Error updating bulletin entry:', err)
-    showToast(err.message || 'Fehler beim Aktualisieren des Eintrags', 'error')
+    const error_ = err as Error
+    showToast(error_.message || 'Fehler beim Aktualisieren des Eintrags', 'error')
   } finally {
     isSubmitting.value = false
   }
 }
 
 // Delete an entry (show confirmation)
-const deleteEntry = (id) => {
+const deleteEntry = (id: string): void => {
   deletingEntryId.value = id
   showDeleteModal.value = true
 }
 
 // Confirm deletion
-const confirmDelete = async () => {
+const confirmDelete = async (): Promise<void> => {
   isSubmitting.value = true
   
   try {
+    if (!deletingEntryId.value) {
+      throw new Error('Kein Eintrag ausgewählt')
+    }
+    
     await api.delete(`/bulletin/${deletingEntryId.value}`)
     
     showToast('Eintrag erfolgreich gelöscht', 'success')
@@ -354,9 +374,10 @@ const confirmDelete = async () => {
     
     // Remove the deleted entry from the list
     entries.value = entries.value.filter(entry => entry._id !== deletingEntryId.value)
-  } catch (err) {
+  } catch (err: unknown) {
     console.error('Error deleting bulletin entry:', err)
-    showToast(err.message || 'Fehler beim Löschen des Eintrags', 'error')
+    const error_ = err as Error
+    showToast(error_.message || 'Fehler beim Löschen des Eintrags', 'error')
   } finally {
     isSubmitting.value = false
     deletingEntryId.value = null

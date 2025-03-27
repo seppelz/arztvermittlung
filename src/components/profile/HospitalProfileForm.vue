@@ -147,7 +147,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useToast } from '@/composables/useToast'
@@ -155,15 +155,44 @@ import { useAnalytics } from '@/composables/useAnalytics'
 import { useAuthStore } from '@/stores/auth'
 import api from '@/services/api'
 
+// Define interfaces for form data
+interface Address {
+  street: string;
+  city: string;
+  postalCode: string;
+}
+
+interface Contact {
+  phone: string;
+}
+
+interface Specialty {
+  id: string;
+  name: string;
+}
+
+interface HospitalFormData {
+  name: string;
+  type: string;
+  address: Address;
+  contact: Contact;
+  specialties: string[];
+  description: string;
+  website: string;
+}
+
 const router = useRouter()
 const { showToast } = useToast()
 const { trackForm } = useAnalytics()
 const authStore = useAuthStore()
 
-const emit = defineEmits(['close', 'profile-updated'])
+const emit = defineEmits<{
+  (e: 'close'): void;
+  (e: 'profile-updated', profile: any): void;
+}>()
 
-const isSubmitting = ref(false)
-const specialties = ref([
+const isSubmitting = ref<boolean>(false)
+const specialties = ref<Specialty[]>([
   { id: 'allgemeinmedizin', name: 'Allgemeinmedizin' },
   { id: 'innere', name: 'Innere Medizin' },
   { id: 'chirurgie', name: 'Chirurgie' },
@@ -175,7 +204,7 @@ const specialties = ref([
   { id: 'anasthesie', name: 'Anästhesie' }
 ])
 
-const formData = ref({
+const formData = ref<HospitalFormData>({
   name: '',
   type: '',
   address: {
@@ -220,16 +249,17 @@ onMounted(async () => {
         website: response.data.website || ''
       }
     }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error loading hospital profile:', error)
     // Don't show an error toast here, as this might be a new user with no profile yet
-    if (error.response && error.response.status !== 404) {
+    const errorResponse = error as { response?: { status?: number } }
+    if (errorResponse.response && errorResponse.response.status !== 404) {
       showToast('Fehler beim Laden des Profils', 'error')
     }
   }
 })
 
-const submitProfile = async () => {
+const submitProfile = async (): Promise<void> => {
   isSubmitting.value = true
   
   try {
@@ -242,7 +272,7 @@ const submitProfile = async () => {
     })
     
     emit('profile-updated', response.data)
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error updating hospital profile:', error)
     showToast('Fehler beim Aktualisieren des Profils', 'error')
   } finally {

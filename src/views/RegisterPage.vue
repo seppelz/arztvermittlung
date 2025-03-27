@@ -162,7 +162,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, reactive } from 'vue';
 import { useRouter } from 'vue-router';
 import { useVuelidate } from '@vuelidate/core';
@@ -170,10 +170,31 @@ import { required, email, minLength, helpers } from '@vuelidate/validators';
 import authService from '@/services/auth.service';
 import { useToast } from '@/composables/useToast';
 
+interface FormData {
+  userType: string;
+  name: string;
+  email: string;
+  username: string;
+  password: string;
+}
+
+interface RegisterUserData extends FormData {
+  role: 'user' | 'admin' | 'doctor' | 'hospital';
+}
+
+interface RegisterError {
+  response?: {
+    data?: {
+      message?: string;
+    };
+  };
+  message?: string;
+}
+
 const router = useRouter();
 const { showToast } = useToast();
 
-const formData = reactive({
+const formData = reactive<FormData>({
   userType: '',
   name: '',
   email: '',
@@ -198,11 +219,11 @@ const rules = {
 };
 
 const v$ = useVuelidate(rules, { formData });
-const error = ref('');
-const successMessage = ref('');
-const isSubmitting = ref(false);
+const error = ref<string>('');
+const successMessage = ref<string>('');
+const isSubmitting = ref<boolean>(false);
 
-const handleSubmit = async () => {
+const handleSubmit = async (): Promise<void> => {
   error.value = '';
   
   // Form validation
@@ -213,7 +234,7 @@ const handleSubmit = async () => {
   
   try {
     // Add role based on userType
-    const userData = {
+    const userData: RegisterUserData = {
       ...formData,
       role: 'user'  // Keep using 'user' as role since backend only accepts this enum value
     };
@@ -226,13 +247,16 @@ const handleSubmit = async () => {
     
     // Reset form
     v$.value.$reset();
-    Object.keys(formData).forEach(key => formData[key] = '');
+    Object.keys(formData).forEach(key => {
+      (formData as any)[key] = '';
+    });
     
-  } catch (err) {
+  } catch (err: unknown) {
     console.error('Registration error:', err);
-    if (err.response && err.response.data && err.response.data.message) {
-      error.value = err.response.data.message;
-      showToast(err.response.data.message, 'error');
+    const error_obj = err as RegisterError;
+    if (error_obj.response?.data?.message) {
+      error.value = error_obj.response.data.message;
+      showToast(error_obj.response.data.message, 'error');
     } else {
       error.value = 'Ein Fehler ist bei der Registrierung aufgetreten. Bitte versuchen Sie es später erneut.';
       showToast('Registrierungsfehler', 'error');

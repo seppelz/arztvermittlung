@@ -220,11 +220,27 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, reactive } from 'vue'
 import bulletinProxyService from '@/services/bulletinProxyService'
+import { Bulletin } from '@/types'
 
-const qualifications = [
+interface DoctorForm {
+  specialty: string;
+  name: string;
+  email: string;
+  phone: string;
+  federalState: string;
+  qualifications: string[];
+  otherQualifications: string;
+  availableFrom: string;
+  additionalInfo: string;
+  privacyPolicyAccepted: boolean;
+  termsAccepted: boolean;
+  marketingAccepted: boolean;
+}
+
+const qualifications: string[] = [
   'Facharzt',
   'Oberarzt',
   'Notfallmedizin',
@@ -235,7 +251,7 @@ const qualifications = [
   'Endoskopie'
 ]
 
-const form = reactive({
+const form = reactive<DoctorForm>({
   specialty: '',
   name: '',
   email: '',
@@ -250,11 +266,11 @@ const form = reactive({
   marketingAccepted: false
 })
 
-const formSubmitted = ref(false)
-const submitError = ref(null)
-const isSubmitting = ref(false)
+const formSubmitted = ref<boolean>(false)
+const submitError = ref<string | null>(null)
+const isSubmitting = ref<boolean>(false)
 
-async function submitForm() {
+async function submitForm(): Promise<void> {
   isSubmitting.value = true
   submitError.value = null
   
@@ -288,21 +304,29 @@ async function submitForm() {
     const generatedTitle = `Arzt sucht ab ${formattedDate}${form.specialty ? ' Stelle als ' + form.specialty : ''}`
     
     // Prepare the bulletin data
-    const bulletinData = {
+    const bulletinData: Partial<Bulletin> = {
       title: generatedTitle,
       name: form.name || 'Arzt', // Fallback if name is not provided
       email: form.email,
-      phone: form.phone || '',
       content: form.additionalInfo,
       specialty: form.specialty,
-      userType: 'Arzt',
       messageType: 'Gesuch',
-      startDate: form.availableFrom,
-      federalState: form.federalState || '',
-      requiredQualifications: qualificationsText,
+      startDate: new Date(form.availableFrom),
       privacyPolicyAccepted: form.privacyPolicyAccepted,
-      status: 'pending',
-      timestamp: new Date()
+      status: 'pending'
+    }
+    
+    // Add optional fields
+    if (form.phone) {
+      (bulletinData as any).phone = form.phone;
+    }
+    
+    if (form.federalState) {
+      (bulletinData as any).federalState = form.federalState;
+    }
+    
+    if (qualificationsText) {
+      (bulletinData as any).requiredQualifications = qualificationsText;
     }
     
     console.log('Submitting data to backend:', bulletinData)
@@ -314,20 +338,10 @@ async function submitForm() {
     // Show success message
     formSubmitted.value = true
     
-    // Reset form after submission
-    Object.keys(form).forEach(key => {
-      if (Array.isArray(form[key])) {
-        form[key] = []
-      } else if (typeof form[key] === 'boolean') {
-        form[key] = false
-      } else if (key === 'availableFrom') {
-        form[key] = new Date().toISOString().split('T')[0] // Reset to today's date
-      } else {
-        form[key] = ''
-      }
-    })
+    // Reset form
+    resetForm();
     
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error submitting form:', error)
     
     // Extract detailed error message if available
@@ -351,5 +365,20 @@ async function submitForm() {
   } finally {
     isSubmitting.value = false
   }
+}
+
+function resetForm(): void {
+  form.specialty = '';
+  form.name = '';
+  form.email = '';
+  form.phone = '';
+  form.federalState = '';
+  form.qualifications = [];
+  form.otherQualifications = '';
+  form.availableFrom = new Date().toISOString().split('T')[0];
+  form.additionalInfo = '';
+  form.privacyPolicyAccepted = false;
+  form.termsAccepted = false;
+  form.marketingAccepted = false;
 }
 </script> 

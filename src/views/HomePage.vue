@@ -396,17 +396,30 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { onMounted, ref } from 'vue';
 import bulletinProxyService from '@/services/bulletinProxyService';
 
+interface BulletinEntry {
+  _id: string;
+  title: string;
+  content: string;
+  messageType: string;
+  timestamp?: string;
+  createdAt?: string;
+  specialty?: string;
+  federalState?: string;
+  startDate?: string;
+  [key: string]: any; // Allow additional properties
+}
+
 // State for bulletin board entries
-const bulletinEntries = ref([]);
-const loading = ref(true);
-const error = ref(null);
+const bulletinEntries = ref<BulletinEntry[]>([]);
+const loading = ref<boolean>(true);
+const error = ref<string | null>(null);
 
 // Fetch bulletin board entries exclusively from the API
-const fetchBulletinEntries = async () => {
+const fetchBulletinEntries = async (): Promise<void> => {
   loading.value = true;
   error.value = null;
   
@@ -423,13 +436,27 @@ const fetchBulletinEntries = async () => {
     const response = await bulletinProxyService.getAllBulletins(params);
     
     if (response && response.data) {
-      bulletinEntries.value = response.data;
+      // Convert the response data to match our BulletinEntry interface
+      bulletinEntries.value = (response.data as unknown[]).map(item => {
+        const typedItem = item as Record<string, any>;
+        return {
+          _id: typedItem._id || '',
+          title: typedItem.title || '',
+          content: typedItem.content || '',
+          messageType: typedItem.messageType || '',
+          timestamp: typedItem.timestamp ? new Date(typedItem.timestamp).toISOString() : undefined,
+          createdAt: typedItem.createdAt ? new Date(typedItem.createdAt).toISOString() : undefined,
+          specialty: typedItem.specialty,
+          federalState: typedItem.federalState,
+          startDate: typedItem.startDate
+        };
+      });
       console.log('Successfully loaded', bulletinEntries.value.length, 'active entries from database');
     } else {
       error.value = 'Keine Einträge gefunden.';
       bulletinEntries.value = [];
     }
-  } catch (err) {
+  } catch (err: unknown) {
     console.error('Error fetching bulletin entries:', err);
     error.value = 'Fehler beim Laden der Daten. Bitte versuchen Sie es später erneut.';
     bulletinEntries.value = [];
@@ -439,12 +466,12 @@ const fetchBulletinEntries = async () => {
 };
 
 // Format date
-const formatDate = (date) => {
+const formatDate = (date?: string): string => {
   if (!date) return '';
   
   const now = new Date();
   const postDate = new Date(date);
-  const diffTime = Math.abs(now - postDate);
+  const diffTime = Math.abs(now.getTime() - postDate.getTime());
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   
   if (diffDays <= 1) return 'Heute';
@@ -467,20 +494,22 @@ onMounted(() => {
   const speed = 200; // The lower the faster
   
   counters.forEach(counter => {
-    const target = +counter.getAttribute('data-target');
-    const increment = target / speed;
-    
-    const updateCount = () => {
-      const count = +counter.innerText;
-      if (count < target) {
-        counter.innerText = Math.ceil(count + increment);
-        setTimeout(updateCount, 1);
-      } else {
-        counter.innerText = target;
-      }
-    };
-    
-    updateCount();
+    if (counter instanceof HTMLElement) {
+      const target = +(counter.getAttribute('data-target') || '0');
+      const increment = target / speed;
+      
+      const updateCount = () => {
+        const count = +(counter.innerText || '0');
+        if (count < target) {
+          counter.innerText = Math.ceil(count + increment).toString();
+          setTimeout(updateCount, 1);
+        } else {
+          counter.innerText = target.toString();
+        }
+      };
+      
+      updateCount();
+    }
   });
 });
 </script>

@@ -29,26 +29,26 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import cookieService from '@/services/cookie.service';
 
 const showBanner = ref(false);
 
 // Prüfen, ob Cookie-Präferenz bereits gesetzt wurde
-const checkCookieConsent = () => {
+const checkCookieConsent = (): void => {
   const cookieConsent = cookieService.getCookie('cookie-consent');
   showBanner.value = cookieConsent === '';
 };
 
 // Cookies akzeptieren
-const acceptCookies = () => {
+const acceptCookies = (): void => {
   cookieService.acceptCookies();
   showBanner.value = false;
 };
 
 // Cookies ablehnen
-const rejectCookies = () => {
+const rejectCookies = (): void => {
   cookieService.rejectCookies();
   showBanner.value = false;
 };
