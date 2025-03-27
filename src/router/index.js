@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomePage from '@/views/HomePage.vue'
+import { h } from 'vue'
 
 // Lazy load the auth service to prevent circular dependencies
 const getAuthService = () => import('@/services/auth.service').then(module => module.default)
@@ -404,5 +405,23 @@ router.push = function push(location) {
     return Promise.reject(err);
   });
 };
+
+// Create a safer RouterView component with error boundary
+const originalRouterView = router.install.prototype?.RouterView;
+if (originalRouterView) {
+  router.install.prototype.RouterView = {
+    ...originalRouterView,
+    setup(props, context) {
+      try {
+        // Call the original setup with error handling
+        return originalRouterView.setup(props, context);
+      } catch (error) {
+        console.error('Error in RouterView setup:', error);
+        // Return a simple div as fallback in case of error
+        return () => h('div', { class: 'router-error' }, 'Router view error. Please refresh the page.');
+      }
+    }
+  };
+}
 
 export default router 
