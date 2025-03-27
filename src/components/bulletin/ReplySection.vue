@@ -239,16 +239,42 @@ const selectedRepliesCount = computed(() => selectedReplies.value.size)
 
 // Add computed property to check if user can edit reply
 const canEditReply = (reply) => {
-  if (!authStore.isAuthenticated) return false
+  if (!reply) return false
+  // Admin can edit any reply
   if (authStore.isAdmin) return true
-  return reply.userId === authStore.userId
+  
+  // Authenticated user can edit their own replies
+  if (authStore.isAuthenticated && reply.userId) {
+    return reply.userId === authStore.userId
+  }
+  
+  // Guest user can edit their own replies using sessionId
+  const sessionId = localStorage.getItem('guestSessionId')
+  if (sessionId && reply.sessionId) {
+    return reply.sessionId === sessionId
+  }
+  
+  return false
 }
 
 // Add computed property to check if user can delete reply
 const canDeleteReply = (reply) => {
-  if (!authStore.isAuthenticated) return false
+  if (!reply) return false
+  // Admin can delete any reply
   if (authStore.isAdmin) return true
-  return reply.userId === authStore.userId
+  
+  // Authenticated user can delete their own replies
+  if (authStore.isAuthenticated && reply.userId) {
+    return reply.userId === authStore.userId
+  }
+  
+  // Guest user can delete their own replies using sessionId
+  const sessionId = localStorage.getItem('guestSessionId')
+  if (sessionId && reply.sessionId) {
+    return reply.sessionId === sessionId
+  }
+  
+  return false
 }
 
 // Add method to handle reply selection
@@ -361,6 +387,28 @@ const formatDate = (date) => {
 
 const submitReply = async () => {
   try {
+    // Validate form
+    if (authStore.isAuthenticated) {
+      // For logged-in users, only content is required
+      if (!replyForm.content) {
+        showToast('Bitte geben Sie einen Inhalt ein', 'error')
+        return
+      }
+    } else {
+      // For guests, name, email, content and privacy policy are required
+      if (!replyForm.name || !replyForm.email || !replyForm.content || !replyForm.privacyPolicyAccepted) {
+        showToast('Bitte füllen Sie alle Pflichtfelder aus', 'error')
+        return
+      }
+      
+      // Validate email format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+      if (!emailRegex.test(replyForm.email)) {
+        showToast('Bitte geben Sie eine gültige E-Mail-Adresse ein', 'error')
+        return
+      }
+    }
+    
     isSubmitting.value = true
     
     const response = await bulletinProxyService.addReply(props.message.id, {
@@ -375,7 +423,16 @@ const submitReply = async () => {
     }
   } catch (error) {
     console.error('Error submitting reply:', error)
-    showToast('Fehler beim Senden der Antwort', 'error')
+    if (error.response?.status === 401) {
+      showToast('Bitte melden Sie sich an, um eine Antwort zu senden', 'error')
+    } else if (error.response?.status === 500) {
+      showToast('Server-Fehler beim Verarbeiten der Antwort. Bitte versuchen Sie es später erneut.', 'error')
+      console.error('Server error details:', error.response?.data)
+    } else if (error.response?.data?.error) {
+      showToast(error.response.data.error, 'error')
+    } else {
+      showToast('Fehler beim Senden der Antwort. Bitte überprüfen Sie Ihre Internetverbindung.', 'error')
+    }
   } finally {
     isSubmitting.value = false
   }
@@ -384,11 +441,6 @@ const submitReply = async () => {
 // Add delete reply method
 const deleteReply = async (reply) => {
   try {
-    if (!authStore.isAuthenticated) {
-      showToast('Bitte melden Sie sich an, um Antworten zu löschen', 'error')
-      return
-    }
-
     await bulletinProxyService.deleteReply(props.message.id, reply._id)
     showToast('Antwort wurde erfolgreich gelöscht', 'success')
     emit('reply-deleted', reply._id)
@@ -396,10 +448,17 @@ const deleteReply = async (reply) => {
     selectedReply.value = null
   } catch (error) {
     console.error('Error deleting reply:', error)
-    if (error.message === 'Please log in to delete replies') {
+    if (error.response?.status === 401) {
+      showToast('Bitte melden Sie sich an, um Antworten zu löschen', 'error')
+    } else if (error.response?.status === 403) {
+      showToast('Sie haben keine Berechtigung, diese Antwort zu löschen', 'error')
+    } else if (error.response?.status === 500) {
+      showToast('Server-Fehler beim Löschen der Antwort. Bitte versuchen Sie es später erneut.', 'error')
+      console.error('Server error details:', error.response?.data)
+    } else if (error.message === 'Please log in to delete replies') {
       showToast('Bitte melden Sie sich an, um Antworten zu löschen', 'error')
     } else {
-      showToast('Fehler beim Löschen der Antwort', 'error')
+      showToast('Fehler beim Löschen der Antwort. Bitte überprüfen Sie Ihre Internetverbindung.', 'error')
     }
   }
 }

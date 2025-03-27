@@ -221,15 +221,30 @@ class BulletinService {
       // Remove timestamp from reply data as it will be set by the server
       const { timestamp, ...dataToSend } = replyData;
       
-      // Ensure user is authenticated
-      if (!this.authStore.isAuthenticated) {
-        throw new Error('Please log in to add replies');
-      }
-
-      // Add user ID to reply data
-      dataToSend.userId = this.authStore.userId;
+      // Set up headers with session ID for guest users
+      const headers = {};
       
-      const response = await api.post(`/bulletin/${bulletinId}/replies`, dataToSend);
+      // For authenticated users, use their account info
+      if (this.authStore.isAuthenticated) {
+        // No need to send name/email as they'll be pulled from the user account
+        const { name, email, ...rest } = dataToSend;
+        dataToSend.userId = this.authStore.userId;
+      } else {
+        // For guests, ensure name, email and privacy policy acceptance are provided
+        if (!dataToSend.name || !dataToSend.email || !dataToSend.privacyPolicyAccepted) {
+          throw new Error('Name, email and privacy policy acceptance are required for guest users');
+        }
+        
+        // Include session ID for guest users in both header and body
+        const sessionId = this.getSessionId();
+        dataToSend.sessionId = sessionId;
+        headers['X-Session-Id'] = sessionId;
+        
+        console.log('BulletinService: Using guest session ID:', sessionId);
+      }
+      
+      console.log('BulletinService: Sending data:', dataToSend);
+      const response = await api.post(`/bulletin/${bulletinId}/replies`, dataToSend, { headers });
       console.log('BulletinService: Reply added successfully:', response.data);
       return response.data;
     } catch (error) {
@@ -254,7 +269,17 @@ class BulletinService {
     try {
       console.log('BulletinService: Deleting reply', replyId, 'from bulletin', bulletinId);
       
-      const response = await api.delete(`/bulletin/${bulletinId}/replies/${replyId}`);
+      // Set up headers with session ID for guest users
+      const headers = {};
+      
+      // Add session ID to headers for guest users
+      if (!this.authStore.isAuthenticated) {
+        const sessionId = this.getSessionId();
+        headers['X-Session-Id'] = sessionId;
+        console.log('BulletinService: Using guest session ID for delete:', sessionId);
+      }
+      
+      const response = await api.delete(`/bulletin/${bulletinId}/replies/${replyId}`, { headers });
       
       console.log('BulletinService: Reply deleted successfully');
       return response.data;
@@ -275,15 +300,25 @@ class BulletinService {
     try {
       console.log('BulletinService: Updating reply', replyId, 'in bulletin', bulletinId);
       
+      // Set up headers with session ID for guest users
+      const headers = {};
+      
       const dataToSend = {
         content,
-        userId: this.authStore.isAuthenticated ? this.authStore.userId : null,
-        sessionId: this.getSessionId()
+        userId: this.authStore.isAuthenticated ? this.authStore.userId : null
       };
+      
+      // For guest users, include session ID in both headers and body
+      if (!this.authStore.isAuthenticated) {
+        const sessionId = this.getSessionId();
+        dataToSend.sessionId = sessionId;
+        headers['X-Session-Id'] = sessionId;
+        console.log('BulletinService: Using guest session ID for update:', sessionId);
+      }
 
       console.log('BulletinService: Sending update data:', dataToSend);
       
-      const response = await api.patch(`/bulletin/${bulletinId}/replies/${replyId}`, dataToSend);
+      const response = await api.patch(`/bulletin/${bulletinId}/replies/${replyId}`, dataToSend, { headers });
       
       console.log('BulletinService: Reply updated successfully');
       return response.data;

@@ -210,6 +210,16 @@ All notable changes to this project will be documented in this file.
 - Enhanced reply controller to use authenticated user data
 - Fixed session handling for guest users in bulletin operations
 - Improved error messages for authentication failures
+- Fixed reply deletion for guest users by adding session ID tracking
+- Fixed visibility of edit/delete buttons for logged-in users
+- Enhanced session middleware to handle both authenticated and guest users
+- Improved error handling in reply controllers with detailed context
+- Added comprehensive permission checking in bulletin controllers
+- Fixed 500 server error when adding replies as a guest user by improving session ID handling
+- Added improved error messages with more context for bulletin reply operations
+- Fixed session ID transmission by including it in both request headers and body for guest users
+- Enhanced error handling for 500-level errors with user-friendly messages and detailed logging
+- Improved validation of session IDs in controllers with more detailed logging
 
 ### Added
 - Auto-fill bulletin reply form with user data when logged in

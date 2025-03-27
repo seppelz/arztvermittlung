@@ -270,17 +270,30 @@ exports.updateBulletinStatus = async (req, res) => {
   }
 };
 
-// Add a reply to a bulletin
+// Add reply to a bulletin
 exports.addReply = async (req, res) => {
   try {
     const { bulletinId } = req.params;
-    const { content, privacyPolicyAccepted } = req.body;
+    const { name, email, content, privacyPolicyAccepted } = req.body;
+
+    console.log('Adding reply to bulletin:', bulletinId);
+    console.log('Request user:', req.user ? { id: req.user._id, name: req.user.name } : 'No user');
+    console.log('Request session:', req.session ? { id: req.session.id } : 'No session');
+    console.log('Request body:', { name, email, content: content?.substring(0, 20) + '...' });
 
     // Validate required fields
     if (!content || !privacyPolicyAccepted) {
       return res.status(400).json({
         success: false,
         error: 'Content and privacy policy acceptance are required'
+      });
+    }
+    
+    // For unauthenticated users, name and email are required
+    if (!req.user && (!name || !email)) {
+      return res.status(400).json({
+        success: false,
+        error: 'Name and email are required for guest users'
       });
     }
 
@@ -293,24 +306,46 @@ exports.addReply = async (req, res) => {
       });
     }
 
-    // Create new reply with user data
+    // Get session ID from request header if not in req.session
+    const sessionId = req.session?.id || req.headers['x-session-id'] || req.body.sessionId;
+    console.log('Using session ID:', sessionId);
+
+    // Create new reply with user data or guest data
     const reply = {
       content,
-      name: req.user.name,
-      email: req.user.email,
+      name: req.user ? req.user.name : name,
+      email: req.user ? req.user.email : email,
       privacyPolicyAccepted,
-      userId: req.user._id
+      userId: req.user ? req.user._id : null,
+      sessionId: !req.user ? sessionId : null
     };
+
+    console.log('Creating reply with:', { 
+      name: reply.name, 
+      email: reply.email,
+      userId: reply.userId ? 'Set' : 'Not set',
+      sessionId: reply.sessionId ? 'Set' : 'Not set'
+    });
+
+    // Initialize replies array if it doesn't exist
+    if (!bulletin.replies) {
+      bulletin.replies = [];
+    }
 
     bulletin.replies.push(reply);
     await bulletin.save();
 
     // Send email notification for new reply
-    await sendEmail({
-      to: bulletin.email,
-      subject: 'New Reply to Your Bulletin Entry',
-      text: `A new reply has been added to your bulletin entry by ${req.user.name} (${req.user.email}).`
-    });
+    try {
+      await sendEmail({
+        to: bulletin.email,
+        subject: 'New Reply to Your Bulletin Entry',
+        text: `A new reply has been added to your bulletin entry by ${reply.name} (${reply.email}).`
+      });
+    } catch (emailError) {
+      console.error('Failed to send email notification for reply:', emailError);
+      // Continue processing even if email fails
+    }
 
     res.status(201).json({
       success: true,
@@ -318,6 +353,7 @@ exports.addReply = async (req, res) => {
     });
   } catch (error) {
     console.error('Error adding reply:', error);
+    console.error('Error stack:', error.stack);
     res.status(500).json({
       success: false,
       error: 'Error adding reply'
@@ -331,6 +367,14 @@ exports.updateReply = async (req, res) => {
     const { bulletinId, replyId } = req.params;
     const { content } = req.body;
 
+    // Validate content
+    if (!content) {
+      return res.status(400).json({
+        success: false,
+        error: 'Content is required'
+      });
+    }
+
     const bulletin = await Bulletin.findById(bulletinId);
     if (!bulletin) {
       return res.status(404).json({
@@ -339,27 +383,53 @@ exports.updateReply = async (req, res) => {
       });
     }
 
-    // Check if user can edit this reply
-    const canEdit = bulletin.canEditReply(replyId, req.user?._id, req.session?.id);
-    if (!canEdit) {
-      return res.status(403).json({
+    // Check if replies array exists
+    if (!bulletin.replies || bulletin.replies.length === 0) {
+      return res.status(404).json({
         success: false,
-        error: 'You are not authorized to edit this reply'
+        error: 'No replies found for this bulletin'
       });
     }
 
-    const reply = bulletin.replies.id(replyId);
-    reply.content = content;
+    // Find the reply to update
+    const replyIndex = bulletin.replies.findIndex(reply => 
+      reply._id.toString() === replyId
+    );
 
+    if (replyIndex === -1) {
+      return res.status(404).json({
+        success: false,
+        error: 'Reply not found'
+      });
+    }
+
+    const reply = bulletin.replies[replyIndex];
+
+    // Check permissions - admin, owner of the reply, or owner of the bulletin can update
+    const isAdmin = req.user && req.user.role === 'admin';
+    const isReplyOwner = req.user && reply.userId && reply.userId.toString() === req.user._id.toString();
+    const isBulletinOwner = req.user && bulletin.userId && bulletin.userId.toString() === req.user._id.toString();
+    const isSessionMatch = req.session && req.session.id === reply.sessionId;
+
+    if (!isAdmin && !isReplyOwner && !isBulletinOwner && !isSessionMatch) {
+      return res.status(403).json({
+        success: false,
+        error: 'You do not have permission to update this reply'
+      });
+    }
+
+    // Update the reply
+    bulletin.replies[replyIndex].content = content;
     await bulletin.save();
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
+      message: 'Reply updated successfully',
       data: bulletin
     });
   } catch (error) {
     console.error('Error updating reply:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: 'Error updating reply'
     });
@@ -379,25 +449,53 @@ exports.deleteReply = async (req, res) => {
       });
     }
 
-    // Check if user can delete this reply
-    const canEdit = bulletin.canEditReply(replyId, req.user?._id, req.session?.id);
-    if (!canEdit) {
-      return res.status(403).json({
+    // Check if replies array exists
+    if (!bulletin.replies || bulletin.replies.length === 0) {
+      return res.status(404).json({
         success: false,
-        error: 'You are not authorized to delete this reply'
+        error: 'No replies found for this bulletin'
       });
     }
 
-    bulletin.replies.pull(replyId);
+    // Find the reply to delete
+    const replyIndex = bulletin.replies.findIndex(reply => 
+      reply._id.toString() === replyId
+    );
+
+    if (replyIndex === -1) {
+      return res.status(404).json({
+        success: false,
+        error: 'Reply not found'
+      });
+    }
+
+    const reply = bulletin.replies[replyIndex];
+
+    // Check permissions - admin, owner of the reply, or owner of the bulletin can delete
+    const isAdmin = req.user && req.user.role === 'admin';
+    const isReplyOwner = req.user && reply.userId && reply.userId.toString() === req.user._id.toString();
+    const isBulletinOwner = req.user && bulletin.userId && bulletin.userId.toString() === req.user._id.toString();
+    const isSessionMatch = req.session && req.session.id === reply.sessionId;
+
+    if (!isAdmin && !isReplyOwner && !isBulletinOwner && !isSessionMatch) {
+      return res.status(403).json({
+        success: false,
+        error: 'You do not have permission to delete this reply'
+      });
+    }
+
+    // Remove the reply
+    bulletin.replies.splice(replyIndex, 1);
     await bulletin.save();
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
+      message: 'Reply deleted successfully',
       data: bulletin
     });
   } catch (error) {
     console.error('Error deleting reply:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: 'Error deleting reply'
     });
