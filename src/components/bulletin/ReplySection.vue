@@ -62,7 +62,7 @@
     <!-- Reply button or registration message -->
     <div v-if="!showReplyForm" class="text-center mt-4">
       <button
-        v-if="authStore.isAuthenticated"
+        v-if="authStore.isAuthenticated && canReply"
         @click="openReplyForm"
         class="inline-flex items-center px-3 py-1.5 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
       >
@@ -71,6 +71,12 @@
         </svg>
         Antworten
       </button>
+      
+      <!-- Message for inactive bulletin -->
+      <div v-else-if="authStore.isAuthenticated && !canReply" class="bg-yellow-50 rounded-lg p-4 border border-yellow-200 text-center">
+        <p class="text-yellow-800 mb-2">Dieser Beitrag ist derzeit nicht für Antworten verfügbar.</p>
+        <p class="text-sm text-yellow-600">Status: {{ bulletinStatus }}</p>
+      </div>
       
       <!-- Message for non-authenticated users -->
       <div v-else class="bg-gray-50 rounded-lg p-4 border border-gray-200 text-center">
@@ -87,7 +93,8 @@
       
       <!-- Debug message - remove in production -->
       <div class="mt-2 text-xs text-gray-400">
-        Auth Status: {{ authStore.isAuthenticated ? 'Angemeldet' : 'Nicht angemeldet' }}
+        Auth Status: {{ authStore.isAuthenticated ? 'Angemeldet' : 'Nicht angemeldet' }} |
+        Bulletin Status: {{ bulletinStatus }}
       </div>
     </div>
 
@@ -200,6 +207,7 @@ import { Bulletin, BulletinReply } from '@/types'
 
 interface Props {
   message: Bulletin;
+  showStatistics?: boolean;
 }
 
 // UI-specific bulletin reply that includes bulletinId
@@ -232,6 +240,8 @@ const showEditForm = ref<boolean>(false)
 const selectedReply = ref<BulletinReply | null>(null)
 const selectedReplies = ref<Set<string>>(new Set())
 const editedContent = ref<string>('')
+const bulletinStatus = computed(() => props.message.status || 'unknown')
+const canReply = computed(() => bulletinStatus.value === 'active')
 
 // Form data - simplified since guests can't reply
 const replyForm = reactive<ReplyForm>({
@@ -299,6 +309,13 @@ function openReplyForm(): void {
     return
   }
   
+  // Check bulletin status before showing the form
+  if (!canReply.value) {
+    showToast(`Antworten sind für diesen Beitrag nicht möglich. Bulletin Status: ${bulletinStatus.value}`, 'error')
+    console.log(`Cannot reply to bulletin with status: ${bulletinStatus.value}`);
+    return
+  }
+  
   showReplyForm.value = true
 }
 
@@ -315,6 +332,14 @@ async function submitReply(): Promise<void> {
       return
     }
     
+    // Check bulletin status before attempting to reply
+    if (!canReply.value) {
+      errorMessage.value = `Antworten sind für diesen Beitrag nicht möglich. Bulletin Status: ${bulletinStatus.value}`
+      showToast(errorMessage.value, 'error')
+      showReplyForm.value = false
+      return
+    }
+    
     isSubmitting.value = true
     errorMessage.value = ''
     
@@ -325,6 +350,7 @@ async function submitReply(): Promise<void> {
     }
     
     console.log('Preparing to submit reply as authenticated user:', authStore.isAuthenticated)
+    console.log('Bulletin status:', bulletinStatus.value)
     
     // Send the reply
     const response = await bulletinService.addReply(props.message._id, replyData)
@@ -353,6 +379,10 @@ async function submitReply(): Promise<void> {
     if (error instanceof Error && error.message.includes('401')) {
       errorMessage.value = 'Sie müssen angemeldet sein, um zu antworten'
       showToast('Sie müssen angemeldet sein, um zu antworten', 'error')
+      showReplyForm.value = false
+    } else if (error instanceof Error && error.message.includes('status')) {
+      errorMessage.value = 'Antworten können nicht hinzugefügt werden. Das Bulletin hat einen ungültigen Status.'
+      showToast(errorMessage.value, 'error')
       showReplyForm.value = false
     } else {
       errorMessage.value = 'Fehler beim Senden der Antwort. Bitte versuchen Sie es später erneut.'
