@@ -11,20 +11,41 @@ export interface ResponseWithData<T> {
   message?: string;
 }
 
+// Variable to track if guest session has been initialized
+let guestSessionInitialized = false;
+
 // Initialize guest session if needed
 function initializeGuestSession(): void {
-  const authStore = useAuthStore();
-  if (!authStore.isAuthenticated && !localStorage.getItem('sessionId')) {
-    const sessionId = crypto.randomUUID();
-    localStorage.setItem('sessionId', sessionId);
+  if (guestSessionInitialized) return;
+  
+  try {
+    const authStore = useAuthStore();
+    if (!authStore.isAuthenticated && !localStorage.getItem('sessionId')) {
+      const sessionId = crypto.randomUUID();
+      localStorage.setItem('sessionId', sessionId);
+    }
+    guestSessionInitialized = true;
+  } catch (error) {
+    console.error('Failed to initialize guest session:', error);
+    // Continue without initialization if the auth store is not ready
   }
 }
 
 // Get current session ID
 function getSessionId(): string | null {
-  const authStore = useAuthStore();
-  if (authStore.isAuthenticated) {
-    return null;
+  // Ensure guest session is initialized when this function is called
+  if (!guestSessionInitialized) {
+    initializeGuestSession();
+  }
+  
+  try {
+    const authStore = useAuthStore();
+    if (authStore.isAuthenticated) {
+      return null;
+    }
+  } catch (error) {
+    console.error('Error accessing auth store:', error);
+    // If we can't access the auth store, assume guest user
   }
   return localStorage.getItem('sessionId');
 }
@@ -469,9 +490,6 @@ function canEditReply(reply: BulletinReply): boolean {
   const sessionId = getSessionId();
   return !!sessionId && sessionId === reply.sessionId;
 }
-
-// Initialize guest session on service import
-initializeGuestSession();
 
 // Export service functions
 export {
