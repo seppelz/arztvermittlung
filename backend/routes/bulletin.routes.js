@@ -80,6 +80,7 @@ const createWithNotification = async (req, res) => {
 router.get('/', bulletinController.getAllBulletins);
 router.get('/:id', bulletinController.getBulletin);
 router.post('/', createWithNotification);
+router.post('/:id/replies', bulletinController.addReply);
 
 // Geschützte Routen (Admin-Bereich)
 router.use(authMiddleware.protect);

@@ -495,3 +495,15 @@ All notable changes to this project will be documented in this file.
 ### Added
 - Added reply functionality to bulletin board messages, allowing users to respond directly to posts
 - Added ReplySection component for handling bulletin message replies
+
+### Added
+- Implemented bulletin reply functionality with email notifications
+- Added backend endpoint for handling bulletin replies
+- Added validation for reply submissions
+
+## [Unreleased]
+
+### Added
+- Implemented bulletin reply functionality with email notifications
+- Added backend endpoint for handling bulletin replies
+- Added validation for reply submissions

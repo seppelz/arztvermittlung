@@ -248,4 +248,60 @@ exports.updateBulletinStatus = async (req, res) => {
     console.error('Error updating bulletin status:', error);
     res.status(500).json({ message: 'Ein Fehler ist aufgetreten', error: error.message });
   }
+};
+
+exports.addReply = async (req, res) => {
+  try {
+    const bulletinId = req.params.id;
+    const { content, name, email, privacyPolicyAccepted } = req.body;
+
+    // Validate required fields
+    if (!content || !name || !email || !privacyPolicyAccepted) {
+      return res.status(400).json({
+        message: 'Required fields are missing',
+        required: {
+          content: !content,
+          name: !name,
+          email: !email,
+          privacyPolicyAccepted: !privacyPolicyAccepted
+        }
+      });
+    }
+
+    // Find the bulletin
+    const bulletin = await Bulletin.findById(bulletinId);
+    if (!bulletin) {
+      return res.status(404).json({ message: 'Bulletin not found' });
+    }
+
+    // Create new reply
+    const reply = {
+      content,
+      name,
+      email,
+      timestamp: new Date(),
+      privacyPolicyAccepted
+    };
+
+    // Add reply to bulletin
+    bulletin.replies.push(reply);
+    await bulletin.save();
+
+    // Send email notification to bulletin author
+    if (bulletin.email) {
+      await sendEmail({
+        to: bulletin.email,
+        subject: 'Neue Antwort auf Ihr Bulletin',
+        text: `Eine neue Antwort wurde auf Ihr Bulletin "${bulletin.title}" veröffentlicht.\n\nAntwort von: ${name}\nE-Mail: ${email}\n\nInhalt:\n${content}`
+      });
+    }
+
+    res.json({
+      message: 'Reply added successfully',
+      reply
+    });
+  } catch (error) {
+    console.error('Error adding reply:', error);
+    res.status(500).json({ message: 'Error adding reply' });
+  }
 }; 
