@@ -13,7 +13,6 @@ const doctorSchema = new mongoose.Schema({
   },
   specialty: {
     type: String,
-    required: true,
     trim: true
   },
   qualifications: [{
@@ -27,7 +26,6 @@ const doctorSchema = new mongoose.Schema({
   contact: {
     phone: {
       type: String,
-      required: true,
       trim: true
     },
     email: {
@@ -66,8 +64,6 @@ doctorSchema.index({ userId: 1 });
 doctorSchema.pre('save', function(next) {
   this.isProfileComplete = !!(
     this.name &&
-    this.specialty &&
-    this.contact.phone &&
     this.contact.email &&
     this.availability.availableFrom
   );

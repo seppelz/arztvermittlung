@@ -325,6 +325,12 @@ All notable changes to this project will be documented in this file.
 - Reordered profile completion form to appear above bulletin entries in profile page for better user experience
 - Updated favicon to use Med-Match logo instead of Vue.js default favicon
 - Improved account deletion functionality with clearer UI and proper account-wide deletion
+- Made specialty field optional in doctor profile form
+- Updated validation logic to remove specialty requirement
+- Improved error handling for optional fields
+- Made phone field optional in doctor profile model
+- Updated profile completion check to not require phone number
+- Improved error handling for optional fields in doctor profile
 
 ### Added
 - Added reply functionality to bulletin board messages, allowing users to respond directly to posts
@@ -344,6 +350,10 @@ All notable changes to this project will be documented in this file.
 - Added edit buttons for authorized users
 - Added confirmation modals for destructive actions
 - Added edit modal for reply content updates
+- Fixed doctor profile validation to properly handle required fields
+- Added client-side validation for doctor profile form
+- Improved error messages for missing required fields
+- Added visual feedback for validation errors in doctor profile form
 
 ## [1.0.0] - 2024-03-26
 
