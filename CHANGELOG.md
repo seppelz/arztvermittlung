@@ -471,3 +471,32 @@ All notable changes to this project will be documented in this file.
 - Improved session validation security
 - Enhanced error messages for session-related issues
 - Fixed route organization for better security
+
+### Fixed
+- Fixed 500 server error when adding replies to bulletins
+- Fixed issue with reply deletion functionality
+- Fixed visibility of edit/delete buttons for logged-in users
+- Added proper session handling for guest users
+- Improved error handling in reply controllers
+- Updated permission checking for bulletin operations
+
+### Changed
+- Enhanced session middleware to support both authenticated and guest users
+- Updated bulletin service to better handle guest user interactions
+- Improved validation in reply form submission
+
+### Added
+- Added session ID tracking for guest users
+- Added comprehensive permission checking in bulletin controllers
+
+### Added
+- Session middleware to handle both authenticated and guest users for bulletin operations
+- Enhanced permission checking for bulletin replies with session ID tracking
+- Support for guest users to edit/delete their own bulletin replies
+- Detailed contextual error messages for debugging bulletin operations
+- Session validation for reply endpoints to support both logged-in and guest users
+
+### Changed
+- Reply endpoints now use validateOrCreateSession middleware instead of protect middleware
+- Permission checking in controllers now accounts for four scenarios (admin, bulletin owner, reply owner, session match)
+- Error handling in bulletin controllers now includes more context for easier debugging
