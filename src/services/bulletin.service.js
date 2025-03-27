@@ -248,23 +248,29 @@ class BulletinService {
    * @param {Object} replyData - Updated reply data
    * @returns {Promise} - Promise with the update response
    */
-  async updateReply(bulletinId, replyId, replyData) {
+  async updateReply(bulletinId, replyId, content) {
     try {
-      console.log(`BulletinService: Updating reply ${replyId} in bulletin ${bulletinId}`);
+      console.log('BulletinService: Updating reply', replyId, 'in bulletin', bulletinId);
       
       // Get user ID from localStorage
-      const userJson = localStorage.getItem('user');
-      const user = userJson ? JSON.parse(userJson) : null;
-      
-      if (user && user._id) {
-        replyData.userId = user._id;
+      const user = JSON.parse(localStorage.getItem('user'));
+      if (!user || !user._id) {
+        throw new Error('User not authenticated');
       }
+
+      const dataToSend = {
+        content,
+        userId: user._id
+      };
+
+      console.log('BulletinService: Sending update data:', dataToSend);
       
-      const response = await api.patch(`/bulletin/${bulletinId}/replies/${replyId}`, replyData);
+      const response = await api.patch(`/bulletin/${bulletinId}/replies/${replyId}`, dataToSend);
+      
       console.log('BulletinService: Reply updated successfully');
-      return response;
+      return response.data;
     } catch (error) {
-      console.error('Error updating reply:', error);
+      console.error('BulletinService: Error updating reply:', error);
       throw error;
     }
   }

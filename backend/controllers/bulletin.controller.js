@@ -337,46 +337,48 @@ exports.addReply = async (req, res) => {
 
 exports.updateReply = async (req, res) => {
   try {
-    const { id, replyId } = req.params;
-    const { content } = req.body;
-    const userId = req.user?._id; // Get user ID from authenticated request
-
-    console.log('Updating reply:', { bulletinId: id, replyId, userId });
-
-    // Find the bulletin
-    const bulletin = await Bulletin.findById(id);
+    const bulletin = await Bulletin.findById(req.params.id);
     if (!bulletin) {
-      return res.status(404).json({ message: 'Bulletin not found' });
+      return res.status(404).json({
+        status: 'error',
+        message: 'Bulletin not found'
+      });
     }
 
-    // Find the reply
-    const reply = bulletin.replies.id(replyId);
+    const reply = bulletin.replies.id(req.params.replyId);
     if (!reply) {
-      return res.status(404).json({ message: 'Reply not found' });
+      return res.status(404).json({
+        status: 'error',
+        message: 'Reply not found'
+      });
     }
 
-    // Check authorization
-    const isAdmin = req.user?.role === 'admin';
-    const isReplyOwner = reply.userId?.equals(userId);
-    
-    if (!isAdmin && !isReplyOwner) {
-      return res.status(403).json({ message: 'Not authorized to edit this reply' });
+    // Check if user is authorized to update the reply
+    if (reply.userId && reply.userId.toString() !== req.user._id.toString()) {
+      return res.status(403).json({
+        status: 'error',
+        message: 'You are not authorized to update this reply'
+      });
     }
 
-    // Update reply content
-    reply.content = content;
+    // Update reply fields
+    reply.content = req.body.content;
+    reply.updatedAt = Date.now();
+
     await bulletin.save();
 
-    console.log('Reply updated successfully:', reply);
-    res.json({
-      message: 'Reply updated successfully',
-      reply
+    res.status(200).json({
+      status: 'success',
+      data: {
+        bulletin
+      }
     });
   } catch (error) {
     console.error('Error updating reply:', error);
-    res.status(500).json({ 
+    res.status(500).json({
+      status: 'error',
       message: 'Error updating reply',
-      error: error.message 
+      error: error.message
     });
   }
 };
