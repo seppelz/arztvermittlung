@@ -536,6 +536,8 @@ All notable changes to this project will be documented in this file.
 - Refactored bulletinProxyService for better error handling and consistency
 - Eliminated direct usage of bulletinService in views for better error handling
 - Fixed Vue Router error by removing dependency on isInitialized property
+- Added robust error handling for router initialization with fallback router
+- Added RouterView error boundary to catch component rendering errors
 
 ## [0.9.0] - 2023-12-15
 
