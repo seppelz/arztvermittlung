@@ -79,7 +79,7 @@
         <p class="text-sm text-gray-500 mb-4">Sie antworten auf die Nachricht von {{ message.name }}</p>
         
         <form @submit.prevent="submitReply" class="space-y-4">
-          <div>
+          <div v-if="!authStore.isAuthenticated">
             <label for="replyName" class="block text-sm font-medium text-gray-700">Ihr Name*</label>
             <input
               id="replyName"
@@ -90,7 +90,7 @@
             >
           </div>
           
-          <div>
+          <div v-if="!authStore.isAuthenticated">
             <label for="replyEmail" class="block text-sm font-medium text-gray-700">Ihre E-Mail*</label>
             <input
               id="replyEmail"
@@ -112,7 +112,7 @@
             ></textarea>
           </div>
           
-          <div class="flex items-start">
+          <div v-if="!authStore.isAuthenticated" class="flex items-start">
             <input
               type="checkbox"
               id="replyPrivacyPolicy"
@@ -208,7 +208,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed } from 'vue'
+import { ref, reactive, computed, watch } from 'vue'
 import { useToast } from '@/composables/useToast'
 import bulletinProxyService from '@/services/bulletinProxyService'
 import { useAuthStore } from '@/stores/auth'
@@ -323,6 +323,32 @@ const replyForm = reactive({
   privacyPolicyAccepted: false
 })
 
+// Add method to initialize form with user data
+const initializeFormWithUserData = () => {
+  if (authStore.isAuthenticated && authStore.user) {
+    replyForm.name = authStore.user.name || ''
+    replyForm.email = authStore.user.email || ''
+    replyForm.privacyPolicyAccepted = true // Since user is logged in, they've already accepted the privacy policy
+  }
+}
+
+// Update showReplyForm watcher to initialize form
+watch(showReplyForm, (newValue) => {
+  if (newValue) {
+    initializeFormWithUserData()
+  }
+})
+
+// Update closeReplyForm to reset form
+const closeReplyForm = () => {
+  showReplyForm.value = false
+  // Reset form
+  replyForm.name = ''
+  replyForm.email = ''
+  replyForm.content = ''
+  replyForm.privacyPolicyAccepted = false
+}
+
 const formatDate = (date) => {
   return new Date(date).toLocaleDateString('de-DE', {
     day: '2-digit',
@@ -331,15 +357,6 @@ const formatDate = (date) => {
     hour: '2-digit',
     minute: '2-digit'
   })
-}
-
-const closeReplyForm = () => {
-  showReplyForm.value = false
-  // Reset form
-  replyForm.name = ''
-  replyForm.email = ''
-  replyForm.content = ''
-  replyForm.privacyPolicyAccepted = false
 }
 
 const submitReply = async () => {
