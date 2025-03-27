@@ -273,71 +273,70 @@ async function addReply(bulletinId: string, reply: Partial<BulletinReply>): Prom
       throw new Error('Sie müssen angemeldet sein, um Antworten zu verfassen.');
     }
     
-    // Prepare reply data with proper type
-    const replyData: Record<string, any> = {
-      content: reply.content,
-      privacyPolicyAccepted: true, // Always include this field
-      status: 'active'             // Ensure valid status value
-    };
-    
-    // Add authorization headers
-    const headers: Record<string, string> = { 
-      'Content-Type': 'application/json'
-    };
-    
     // Get token for authenticated users
     const token = localStorage.getItem('token');
     if (!token) {
       console.error('BulletinService: No token found for authenticated user');
       throw new Error('Authentifizierungstoken nicht gefunden. Bitte melden Sie sich erneut an.');
     }
-    
-    // Add token to headers
-    headers['Authorization'] = `Bearer ${token}`;
-    console.log('BulletinService: Added authorization token to headers');
-    
-    // Get user info from auth store
-    const userName = authStore.userName;
-    const userEmail = authStore.userEmail;
-    
-    // Include name and email for authenticated users
-    if (userName) replyData.name = userName;
-    if (userEmail) replyData.email = userEmail;
-    
-    // Add userId to request data explicitly
-    if (userId) {
-      replyData.userId = userId;
-    } else {
-      // Extract user ID from JWT token if not available in auth store
+
+    // Try to extract user ID from token first to ensure we have it
+    let userIdToUse = userId;
+    if (!userIdToUse) {
       try {
         const tokenParts = token.split('.');
         if (tokenParts.length === 3) {
           const payload = JSON.parse(atob(tokenParts[1]));
           if (payload && payload.id) {
             console.log('BulletinService: Extracted user ID from token:', payload.id);
-            replyData.userId = payload.id;
+            userIdToUse = payload.id;
           }
         }
       } catch (tokenError) {
         console.error('BulletinService: Error extracting user ID from token:', tokenError);
       }
     }
+
+    // Still no userId, reject the operation
+    if (!userIdToUse) {
+      console.error('BulletinService: Unable to determine user ID for reply');
+      throw new Error('Benutzer-ID konnte nicht ermittelt werden. Bitte aktualisieren Sie die Seite und versuchen Sie es erneut.');
+    }
+    
+    // Get user info from auth store
+    const userName = authStore.userName || 'Angemeldeter Benutzer';
+    const userEmail = authStore.userEmail || '';
+    
+    // Prepare reply data with proper type
+    const replyData: Record<string, any> = {
+      content: reply.content,
+      privacyPolicyAccepted: true,
+      status: 'active',
+      userId: userIdToUse,
+      name: userName,
+      email: userEmail
+    };
+    
+    // Add authorization headers
+    const headers: Record<string, string> = { 
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    };
     
     console.log('BulletinService: Using authenticated user data:', { 
-      name: replyData.name || 'Not available', 
-      email: replyData.email || 'Not available',
-      userId: replyData.userId || 'Not available'
+      name: replyData.name,
+      email: replyData.email,
+      userId: replyData.userId
     });
     
     console.log('BulletinService: Final reply data:', { 
       content: replyData.content?.substring(0, 20) + '...',
-      name: replyData.name || 'Not available',
-      email: replyData.email || 'Not available',
+      name: replyData.name,
+      email: replyData.email,
       privacyPolicyAccepted: replyData.privacyPolicyAccepted,
-      userId: replyData.userId || 'Not available'
+      status: replyData.status,
+      userId: replyData.userId
     });
-    
-    console.log('BulletinService: Request headers:', headers);
     
     // Set a timeout for the request to avoid hanging
     const response = await api.post(`/bulletin/${bulletinId}/replies`, replyData, {
@@ -351,20 +350,31 @@ async function addReply(bulletinId: string, reply: Partial<BulletinReply>): Prom
     console.error('BulletinService: Error adding reply:', error.message);
     
     if (error.response) {
-      console.error(`BulletinService: Server returned status ${error.response.status}`);
-      console.error('BulletinService: Error response data:', error.response.data);
+      const status = error.response.status;
+      const responseData = error.response.data;
       
-      const authStore = useAuthStore();
-      const contextInfo = {
-        isAuthenticated: authStore.isAuthenticated,
-        hasUserId: !!authStore.userId,
-        userId: authStore.userId,
-        sessionId: localStorage.getItem('sessionId'),
-        responseData: error.response.data
-      };
-      console.error('BulletinService: Error context:', contextInfo);
+      console.error(`BulletinService: Server returned status ${status}`);
+      console.error('BulletinService: Error response data:', responseData);
+      
+      // Enhanced error handling with more specific messages
+      if (status === 400) {
+        if (responseData?.message?.includes('validation')) {
+          console.error('BulletinService: Validation error:', responseData.message);
+          throw new Error('Validierungsfehler: ' + responseData.message);
+        }
+        throw new Error('Ungültige Anfrage. Bitte überprüfen Sie Ihre Eingaben.');
+      } else if (status === 401) {
+        throw new Error('Sie sind nicht angemeldet oder Ihre Sitzung ist abgelaufen. Bitte melden Sie sich erneut an.');
+      } else if (status === 403) {
+        throw new Error('Sie haben keine Berechtigung, diese Aktion durchzuführen.');
+      } else if (status === 404) {
+        throw new Error('Die Nachricht wurde nicht gefunden oder wurde bereits gelöscht.');
+      } else if (status === 500) {
+        throw new Error('Ein Serverfehler ist aufgetreten. Bitte versuchen Sie es später erneut.');
+      }
     }
     
+    // If we get here, it's a generic error
     throw error;
   }
 }
