@@ -186,6 +186,8 @@ All notable changes to this project will be documented in this file.
   - Added comprehensive logging to debug data filtering issues
   - Improved date handling in sorting functionality
   - Fixed pagination display issues
+- Fixed bulletin reply endpoints to use correct path (/bulletin instead of /bulletins)
+- Added better error logging for bulletin reply operations
 
 ### Added
 - Created test scripts for MongoDB Atlas connection testing

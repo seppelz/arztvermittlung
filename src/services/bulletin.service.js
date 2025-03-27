@@ -194,11 +194,13 @@ class BulletinService {
   // Add reply to a bulletin message
   async addReply(bulletinId, replyData) {
     try {
-      const response = await api.post(`/bulletins/${bulletinId}/replies`, replyData)
-      return response
+      console.log('BulletinService: Adding reply to bulletin:', bulletinId);
+      const response = await api.post(`/bulletin/${bulletinId}/replies`, replyData);
+      console.log('BulletinService: Reply added successfully:', response.data);
+      return response;
     } catch (error) {
-      console.error('Error adding reply:', error)
-      throw error
+      console.error('Error adding reply:', error);
+      throw error;
     }
   }
 
@@ -210,7 +212,9 @@ class BulletinService {
    */
   async deleteReply(bulletinId, replyId) {
     try {
-      const response = await api.delete(`/bulletins/${bulletinId}/replies/${replyId}`);
+      console.log(`BulletinService: Deleting reply ${replyId} from bulletin ${bulletinId}`);
+      const response = await api.delete(`/bulletin/${bulletinId}/replies/${replyId}`);
+      console.log('BulletinService: Reply deleted successfully');
       return response;
     } catch (error) {
       console.error('Error deleting reply:', error);
@@ -227,7 +231,9 @@ class BulletinService {
    */
   async updateReply(bulletinId, replyId, replyData) {
     try {
-      const response = await api.patch(`/bulletins/${bulletinId}/replies/${replyId}`, replyData);
+      console.log(`BulletinService: Updating reply ${replyId} in bulletin ${bulletinId}`);
+      const response = await api.patch(`/bulletin/${bulletinId}/replies/${replyId}`, replyData);
+      console.log('BulletinService: Reply updated successfully');
       return response;
     } catch (error) {
       console.error('Error updating reply:', error);
