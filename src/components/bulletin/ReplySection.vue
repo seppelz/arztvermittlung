@@ -367,12 +367,23 @@ const submitReply = async () => {
 // Add delete reply method
 const deleteReply = async (reply) => {
   try {
+    if (!authStore.isAuthenticated) {
+      showToast('Bitte melden Sie sich an, um Antworten zu löschen', 'error')
+      return
+    }
+
     await bulletinProxyService.deleteReply(props.message.id, reply._id)
     showToast('Antwort wurde erfolgreich gelöscht', 'success')
     emit('reply-deleted', reply._id)
+    showDeleteConfirm.value = false
+    selectedReply.value = null
   } catch (error) {
     console.error('Error deleting reply:', error)
-    showToast('Fehler beim Löschen der Antwort', 'error')
+    if (error.message === 'Please log in to delete replies') {
+      showToast('Bitte melden Sie sich an, um Antworten zu löschen', 'error')
+    } else {
+      showToast('Fehler beim Löschen der Antwort', 'error')
+    }
   }
 }
 </script> 

@@ -200,6 +200,10 @@ All notable changes to this project will be documented in this file.
 - Improved error handling for unauthenticated users in bulletin replies
 - Added proper user feedback for authentication errors in reply operations
 - Enhanced reply section component with better authentication checks
+- Fixed bulletin reply deletion authentication by using auth store
+- Improved error handling for unauthenticated users in reply deletion
+- Added proper user feedback for authentication errors in reply deletion
+- Enhanced reply section component with better authentication checks for deletion
 
 ### Added
 - Created test scripts for MongoDB Atlas connection testing

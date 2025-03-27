@@ -232,12 +232,21 @@ class BulletinService {
    */
   async deleteReply(bulletinId, replyId) {
     try {
-      console.log(`BulletinService: Deleting reply ${replyId} from bulletin ${bulletinId}`);
+      console.log('BulletinService: Deleting reply', replyId, 'from bulletin', bulletinId);
+      
+      // Get user from auth store instead of localStorage
+      const authStore = useAuthStore();
+      if (!authStore.isAuthenticated || !authStore.user) {
+        console.error('BulletinService: User not authenticated');
+        throw new Error('Please log in to delete replies');
+      }
+
       const response = await api.delete(`/bulletin/${bulletinId}/replies/${replyId}`);
+      
       console.log('BulletinService: Reply deleted successfully');
-      return response;
+      return response.data;
     } catch (error) {
-      console.error('Error deleting reply:', error);
+      console.error('BulletinService: Error deleting reply:', error);
       throw error;
     }
   }
