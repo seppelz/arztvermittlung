@@ -255,8 +255,17 @@ exports.addReply = async (req, res) => {
     const bulletinId = req.params.id;
     const { content, name, email, privacyPolicyAccepted } = req.body;
 
+    console.log('Adding reply to bulletin:', bulletinId);
+    console.log('Reply data:', { content, name, email, privacyPolicyAccepted });
+
     // Validate required fields
     if (!content || !name || !email || !privacyPolicyAccepted) {
+      console.log('Missing required fields:', {
+        content: !content,
+        name: !name,
+        email: !email,
+        privacyPolicyAccepted: !privacyPolicyAccepted
+      });
       return res.status(400).json({
         message: 'Required fields are missing',
         required: {
@@ -271,6 +280,7 @@ exports.addReply = async (req, res) => {
     // Find the bulletin
     const bulletin = await Bulletin.findById(bulletinId);
     if (!bulletin) {
+      console.log('Bulletin not found:', bulletinId);
       return res.status(404).json({ message: 'Bulletin not found' });
     }
 
@@ -287,13 +297,21 @@ exports.addReply = async (req, res) => {
     bulletin.replies.push(reply);
     await bulletin.save();
 
+    console.log('Reply added successfully:', reply);
+
     // Send email notification to bulletin author
     if (bulletin.email) {
-      await sendEmail({
-        to: bulletin.email,
-        subject: 'Neue Antwort auf Ihr Bulletin',
-        text: `Eine neue Antwort wurde auf Ihr Bulletin "${bulletin.title}" veröffentlicht.\n\nAntwort von: ${name}\nE-Mail: ${email}\n\nInhalt:\n${content}`
-      });
+      try {
+        await sendEmail({
+          to: bulletin.email,
+          subject: 'Neue Antwort auf Ihr Bulletin',
+          text: `Eine neue Antwort wurde auf Ihr Bulletin "${bulletin.title}" veröffentlicht.\n\nAntwort von: ${name}\nE-Mail: ${email}\n\nInhalt:\n${content}`
+        });
+        console.log('Email notification sent to:', bulletin.email);
+      } catch (emailError) {
+        console.error('Error sending email notification:', emailError);
+        // Don't fail the request if email sending fails
+      }
     }
 
     res.json({
@@ -302,6 +320,15 @@ exports.addReply = async (req, res) => {
     });
   } catch (error) {
     console.error('Error adding reply:', error);
-    res.status(500).json({ message: 'Error adding reply' });
+    console.error('Error details:', {
+      message: error.message,
+      stack: error.stack,
+      bulletinId: req.params.id,
+      replyData: req.body
+    });
+    res.status(500).json({ 
+      message: 'Error adding reply',
+      error: error.message 
+    });
   }
 }; 

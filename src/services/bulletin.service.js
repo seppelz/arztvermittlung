@@ -195,11 +195,22 @@ class BulletinService {
   async addReply(bulletinId, replyData) {
     try {
       console.log('BulletinService: Adding reply to bulletin:', bulletinId);
-      const response = await api.post(`/bulletin/${bulletinId}/replies`, replyData);
+      console.log('BulletinService: Reply data:', replyData);
+      
+      // Remove timestamp from reply data as it will be set by the server
+      const { timestamp, ...dataToSend } = replyData;
+      
+      const response = await api.post(`/bulletin/${bulletinId}/replies`, dataToSend);
       console.log('BulletinService: Reply added successfully:', response.data);
       return response;
     } catch (error) {
       console.error('Error adding reply:', error);
+      console.error('Error details:', {
+        message: error.message,
+        response: error.response?.data,
+        bulletinId,
+        replyData
+      });
       throw error;
     }
   }
