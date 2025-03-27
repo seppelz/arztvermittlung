@@ -524,6 +524,7 @@ All notable changes to this project will be documented in this file.
 - Updated authentication store with safer getters for user data
 - Improved API client with better logging, timeout handling, and session management
 - Added consistent session ID handling for guest operations
+- Standardized bulletinProxyService usage across all components and views
 
 ### Fixed
 - Fixed 400 error when submitting bulletin replies
@@ -534,6 +535,7 @@ All notable changes to this project will be documented in this file.
 - Improved error handling in ReplySection.vue for both guests and authenticated users
 - Refactored bulletinProxyService for better error handling and consistency
 - Eliminated direct usage of bulletinService in views for better error handling
+- Fixed Vue Router error by removing dependency on isInitialized property
 
 ## [0.9.0] - 2023-12-15
 
