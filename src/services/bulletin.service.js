@@ -200,6 +200,14 @@ class BulletinService {
       // Remove timestamp from reply data as it will be set by the server
       const { timestamp, ...dataToSend } = replyData;
       
+      // Get user ID from localStorage
+      const userJson = localStorage.getItem('user');
+      const user = userJson ? JSON.parse(userJson) : null;
+      
+      if (user && user._id) {
+        dataToSend.userId = user._id;
+      }
+      
       const response = await api.post(`/bulletin/${bulletinId}/replies`, dataToSend);
       console.log('BulletinService: Reply added successfully:', response.data);
       return response;
@@ -243,6 +251,15 @@ class BulletinService {
   async updateReply(bulletinId, replyId, replyData) {
     try {
       console.log(`BulletinService: Updating reply ${replyId} in bulletin ${bulletinId}`);
+      
+      // Get user ID from localStorage
+      const userJson = localStorage.getItem('user');
+      const user = userJson ? JSON.parse(userJson) : null;
+      
+      if (user && user._id) {
+        replyData.userId = user._id;
+      }
+      
       const response = await api.patch(`/bulletin/${bulletinId}/replies/${replyId}`, replyData);
       console.log('BulletinService: Reply updated successfully');
       return response;

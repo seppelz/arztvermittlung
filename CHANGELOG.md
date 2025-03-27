@@ -193,6 +193,9 @@ All notable changes to this project will be documented in this file.
 - Added proper authorization checks for reply editing and deletion
 - Added user ID tracking for bulletin replies
 - Fixed reply update and delete endpoints in backend routes
+- Fixed authentication issues with bulletin replies
+- Added proper user ID handling in reply operations
+- Fixed authorization middleware for reply routes
 
 ### Added
 - Created test scripts for MongoDB Atlas connection testing

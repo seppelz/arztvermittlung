@@ -81,12 +81,15 @@ router.get('/', bulletinController.getAllBulletins);
 router.get('/search', bulletinController.searchBulletins);
 router.get('/:id', bulletinController.getBulletin);
 router.post('/', createWithNotification);
+
+// Reply routes with authentication
+router.use(authMiddleware.protect);
 router.post('/:id/replies', bulletinController.addReply);
 router.patch('/:id/replies/:replyId', bulletinController.updateReply);
 router.delete('/:id/replies/:replyId', bulletinController.deleteReply);
 
-// Geschützte Routen (Admin-Bereich)
-router.use(authMiddleware.protect);
+// Admin routes
+router.use(authMiddleware.restrictToAdmin);
 router.patch('/:id', bulletinController.updateBulletin);
 router.delete('/:id', bulletinController.deleteBulletin);
 router.patch('/:id/status', bulletinController.updateBulletinStatus);
