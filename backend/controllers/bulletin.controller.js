@@ -274,18 +274,31 @@ exports.updateBulletinStatus = async (req, res) => {
 exports.addReply = async (req, res) => {
   try {
     const { bulletinId } = req.params;
-    const { name, email, content, privacyPolicyAccepted } = req.body;
+    const { name, email, content, privacyPolicyAccepted, userId, sessionId: clientSessionId } = req.body;
 
     console.log('Adding reply to bulletin:', bulletinId);
     console.log('Request user:', req.user ? { id: req.user._id, name: req.user.name } : 'No user');
     console.log('Request session:', req.session ? { id: req.session.id } : 'No session');
-    console.log('Request body:', { name, email, content: content?.substring(0, 20) + '...' });
+    console.log('Request body:', { 
+      name, 
+      email, 
+      content: content?.substring(0, 20) + '...',
+      userId: userId ? 'Provided' : 'Not provided',
+      clientSessionId: clientSessionId ? 'Provided' : 'Not provided'
+    });
 
     // Validate required fields
-    if (!content || !privacyPolicyAccepted) {
+    if (!content) {
       return res.status(400).json({
         success: false,
-        error: 'Content and privacy policy acceptance are required'
+        error: 'Content is required'
+      });
+    }
+    
+    if (!privacyPolicyAccepted) {
+      return res.status(400).json({
+        success: false,
+        error: 'Privacy policy acceptance is required'
       });
     }
     
@@ -306,19 +319,38 @@ exports.addReply = async (req, res) => {
       });
     }
 
-    // Get session ID from request header if not in req.session
-    const sessionId = req.session?.id || req.headers['x-session-id'] || req.body.sessionId;
-    console.log('Using session ID:', sessionId);
+    // Collect all possible session IDs (server session, header, body)
+    const serverSessionId = req.session?.id;
+    const headerSessionId = req.headers['x-session-id'];
+    const sessionIdToUse = serverSessionId || headerSessionId || clientSessionId;
+    
+    console.log('Session ID sources:', { 
+      server: serverSessionId ? 'Present' : 'Not present', 
+      header: headerSessionId ? 'Present' : 'Not present',
+      client: clientSessionId ? 'Present' : 'Not present',
+      used: sessionIdToUse ? 'Using ID' : 'No session ID available'
+    });
 
-    // Create new reply with user data or guest data
+    // Create new reply with appropriate data
     const reply = {
       content,
-      name: req.user ? req.user.name : name,
-      email: req.user ? req.user.email : email,
-      privacyPolicyAccepted,
-      userId: req.user ? req.user._id : null,
-      sessionId: !req.user ? sessionId : null
+      privacyPolicyAccepted
     };
+    
+    // Set user information based on authentication state
+    if (req.user) {
+      // For authenticated users
+      reply.name = req.user.name;
+      reply.email = req.user.email;
+      reply.userId = req.user._id;
+      console.log('Using authenticated user data:', { id: req.user._id, name: req.user.name });
+    } else {
+      // For guest users
+      reply.name = name;
+      reply.email = email;
+      reply.sessionId = sessionIdToUse;
+      console.log('Using guest user data with session ID:', sessionIdToUse);
+    }
 
     console.log('Creating reply with:', { 
       name: reply.name, 
@@ -354,6 +386,20 @@ exports.addReply = async (req, res) => {
   } catch (error) {
     console.error('Error adding reply:', error);
     console.error('Error stack:', error.stack);
+    
+    // Provide more specific error based on the type of error
+    if (error.name === 'ValidationError') {
+      return res.status(400).json({
+        success: false,
+        error: 'Validation error: ' + error.message
+      });
+    } else if (error.name === 'CastError') {
+      return res.status(400).json({
+        success: false,
+        error: 'Invalid bulletin ID format'
+      });
+    }
+    
     res.status(500).json({
       success: false,
       error: 'Error adding reply'

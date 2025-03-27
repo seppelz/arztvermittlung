@@ -290,16 +290,34 @@ const router = createRouter({
 // Navigation guard to check authentication for routes that require it
 router.beforeEach(async (to, from, next) => {
   try {
+    console.log(`Router: Navigating from ${from.path} to ${to.path}`);
+    
+    // Add a timeout to prevent infinite hangs during router navigation
+    const navigationTimeout = setTimeout(() => {
+      console.error(`Router: Navigation timeout from ${from.path} to ${to.path}`);
+      next();
+    }, 5000);
+    
     // Wait for auth store to be initialized
     const { useAuthStore } = await import('@/stores/auth');
     const authStore = useAuthStore();
     
     // If auth store is not initialized yet, wait for it
     if (!authStore.isInitialized) {
+      console.log('Router: Waiting for auth store initialization');
+      
+      // Add a timeout for auth initialization to prevent hangs
+      let initializationAttempts = 0;
+      
       await new Promise(resolve => {
         const checkInitialized = () => {
+          initializationAttempts++;
           if (authStore.isInitialized) {
+            console.log('Router: Auth store initialized successfully');
             resolve();
+          } else if (initializationAttempts > 20) { // 2 second timeout (100ms * 20)
+            console.error('Router: Auth store initialization timeout');
+            resolve(); // Proceed anyway to avoid blocking navigation
           } else {
             setTimeout(checkInitialized, 100);
           }
@@ -308,10 +326,17 @@ router.beforeEach(async (to, from, next) => {
       });
     }
     
+    // Clear the navigation timeout
+    clearTimeout(navigationTimeout);
+    
     // Check if route requires authentication
     if (to.matched.some(record => record.meta.requiresAuth)) {
+      console.log('Router: Route requires authentication');
+      
       // Check if user is authenticated
       if (!authStore.isAuthenticated) {
+        console.log('Router: User not authenticated, redirecting to login');
+        
         // Not authenticated, redirect to appropriate login page
         if (to.path.startsWith('/admin')) {
           next({ name: 'AdminLogin' });
@@ -323,7 +348,10 @@ router.beforeEach(async (to, from, next) => {
       
       // For admin routes, check user role
       if (to.matched.some(record => record.meta.requiresAdmin)) {
+        console.log('Router: Route requires admin role');
+        
         if (!authStore.isAdmin) {
+          console.log('Router: User not admin, redirecting to home');
           next({ name: 'Home' });
           return;
         }
@@ -334,6 +362,18 @@ router.beforeEach(async (to, from, next) => {
     next();
   } catch (error) {
     console.error('Navigation guard error:', error);
+    
+    // Log detailed error information
+    console.error('Error details:', {
+      name: error.name,
+      message: error.message,
+      stack: error.stack?.split('\n').slice(0, 5).join('\n'),
+      route: {
+        from: from.path,
+        to: to.path
+      }
+    });
+    
     // In case of any error, redirect to home page
     next({ name: 'Home' });
   }

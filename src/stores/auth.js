@@ -17,6 +17,15 @@ export const useAuthStore = defineStore('auth', {
     },
     isHospital: (state) => {
       return state.user && (state.user.role === 'hospital' || (state.user.role === 'user' && state.user.userType === 'Klinik'))
+    },
+    userId: (state) => {
+      return state.user && state.user._id ? state.user._id : null
+    },
+    userName: (state) => {
+      return state.user && state.user.name ? state.user.name : null
+    },
+    userEmail: (state) => {
+      return state.user && state.user.email ? state.user.email : null
     }
   },
   

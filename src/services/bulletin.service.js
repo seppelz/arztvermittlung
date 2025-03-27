@@ -224,11 +224,23 @@ class BulletinService {
       // Set up headers with session ID for guest users
       const headers = {};
       
+      // Get auth store and user ID with better error handling
+      const userId = this.authStore.userId;
+      console.log('BulletinService: Current authenticated user ID:', userId || 'Not authenticated');
+      
       // For authenticated users, use their account info
       if (this.authStore.isAuthenticated) {
         // No need to send name/email as they'll be pulled from the user account
         const { name, email, ...rest } = dataToSend;
-        dataToSend.userId = this.authStore.userId;
+        
+        // Explicitly set userId from auth store
+        dataToSend.userId = userId;
+        
+        // Also use the getters for name and email as fallback
+        dataToSend.name = this.authStore.userName || name;
+        dataToSend.email = this.authStore.userEmail || email;
+        
+        console.log('BulletinService: Using authenticated user ID:', userId);
       } else {
         // For guests, ensure name, email and privacy policy acceptance are provided
         if (!dataToSend.name || !dataToSend.email || !dataToSend.privacyPolicyAccepted) {
@@ -244,17 +256,34 @@ class BulletinService {
       }
       
       console.log('BulletinService: Sending data:', dataToSend);
-      const response = await api.post(`/bulletin/${bulletinId}/replies`, dataToSend, { headers });
+      
+      // Add timeout to prevent hanging requests
+      const response = await api.post(`/bulletin/${bulletinId}/replies`, dataToSend, { 
+        headers,
+        timeout: 10000 
+      });
+      
       console.log('BulletinService: Reply added successfully:', response.data);
       return response.data;
     } catch (error) {
       console.error('Error adding reply:', error);
-      console.error('Error details:', {
+      
+      // Provide more detail about what failed
+      const errorContext = {
         message: error.message,
         response: error.response?.data,
         bulletinId,
-        replyData
-      });
+        replyData: {
+          ...replyData,
+          content: replyData.content?.substring(0, 20) + '...'
+        },
+        authStatus: this.authStore.isAuthenticated ? 'Authenticated' : 'Guest',
+        userId: this.authStore.userId,
+        sessionId: !this.authStore.isAuthenticated ? this.getSessionId() : null
+      };
+      
+      console.error('Error details:', errorContext);
+      
       throw error;
     }
   }

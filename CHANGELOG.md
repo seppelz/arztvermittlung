@@ -220,6 +220,14 @@ All notable changes to this project will be documented in this file.
 - Fixed session ID transmission by including it in both request headers and body for guest users
 - Enhanced error handling for 500-level errors with user-friendly messages and detailed logging
 - Improved validation of session IDs in controllers with more detailed logging
+- Fixed user ID not being correctly accessed in bulletin reply operations
+- Added proper getters in auth store for userId, userName, and userEmail
+- Fixed router initialization issues that caused Vue errors during application startup
+- Added timeout protection for router navigation to prevent infinite loops
+- Enhanced error logging in router with detailed context for easier debugging
+- Fixed issue with authenticated users not being able to reply to bulletins
+- Added additional logging to help diagnose session and authentication issues
+- Improved error handling for different types of errors in bulletin controllers
 
 ### Added
 - Auto-fill bulletin reply form with user data when logged in
