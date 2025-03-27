@@ -462,8 +462,8 @@ async function submitMessage(): Promise<void> {
       content: newMessage.content,
       messageType: newMessage.messageType,
       privacyPolicyAccepted: newMessage.privacyPolicyAccepted,
-      // Additional fields that might be needed
-      status: 'pending', // Assuming new bulletins are pending by default
+      // Set status to 'active' instead of 'pending' to comply with backend validation
+      status: 'active',
     };
     
     // Send the request through our proxy service for better error handling
