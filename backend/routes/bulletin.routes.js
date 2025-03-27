@@ -1,6 +1,7 @@
 const express = require('express');
 const bulletinController = require('../controllers/bulletin.controller');
 const authMiddleware = require('../middlewares/auth.middleware');
+const sessionMiddleware = require('../middlewares/session.middleware');
 const { sendEmail } = require('../utils/email');
 
 const router = express.Router();
@@ -76,25 +77,29 @@ const createWithNotification = async (req, res) => {
   }
 };
 
-// Öffentliche Routen
+// Public routes (no auth required)
 router.get('/', bulletinController.getAllBulletins);
 router.get('/search', bulletinController.searchBulletins);
 router.get('/:id', bulletinController.getBulletin);
-router.post('/', createWithNotification);
 
-// Reply routes with authentication
+// Guest routes (require session)
+router.post('/', sessionMiddleware.validateSession, bulletinController.createBulletin);
+router.post('/:bulletinId/replies', sessionMiddleware.validateSession, bulletinController.addReply);
+
+// Protected routes (require auth)
 router.use(authMiddleware.protect);
-router.post('/:id/replies', bulletinController.addReply);
-router.patch('/:id/replies/:replyId', bulletinController.updateReply);
-router.delete('/:id/replies/:replyId', bulletinController.deleteReply);
+
+// User-specific routes
+router.get('/user/bulletins', bulletinController.getUserBulletins);
+
+// Bulletin management routes
+router.patch('/:id', bulletinController.updateBulletin);
+router.delete('/:id', bulletinController.deleteBulletin);
+router.patch('/:bulletinId/replies/:replyId', bulletinController.updateReply);
+router.delete('/:bulletinId/replies/:replyId', bulletinController.deleteReply);
 
 // Admin routes
 router.use(authMiddleware.restrictToAdmin);
-router.patch('/:id', bulletinController.updateBulletin);
-router.delete('/:id', bulletinController.deleteBulletin);
 router.patch('/:id/status', bulletinController.updateBulletinStatus);
-
-// User-specific routes
-router.get('/user/:userId', bulletinController.getBulletinsByUser);
 
 module.exports = router; 

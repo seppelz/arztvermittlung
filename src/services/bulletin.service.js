@@ -7,6 +7,23 @@ import { useAuthStore } from '@/stores/auth';
 class BulletinService {
   constructor() {
     this.authStore = useAuthStore();
+    this.initializeGuestSession();
+  }
+
+  // Initialize guest session if needed
+  initializeGuestSession() {
+    if (!this.authStore.isAuthenticated && !localStorage.getItem('guestSessionId')) {
+      const sessionId = crypto.randomUUID();
+      localStorage.setItem('guestSessionId', sessionId);
+    }
+  }
+
+  // Get current session ID
+  getSessionId() {
+    if (this.authStore.isAuthenticated) {
+      return null;
+    }
+    return localStorage.getItem('guestSessionId');
   }
 
   /**
@@ -124,22 +141,17 @@ class BulletinService {
       
       // Ensure startDate is properly set for job listings
       if ((bulletinData.messageType === 'Angebot' || bulletinData.messageType === 'Gesuch') && bulletinData.startDate) {
-        // Ensure startDate is a Date object (if string, convert to Date)
         if (typeof bulletinData.startDate === 'string') {
           processedData.startDate = new Date(bulletinData.startDate);
         }
-        
-        console.log('BulletinService: Using startDate for job listing:', processedData.startDate);
       } else if ((bulletinData.messageType === 'Angebot' || bulletinData.messageType === 'Gesuch') && !bulletinData.startDate) {
-        // If no startDate provided for job listings, set to current date
         processedData.startDate = new Date();
-        console.log('BulletinService: No startDate provided, using current date:', processedData.startDate);
       }
       
       const response = await api.post('/bulletin', {
         ...processedData,
         userId: this.authStore.isAuthenticated ? this.authStore.userId : null,
-        sessionId: !this.authStore.isAuthenticated ? localStorage.getItem('guestSessionId') : null
+        sessionId: this.getSessionId()
       });
       console.log('BulletinService: Bulletin created successfully:', response.data);
       return response.data;
@@ -212,7 +224,7 @@ class BulletinService {
       const response = await api.post(`/bulletin/${bulletinId}/replies`, {
         ...dataToSend,
         userId: this.authStore.isAuthenticated ? this.authStore.userId : null,
-        sessionId: !this.authStore.isAuthenticated ? localStorage.getItem('guestSessionId') : null
+        sessionId: this.getSessionId()
       });
       console.log('BulletinService: Reply added successfully:', response.data);
       return response;
@@ -262,7 +274,7 @@ class BulletinService {
       const dataToSend = {
         content,
         userId: this.authStore.isAuthenticated ? this.authStore.userId : null,
-        sessionId: !this.authStore.isAuthenticated ? localStorage.getItem('guestSessionId') : null
+        sessionId: this.getSessionId()
       };
 
       console.log('BulletinService: Sending update data:', dataToSend);
