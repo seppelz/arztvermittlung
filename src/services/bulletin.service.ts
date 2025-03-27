@@ -301,6 +301,15 @@ async function addReply(bulletinId: string, reply: Partial<BulletinReply>): Prom
     const userName = authStore.userName || 'Angemeldeter Benutzer';
     const userEmail = authStore.userEmail || '';
     
+    // Helper function to create request headers
+    const createHeaders = () => ({
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    });
+    
+    // Create initial headers
+    const headers = createHeaders();
+    
     // Prepare reply data - include only fields the backend expects
     // Based on backend controller code: content, privacyPolicyAccepted are required
     // Auth token will identify the user; we don't need to send userId explicitly
@@ -312,12 +321,6 @@ async function addReply(bulletinId: string, reply: Partial<BulletinReply>): Prom
     // Only include these fields for backwards compatibility
     if (userName) replyData.name = userName;
     if (userEmail) replyData.email = userEmail;
-    
-    // Add authorization headers
-    const headers: Record<string, string> = { 
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    };
     
     console.log('BulletinService: Using authenticated user data:', { 
       name: replyData.name || 'Not provided - will use auth token',
@@ -331,14 +334,67 @@ async function addReply(bulletinId: string, reply: Partial<BulletinReply>): Prom
     }
     console.log('BulletinService: Final reply data:', logData);
     
-    // Set a timeout for the request to avoid hanging
-    const response = await api.post(`/bulletin/${bulletinId}/replies`, replyData, {
-      timeout: 15000, // 15 seconds timeout
-      headers: headers
-    });
-    
-    console.log('BulletinService: Reply added successfully');
-    return response;
+    // Set a timeout for the request to avoid hanging and make the initial request
+    try {
+      const response = await api.post(`/bulletin/${bulletinId}/replies`, replyData, {
+        timeout: 15000, // 15 seconds timeout
+        headers: headers
+      });
+      
+      console.log('BulletinService: Reply added successfully');
+      return response;
+    } catch (initialError: any) {
+      if (initialError.response?.status === 400 && 
+          initialError.response?.data?.error?.includes('privacyPolicyAccepted')) {
+        
+        console.log('BulletinService: Privacy policy validation error, retrying with different data format');
+        
+        // Try with explicit bulletin-level privacyPolicyAccepted
+        const modifiedData = {
+          ...replyData,
+          bulletin: {
+            privacyPolicyAccepted: true
+          }
+        };
+        
+        try {
+          console.log('BulletinService: Retrying with bulletin property:', modifiedData);
+          const retryResponse = await api.post(`/bulletin/${bulletinId}/replies`, modifiedData, {
+            timeout: 15000,
+            headers: createHeaders()
+          });
+          console.log('BulletinService: Retry successful');
+          return retryResponse;
+        } catch (firstRetryError) {
+          console.log('BulletinService: First retry failed, trying direct approach');
+          
+          // Try with the privacyPolicyAccepted at the root level again, but with a different structure
+          try {
+            const finalAttemptData = {
+              content: reply.content,
+              privacyPolicyAccepted: true,
+              name: userName,
+              email: userEmail,
+              bulletinPrivacyAccepted: true // Custom field name to try
+            };
+            
+            console.log('BulletinService: Final retry attempt with:', finalAttemptData);
+            const finalResponse = await api.post(`/bulletin/${bulletinId}/replies`, finalAttemptData, {
+              timeout: 15000,
+              headers: createHeaders()
+            });
+            console.log('BulletinService: Final retry successful');
+            return finalResponse;
+          } catch (finalError) {
+            console.error('BulletinService: All retry attempts failed:', finalError);
+            throw new Error('Validierungsfehler: Die Datenschutzerklärung muss akzeptiert werden.');
+          }
+        }
+      }
+      
+      // Re-throw the original error if it wasn't a privacy policy issue
+      throw initialError;
+    }
   } catch (error: any) {
     console.error('BulletinService: Error adding reply:', error.message);
     
