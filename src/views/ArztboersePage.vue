@@ -582,17 +582,32 @@ async function fetchMessages() {
     console.log('Fetching job listings from database');
     
     // Fetch both types of job listings - offers and requests
-    const params = {
-      messageType: currentFilter.value
-    };
-    if (newMessage.specialty) {
-      params.specialty = newMessage.specialty;
-    }
-    if (newMessage.federalState) {
-      params.federalState = newMessage.federalState;
-    }
+    const params = {};
+    
+    // Remove messageType filter for testing to get all bulletins
+    // if (currentFilter.value !== 'all') {
+    //   params.messageType = currentFilter.value;
+    // }
+    
+    console.log('API params:', params);
     
     const response = await bulletinProxyService.getAllBulletins(params);
+    
+    console.log('API response:', response);
+    console.log('API response data structure:', {
+      hasData: !!response.data,
+      dataType: response.data ? typeof response.data : 'undefined',
+      isArray: response.data ? Array.isArray(response.data) : false,
+      dataLength: response.data && Array.isArray(response.data) ? response.data.length : 'not an array',
+      hasStatus: response.status ? true : false,
+      status: response.status,
+      firstItem: response.data && Array.isArray(response.data) && response.data.length > 0 ? 
+        { 
+          id: response.data[0]._id || response.data[0].id, 
+          type: response.data[0].messageType,
+          status: response.data[0].status 
+        } : 'no items'
+    });
     
     if (response && response.data) {
       // Store filtered job listings
@@ -602,6 +617,11 @@ async function fetchMessages() {
       }));
       
       console.log('Loaded job listings from database:', messages.value.length);
+      if (messages.value.length > 0) {
+        console.log('Sample listing:', messages.value[0]);
+        console.log('All message types:', [...new Set(messages.value.map(m => m.messageType))]);
+        console.log('All statuses:', [...new Set(messages.value.map(m => m.status))]);
+      }
     } else {
       console.warn('No job listings found in database');
       messages.value = [];
