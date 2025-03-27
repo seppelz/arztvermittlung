@@ -270,7 +270,9 @@ async function addReply(bulletinId: string, reply: Partial<BulletinReply>): Prom
     // Prepare reply data with proper type
     const replyData: Record<string, any> = {
       content: reply.content,
-      privacyPolicyAccepted: true // Always include this field, regardless of authentication status
+      privacyPolicyAccepted: true, // Always include this field, regardless of authentication status
+      // Add status field to fix validation error
+      status: 'active'
     };
     
     // Add authorization headers
@@ -284,6 +286,26 @@ async function addReply(bulletinId: string, reply: Partial<BulletinReply>): Prom
       if (token) {
         headers['Authorization'] = `Bearer ${token}`;
         console.log('BulletinService: Added authorization token to headers');
+        
+        // Extract user ID from JWT token if not available in auth store
+        if (!userId) {
+          try {
+            const tokenParts = token.split('.');
+            if (tokenParts.length === 3) {
+              const payload = JSON.parse(atob(tokenParts[1]));
+              if (payload && payload.id) {
+                console.log('BulletinService: Extracted user ID from token:', payload.id);
+                // Add userId to request data
+                replyData.userId = payload.id;
+              }
+            }
+          } catch (tokenError) {
+            console.error('BulletinService: Error extracting user ID from token:', tokenError);
+          }
+        } else {
+          // Use userId from auth store
+          replyData.userId = userId;
+        }
       } else {
         console.warn('BulletinService: No token found for authenticated user');
       }
@@ -298,7 +320,8 @@ async function addReply(bulletinId: string, reply: Partial<BulletinReply>): Prom
       
       console.log('BulletinService: Using authenticated user data:', { 
         name: replyData.name || 'Not available', 
-        email: replyData.email || 'Not available'
+        email: replyData.email || 'Not available',
+        userId: replyData.userId || 'Not available'
       });
     } else {
       // For guest users: Add name, email, and session ID
