@@ -26,7 +26,9 @@
               v-model="formData.specialty"
               type="text"
               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              :class="{ 'border-red-500': errors.specialty }"
             >
+            <p v-if="errors.specialty" class="mt-1 text-sm text-red-600">{{ errors.specialty }}</p>
           </div>
         </div>
       </div>
@@ -204,6 +206,19 @@ const formData = ref({
   additionalInfo: ''
 })
 
+const errors = ref({
+  name: '',
+  specialty: '',
+  contact: {
+    email: '',
+    phone: ''
+  },
+  availability: {
+    availableFrom: '',
+    federalState: ''
+  }
+})
+
 // Load existing profile data if available
 onMounted(async () => {
   // Initialize form with user data from auth store if available
@@ -254,8 +269,46 @@ onMounted(async () => {
   }
 })
 
+const validateForm = () => {
+  errors.value = {
+    name: '',
+    specialty: '',
+    contact: {
+      email: '',
+      phone: ''
+    },
+    availability: {
+      availableFrom: '',
+      federalState: ''
+    }
+  }
+
+  let isValid = true
+
+  if (!formData.value.name) {
+    errors.value.name = 'Name ist erforderlich'
+    isValid = false
+  }
+
+  if (!formData.value.contact?.email) {
+    errors.value.contact.email = 'E-Mail ist erforderlich'
+    isValid = false
+  }
+
+  if (!formData.value.availability?.availableFrom) {
+    errors.value.availability.availableFrom = 'Verfügbarkeitsdatum ist erforderlich'
+    isValid = false
+  }
+
+  return isValid
+}
+
 const submitProfile = async () => {
   try {
+    if (!validateForm()) {
+      return
+    }
+
     isSubmitting.value = true
     
     // Track the form submission
@@ -263,11 +316,23 @@ const submitProfile = async () => {
     
     const response = await api.post('/doctor/profile', formData.value)
     
-    showToast('Profil erfolgreich gespeichert', 'success')
-    emit('profile-updated', response.data)
+    if (response.data) {
+      emit('profile-updated', response.data)
+      showToast('Profil wurde erfolgreich aktualisiert', 'success')
+    }
   } catch (error) {
     console.error('Error submitting doctor profile:', error)
-    showToast(error.message || 'Ein Fehler ist aufgetreten', 'error')
+    
+    // Handle validation errors
+    if (error.response?.data?.required) {
+      const required = error.response.data.required
+      if (required.name) errors.value.name = 'Name ist erforderlich'
+      if (required.specialty) errors.value.specialty = 'Fachrichtung ist erforderlich'
+      if (required.contact) errors.value.contact.email = 'E-Mail ist erforderlich'
+      if (required.availability) errors.value.availability.availableFrom = 'Verfügbarkeitsdatum ist erforderlich'
+    } else {
+      showToast('Fehler beim Speichern des Profils', 'error')
+    }
   } finally {
     isSubmitting.value = false
   }
