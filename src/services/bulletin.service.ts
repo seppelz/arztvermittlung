@@ -278,10 +278,6 @@ async function addReply(bulletinId: string, reply: Partial<BulletinReply>): Prom
       throw new Error('Authentifizierungstoken nicht gefunden. Bitte melden Sie sich erneut an.');
     }
 
-    // Get user info from auth store
-    const userName = authStore.userName || 'Angemeldeter Benutzer';
-    const userEmail = authStore.userEmail || '';
-    
     // Create a simplified data structure that exactly matches what the backend expects
     const replyData = {
       content: reply.content,
