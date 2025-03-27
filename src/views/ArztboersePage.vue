@@ -387,16 +387,16 @@ const filteredMessages = computed(() => {
   let result = [...messages.value];
   
   console.log('Filtering messages:', messages.value.length, 'total entries');
-  console.log('Message types:', messages.value.map(m => m.messageType));
-  console.log('Message statuses:', messages.value.map(m => m.status));
+  console.log('Message types:', [...new Set(messages.value.map(m => m.messageType))]);
+  console.log('Message statuses:', [...new Set(messages.value.map(m => m.status))]);
   
   // Show only Angebot and Gesuch messages
   result = result.filter(msg => msg.messageType === 'Angebot' || msg.messageType === 'Gesuch');
   console.log('After messageType filter:', result.length, 'entries');
   
-  // Show both active and pending entries for testing
-  // result = result.filter(msg => msg.status === 'active' || msg.status === undefined);
-  console.log('Status values in data:', [...new Set(result.map(m => m.status))]);
+  // Show only active entries and handle legacy entries without status
+  result = result.filter(msg => msg.status === 'active' || msg.status === undefined);
+  console.log('After status filter:', result.length, 'entries with status active/undefined');
   
   // Filtern nach Nachrichtentyp
   if (currentFilter.value !== 'all') {
