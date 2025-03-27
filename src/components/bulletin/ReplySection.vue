@@ -178,7 +178,7 @@
             <label for="editContent" class="block text-sm font-medium text-gray-700">Ihre Antwort*</label>
             <textarea
               id="editContent"
-              v-model="selectedReply?.content"
+              v-model="editedContent"
               rows="4"
               required
               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
@@ -247,6 +247,7 @@ const showDeleteConfirm = ref<boolean>(false)
 const showEditForm = ref<boolean>(false)
 const selectedReply = ref<BulletinReply | null>(null)
 const selectedReplies = ref<Set<string>>(new Set())
+const editedContent = ref<string>('')
 
 // Form data
 const replyForm = reactive<ReplyForm>({
@@ -397,7 +398,8 @@ async function deleteReply(reply: BulletinReply | null): Promise<void> {
  * Prepare to edit a reply
  */
 function editReply(reply: BulletinReply): void {
-  selectedReply.value = {...reply}
+  selectedReply.value = reply
+  editedContent.value = reply.content
   showEditForm.value = true
 }
 
@@ -410,27 +412,21 @@ async function updateReply(): Promise<void> {
   try {
     isSubmitting.value = true
     
-    const response = await bulletinService.updateReply(
-      props.message._id, 
-      selectedReply.value._id, 
-      selectedReply.value.content
-    )
-    
-    // Get the updated reply from response
-    const updatedReply = response.data.replies.find(
-      (r: BulletinReply) => r._id === selectedReply.value?._id
-    )
-    
-    if (updatedReply) {
-      // Construct UI-friendly reply object to emit
-      const uiReply: UIBulletinReply = {
-        ...updatedReply,
-        bulletinId: props.message._id
-      }
-      
-      // Emit event to parent
-      emit('reply-updated', uiReply)
+    // Create a copy of the reply with the updated content
+    const updatedReply = {
+      ...selectedReply.value,
+      content: editedContent.value
     }
+    
+    await bulletinService.updateReply(props.message._id, updatedReply._id, editedContent.value)
+    
+    // Emit event to parent
+    const uiReply: UIBulletinReply = {
+      ...updatedReply,
+      bulletinId: props.message._id
+    }
+    
+    emit('reply-updated', uiReply)
     
     // Reset state
     showEditForm.value = false
