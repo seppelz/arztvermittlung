@@ -298,33 +298,13 @@ router.beforeEach(async (to, from, next) => {
       next();
     }, 5000);
     
-    // Wait for auth store to be initialized
+    // Get auth store
     const { useAuthStore } = await import('@/stores/auth');
     const authStore = useAuthStore();
     
-    // If auth store is not initialized yet, wait for it
-    if (!authStore.isInitialized) {
-      console.log('Router: Waiting for auth store initialization');
-      
-      // Add a timeout for auth initialization to prevent hangs
-      let initializationAttempts = 0;
-      
-      await new Promise(resolve => {
-        const checkInitialized = () => {
-          initializationAttempts++;
-          if (authStore.isInitialized) {
-            console.log('Router: Auth store initialized successfully');
-            resolve();
-          } else if (initializationAttempts > 20) { // 2 second timeout (100ms * 20)
-            console.error('Router: Auth store initialization timeout');
-            resolve(); // Proceed anyway to avoid blocking navigation
-          } else {
-            setTimeout(checkInitialized, 100);
-          }
-        };
-        checkInitialized();
-      });
-    }
+    // Wait a brief moment for auth store to initialize
+    // This ensures any async initialization has a chance to complete
+    await new Promise(resolve => setTimeout(resolve, 100));
     
     // Clear the navigation timeout
     clearTimeout(navigationTimeout);
@@ -374,8 +354,8 @@ router.beforeEach(async (to, from, next) => {
       }
     });
     
-    // In case of any error, redirect to home page
-    next({ name: 'Home' });
+    // In case of any error, proceed with navigation
+    next();
   }
 });
 
