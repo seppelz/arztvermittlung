@@ -2,6 +2,7 @@ import './assets/main.css'
 
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
+import { createRouter, createWebHistory } from 'vue-router'
 import App from './App.vue'
 import { trackPageView, initOutboundLinkTracking } from './services/analyticsService'
 
@@ -158,11 +159,34 @@ const initializeApp = async () => {
     console.log('Auth state initialized');
     
     // 3. Router initialisieren
+    console.log('Loading router...');
     const router = await loadRouter();
-    
-    // 4. Router an die App anhängen
-    app.use(router);
-    console.log('Router initialized');
+
+    // Wrap router installation in a try-catch to handle potential runtime errors
+    try {
+      // 4. Router an die App anhängen
+      app.use(router);
+      console.log('Router initialized');
+    } catch (error) {
+      console.error('Error installing router:', error);
+      console.error('Router installation error details:', {
+        name: error.name,
+        message: error.message,
+        stack: error.stack?.split('\n').slice(0, 5).join('\n')
+      });
+      
+      // Create a minimal router as fallback in case the main router fails
+      const fallbackRouter = createRouter({
+        history: createWebHistory(),
+        routes: [
+          { path: '/', component: () => import('@/views/HomePage.vue') },
+          { path: '/:pathMatch(.*)*', component: () => import('@/views/NotFoundPage.vue') }
+        ]
+      });
+      
+      console.log('Using fallback router due to initialization error');
+      app.use(fallbackRouter);
+    }
     
     // 5. Initialize outbound link tracking
     initOutboundLinkTracking();
