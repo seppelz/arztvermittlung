@@ -143,15 +143,6 @@ import authService from '@/services/auth.service';
 import { useAuthStore } from '@/stores/auth';
 import { useToast } from '@/composables/useToast';
 
-interface LoginError {
-  response?: {
-    data?: {
-      message?: string;
-    };
-  };
-  message?: string;
-}
-
 const router = useRouter();
 const authStore = useAuthStore();
 const { showToast } = useToast();
@@ -183,10 +174,13 @@ const handleLogin = async (): Promise<void> => {
   error.value = '';
   
   try {
-    const { token, user } = await authService.login({
+    const response = await authService.login({
       email: email.value,
       password: password.value
     });
+    
+    // Store user data in auth store
+    authStore.setAuth(response);
     
     // Show success message
     showToast('Login erfolgreich!', 'success');
@@ -201,7 +195,7 @@ const handleLogin = async (): Promise<void> => {
       router.push(redirectPath);
     } else {
       // Default redirect to dashboard or home
-      if (user.role === 'admin') {
+      if (response.user.role === 'admin') {
         router.push('/admin');
       } else {
         router.push('/');

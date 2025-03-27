@@ -282,12 +282,6 @@ async function addReply(bulletinId: string, reply: Partial<BulletinReply>): Prom
     const userName = authStore.userName || 'Angemeldeter Benutzer';
     const userEmail = authStore.userEmail || '';
     
-    // DIRECT APPROACH: Just send the required data for a reply
-    const headers = {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    };
-    
     // Create the simplest reply data with just what's needed
     const simpleReplyData = {
       content: reply.content,

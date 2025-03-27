@@ -1,19 +1,16 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
-import AppHeader from '@/components/layout/AppHeader.vue'
 import AppFooter from '@/components/layout/AppFooter.vue'
 import ToastNotification from '@/components/ToastNotification.vue'
 import CookieBanner from '@/components/CookieBanner.vue'
 import { onMounted, ref, computed } from 'vue'
 import { useAuthStore } from '@/stores/auth'
-import { useRouter } from 'vue-router'
 import NavBar from '@/components/layout/NavBar.vue'
 import Footer from '@/components/layout/Footer.vue'
 import api from '@/services/api'
 import { useToast } from '@/composables/useToast'
 
 const authStore = useAuthStore()
-const router = useRouter()
 const { showToast } = useToast()
 
 // Add ApiStatus tracking
