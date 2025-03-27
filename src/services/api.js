@@ -47,7 +47,7 @@ const normalizeApiUrl = (url) => {
 };
 
 // Get API URL from global config, environment variable, or use a default
-const rawApiUrl = window.MED_MATCH_CONFIG?.apiUrl || import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const rawApiUrl = window.MED_MATCH_CONFIG?.apiUrl || import.meta.env.VITE_API_URL || 'https://www.med-match.de/api';
 const apiUrl = normalizeApiUrl(rawApiUrl);
 
 // Log the API URL being used for debugging
@@ -57,24 +57,35 @@ console.log('API Service normalized URL:', apiUrl);
 // Base API configuration
 const api = axios.create({
   baseURL: apiUrl,
+  timeout: 30000, // 30 second timeout
   headers: {
     'Content-Type': 'application/json',
-  },
-  // Add a timeout to prevent hanging requests
-  timeout: 15000,
+    'Accept': 'application/json'
+  }
 });
 
 // Request interceptor for adding the auth token
 api.interceptors.request.use(
   (config) => {
-    // Log outgoing requests for debugging
-    console.log(`API Request: ${config.method.toUpperCase()} ${config.baseURL}${config.url}`, 
-      config.params ? `with params: ${JSON.stringify(config.params)}` : '');
-    
+    // Get token from localStorage
     const token = localStorage.getItem('token');
+    
+    // Get session ID for guest operations
+    const sessionId = localStorage.getItem('sessionId');
+    
+    // Set auth header if token exists
     if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+      config.headers['Authorization'] = `Bearer ${token}`;
     }
+    
+    // Include session ID for guest operations if exists
+    if (sessionId && !token) {
+      config.headers['Session-ID'] = sessionId;
+    }
+    
+    // Log request for debugging
+    console.log(`API Request: ${config.method.toUpperCase()} ${config.url}`);
+    
     return config;
   },
   (error) => {
@@ -86,42 +97,30 @@ api.interceptors.request.use(
 // Response interceptor for error handling
 api.interceptors.response.use(
   (response) => {
-    console.log(`API Response from ${response.config.url}:`, 
-      response.status, 
-      response.data ? 'Data received' : 'No data');
     return response;
   },
   (error) => {
-    // Enhanced error logging
-    console.error('API Response Error:', {
+    // Handle network errors
+    if (!error.response) {
+      console.error('Network Error:', error.message);
+      
+      // Check for timeout
+      if (error.code === 'ECONNABORTED') {
+        console.error('Request timed out');
+        error.isTimeout = true;
+      }
+      
+      return Promise.reject(error);
+    }
+    
+    // Log detailed error information
+    console.error(`API Error: ${error.response.status}`, {
       url: error.config?.url,
       method: error.config?.method,
-      status: error.response?.status,
-      statusText: error.response?.statusText,
       data: error.response?.data,
-      message: error.message
+      headers: error.config?.headers
     });
     
-    if (error.response && error.response.status === 401) {
-      // Unauthorized - clear token and redirect to login
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      
-      // Check if the request was for an admin route to determine which login page to redirect to
-      const isAdminRoute = error.config.url.includes('/admin');
-      if (!window.location.pathname.includes('/login')) {
-        window.location.href = isAdminRoute ? '/admin/login' : '/login';
-      }
-    } else if (error.response && error.response.status === 500) {
-      // For 500 errors, provide more detailed logging
-      console.error('Server error (500):', error.response.data);
-      console.error('Request that caused 500:', {
-        url: error.config.url,
-        method: error.config.method,
-        params: error.config.params,
-        data: error.config.data
-      });
-    }
     return Promise.reject(error);
   }
 );

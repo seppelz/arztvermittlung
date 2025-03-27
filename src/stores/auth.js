@@ -4,29 +4,22 @@ export const useAuthStore = defineStore('auth', {
   state: () => ({
     user: null,
     token: null,
-    isAuthenticated: false,
-    isInitialized: false
+    status: 'idle', // 'idle', 'loading', 'authenticated', 'error'
+    expiresAt: null,
+    error: null
   }),
   
   getters: {
-    isAdmin: (state) => {
-      return state.user && state.user.role === 'admin'
-    },
-    isDoctor: (state) => {
-      return state.user && (state.user.role === 'doctor' || (state.user.role === 'user' && state.user.userType === 'Arzt'))
-    },
-    isHospital: (state) => {
-      return state.user && (state.user.role === 'hospital' || (state.user.role === 'user' && state.user.userType === 'Klinik'))
-    },
-    userId: (state) => {
-      return state.user && state.user._id ? state.user._id : null
-    },
-    userName: (state) => {
-      return state.user && state.user.name ? state.user.name : null
-    },
-    userEmail: (state) => {
-      return state.user && state.user.email ? state.user.email : null
-    }
+    isAuthenticated: (state) => !!state.token && !!state.user && state.status === 'authenticated',
+    isAdmin: (state) => state.user?.role === 'admin',
+    isDoctor: (state) => state.user?.role === 'doctor',
+    isClient: (state) => state.user?.role === 'client',
+    authStatus: (state) => state.status,
+    
+    // Safe getters for user properties
+    userId: (state) => state.user?._id || null,
+    userName: (state) => state.user?.name || null,
+    userEmail: (state) => state.user?.email || null,
   },
   
   actions: {
@@ -35,7 +28,7 @@ export const useAuthStore = defineStore('auth', {
         // Store user data from login/register response
         this.user = userData.user
         this.token = userData.token
-        this.isAuthenticated = true
+        this.status = 'authenticated'
         
         // Save to localStorage for persistence
         localStorage.setItem('user', JSON.stringify(userData.user))
@@ -56,13 +49,11 @@ export const useAuthStore = defineStore('auth', {
           const user = JSON.parse(userJson)
           this.user = user
           this.token = token
-          this.isAuthenticated = true
+          this.status = 'authenticated'
         }
       } catch (error) {
         console.error('Error initializing auth state:', error)
         this.clearAuth()
-      } finally {
-        this.isInitialized = true
       }
     },
     
@@ -70,7 +61,7 @@ export const useAuthStore = defineStore('auth', {
       // Clear auth data on logout
       this.user = null
       this.token = null
-      this.isAuthenticated = false
+      this.status = 'idle'
       
       // Remove from localStorage
       localStorage.removeItem('user')

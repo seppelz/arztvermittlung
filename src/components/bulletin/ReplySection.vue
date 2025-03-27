@@ -249,7 +249,7 @@ const canEditReply = (reply) => {
   }
   
   // Guest user can edit their own replies using sessionId
-  const sessionId = localStorage.getItem('guestSessionId')
+  const sessionId = localStorage.getItem('sessionId')
   if (sessionId && reply.sessionId) {
     return reply.sessionId === sessionId
   }
@@ -269,7 +269,7 @@ const canDeleteReply = (reply) => {
   }
   
   // Guest user can delete their own replies using sessionId
-  const sessionId = localStorage.getItem('guestSessionId')
+  const sessionId = localStorage.getItem('sessionId')
   if (sessionId && reply.sessionId) {
     return reply.sessionId === sessionId
   }
@@ -312,12 +312,22 @@ const editReply = (reply) => {
 // Add method to handle reply update
 const updateReply = async () => {
   try {
-    if (!authStore.isAuthenticated) {
-      showToast('Bitte melden Sie sich an, um Antworten zu bearbeiten', 'error')
+    isSubmitting.value = true
+    
+    // Check if content is provided
+    if (!selectedReply.value.content || selectedReply.value.content.trim() === '') {
+      showToast('Bitte geben Sie einen Inhalt ein', 'error')
+      isSubmitting.value = false
       return
     }
-
-    isSubmitting.value = true
+    
+    console.log('Updating reply as:', authStore.isAuthenticated ? 'Authenticated user' : 'Guest')
+    console.log('Auth state for update:', { 
+      isAuth: authStore.isAuthenticated,
+      userId: authStore.userId, 
+      userName: authStore.userName
+    })
+    
     const response = await bulletinProxyService.updateReply(
       props.message.id, 
       selectedReply.value._id, 
@@ -332,8 +342,17 @@ const updateReply = async () => {
     }
   } catch (error) {
     console.error('Error updating reply:', error)
-    if (error.message === 'Please log in to update replies') {
+    console.error('Error response data:', error.response?.data)
+    
+    if (error.response?.status === 401) {
       showToast('Bitte melden Sie sich an, um Antworten zu bearbeiten', 'error')
+    } else if (error.response?.status === 403) {
+      showToast('Sie haben keine Berechtigung, diese Antwort zu bearbeiten', 'error')
+    } else if (error.response?.status === 400) {
+      const errorMessage = error.response.data?.error || 'Validierungsfehler beim Aktualisieren der Antwort'
+      showToast(errorMessage, 'error')
+    } else if (error.response?.status === 500) {
+      showToast('Server-Fehler beim Verarbeiten der Antwort. Bitte versuchen Sie es später erneut.', 'error')
     } else {
       showToast('Fehler beim Aktualisieren der Antwort', 'error')
     }
@@ -411,6 +430,14 @@ const submitReply = async () => {
     
     isSubmitting.value = true
     
+    // Add debug info
+    console.log('Submitting reply as:', authStore.isAuthenticated ? 'Authenticated user' : 'Guest')
+    console.log('Auth state from store:', { 
+      isAuth: authStore.isAuthenticated,
+      userId: authStore.userId, 
+      userName: authStore.userName
+    })
+    
     const response = await bulletinProxyService.addReply(props.message.id, {
       ...replyForm,
       timestamp: new Date()
@@ -423,8 +450,19 @@ const submitReply = async () => {
     }
   } catch (error) {
     console.error('Error submitting reply:', error)
+    console.error('Error response data:', error.response?.data)
+    
     if (error.response?.status === 401) {
       showToast('Bitte melden Sie sich an, um eine Antwort zu senden', 'error')
+    } else if (error.response?.status === 400) {
+      // Handle validation errors from server
+      const errorMessage = error.response.data?.error || 'Validierungsfehler beim Senden der Antwort'
+      showToast(errorMessage, 'error')
+      
+      // If the error involves authentication, force guest mode
+      if (errorMessage.includes('Name and email') || errorMessage.includes('required for guest')) {
+        showToast('Ihre Sitzung scheint abgelaufen zu sein. Bitte überprüfen Sie Ihre Daten.', 'warning')
+      }
     } else if (error.response?.status === 500) {
       showToast('Server-Fehler beim Verarbeiten der Antwort. Bitte versuchen Sie es später erneut.', 'error')
       console.error('Server error details:', error.response?.data)

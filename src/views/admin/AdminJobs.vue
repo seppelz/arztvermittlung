@@ -603,7 +603,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
-import bulletinService from '@/services/bulletin.service';
+import bulletinProxyService from '@/services/bulletinProxyService';
 
 // Zustandsvariablen
 const jobs = ref([]);
@@ -632,7 +632,9 @@ const fetchJobs = async () => {
     console.log('AdminJobs: Fetching job listings from server...');
     
     // Verwende den vorhandenen bulletin-Service und filtere clientseitig nach Angeboten/Gesuchen
-    const response = await bulletinService.getAllBulletins();
+    const response = await bulletinProxyService.getAllBulletins({
+      messageType: 'Angebot,Gesuch'
+    });
     
     console.log('AdminJobs: Response received:', response);
     
@@ -839,7 +841,7 @@ const saveJobChanges = async () => {
     delete updates.id;
     
     // Sende die Aktualisierungsanfrage
-    const response = await bulletinService.updateBulletin(id, updates);
+    const response = await bulletinProxyService.updateBulletin(id, updates);
     
     if (!response || !response.data) {
       throw new Error('Keine Daten vom Server erhalten');
@@ -883,7 +885,7 @@ const deleteJob = async (id) => {
   }
   
   try {
-    await bulletinService.deleteBulletin(id);
+    await bulletinProxyService.deleteBulletin(id);
     // Nach erfolgreichem Löschen den Eintrag aus der lokalen Liste entfernen
     jobs.value = jobs.value.filter(item => item.id !== id);
     // Detail-Modal schließen, falls das gelöschte Element angezeigt wurde
@@ -899,7 +901,7 @@ const deleteJob = async (id) => {
 // Status eines Stellenangebots/-gesuchs aktualisieren
 const updateJobStatus = async (id, newStatus) => {
   try {
-    await bulletinService.updateBulletin(id, { status: newStatus });
+    await bulletinProxyService.updateBulletin(id, { status: newStatus });
     
     // Nach erfolgreicher Aktualisierung den Eintrag in der lokalen Liste aktualisieren
     const index = jobs.value.findIndex(item => item.id === id);

@@ -489,7 +489,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
-import bulletinService from '@/services/bulletin.service';
+import bulletinProxyService from '@/services/bulletinProxyService';
 
 // Zustandsvariablen
 const bulletins = ref([]);
@@ -531,7 +531,7 @@ const fetchBulletins = async () => {
     // Log the request parameters
     console.log('AdminBulletin: Request parameters:', {});
     
-    const response = await bulletinService.getAllBulletins();
+    const response = await bulletinProxyService.getAllBulletins();
     
     if (response.data) {
       // Format the data to use consistent id property (either id or _id)
@@ -706,9 +706,9 @@ const saveBulletin = async () => {
     if (bulletinData._id) {
       const id = bulletinData._id;
       delete bulletinData._id; // _id kann nicht aktualisiert werden
-      response = await bulletinService.updateBulletin(id, bulletinData);
+      response = await bulletinProxyService.updateBulletin(id, bulletinData);
     } else {
-      response = await bulletinService.createBulletin(bulletinData);
+      response = await bulletinProxyService.createBulletin(bulletinData);
     }
     
     // Nach erfolgreichem Speichern, aktualisieren wir die lokale Liste
@@ -723,7 +723,7 @@ const saveBulletin = async () => {
 // Pinnwand-Eintrag löschen
 const deleteBulletin = async (id) => {
   try {
-    await bulletinService.deleteBulletin(id);
+    await bulletinProxyService.deleteBulletin(id);
     // Nach erfolgreichem Löschen den Eintrag aus der lokalen Liste entfernen
     bulletins.value = bulletins.value.filter(item => item.id !== id);
   } catch (err) {

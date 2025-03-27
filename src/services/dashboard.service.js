@@ -1,6 +1,6 @@
 import api from './api';
 import userService from './user.service';
-import bulletinService from './bulletin.service';
+import bulletinProxyService from './bulletinProxyService';
 
 /**
  * Service für Admin-Dashboard-Funktionen
@@ -57,7 +57,7 @@ class DashboardService {
       
       // Bulletin-Statistiken
       try {
-        const bulletinsResponse = await bulletinService.getAllBulletins();
+        const bulletinsResponse = await bulletinProxyService.getAllBulletins();
         
         // Sicherstellen, dass wir ein Array haben
         const bulletins = Array.isArray(bulletinsResponse.data) ? bulletinsResponse.data : [];
@@ -144,7 +144,7 @@ class DashboardService {
       
       // Pinnwand-Einträge laden (für neue Einträge und Aktualisierungen)
       try {
-        const bulletinsResponse = await bulletinService.getAllBulletins();
+        const bulletinsResponse = await bulletinProxyService.getAllBulletins();
         
         // Sicherstellen, dass wir ein Array haben
         const bulletins = Array.isArray(bulletinsResponse.data) ? bulletinsResponse.data : [];

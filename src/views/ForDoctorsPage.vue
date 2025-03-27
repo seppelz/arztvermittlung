@@ -222,7 +222,12 @@
 
 <script setup>
 import { ref, reactive } from 'vue'
-import bulletinService from '@/services/bulletin.service'
+import BulletinSearch from '@/components/bulletin/BulletinSearch.vue'
+import StatsSection from '@/components/homepage/StatsSection.vue'
+import FaqSection from '@/components/shared/FaqSection.vue'
+import BaseSection from '@/components/shared/BaseSection.vue'
+import SectionHeading from '@/components/shared/SectionHeading.vue'
+import bulletinProxyService from '@/services/bulletinProxyService'
 
 const qualifications = [
   'Facharzt',
@@ -308,7 +313,7 @@ async function submitForm() {
     console.log('Submitting data to backend:', bulletinData)
     
     // Send the data to the backend
-    const response = await bulletinService.createBulletin(bulletinData)
+    const response = await bulletinProxyService.createBulletin(bulletinData)
     console.log('Response from backend:', response)
     
     // Show success message

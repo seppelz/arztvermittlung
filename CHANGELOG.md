@@ -518,3 +518,36 @@ All notable changes to this project will be documented in this file.
 - Reply endpoints now use validateOrCreateSession middleware instead of protect middleware
 - Permission checking in controllers now accounts for four scenarios (admin, bulletin owner, reply owner, session match)
 - Error handling in bulletin controllers now includes more context for easier debugging
+
+### Added
+- Enhanced bulletin reply submission with improved error handling and validation
+- Updated authentication store with safer getters for user data
+- Improved API client with better logging, timeout handling, and session management
+- Added consistent session ID handling for guest operations
+
+### Fixed
+- Fixed 400 error when submitting bulletin replies
+- Fixed issue with user authentication state not being properly recognized
+- Improved error reporting with detailed context for easier debugging
+- Fixed endpoint URL inconsistency in the bulletin service (bulletins/ vs. bulletin/)
+- Standardized session ID key in localStorage ('sessionId' instead of 'guestSessionId')
+- Improved error handling in ReplySection.vue for both guests and authenticated users
+- Refactored bulletinProxyService for better error handling and consistency
+- Eliminated direct usage of bulletinService in views for better error handling
+
+## [0.9.0] - 2023-12-15
+
+### Added
+- Backend endpoint for updating bulletin entries
+- Tests for bulletin controller
+- Backend environment example file
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
