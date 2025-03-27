@@ -225,56 +225,86 @@ class BulletinService {
       console.log('BulletinService: Auth status:', isAuthenticated ? 'Authenticated' : 'Guest');
       console.log('BulletinService: User ID from auth store:', userId || 'Not available');
       
-      // Prepare reply data based on authentication status
-      let replyData = { ...reply };
+      // Prepare reply data
+      const replyData = {
+        content: reply.content,
+        privacyPolicyAccepted: true // Always include this field
+      };
       
-      if (isAuthenticated && userId) {
-        // For authenticated users: Use the userID from auth store
-        replyData.userId = userId;
-        console.log('BulletinService: Using authenticated user ID:', userId);
-        
-        // For authenticated users, we don't need name/email as they're in the user profile
-        delete replyData.name;
-        delete replyData.email;
+      // Add authorization headers
+      const headers = { 
+        'Content-Type': 'application/json'
+      };
+      
+      if (isAuthenticated) {
+        // For authenticated users: Use ID from auth store
+        if (userId) {
+          // Don't send userId in body as the backend will extract it from the token
+          console.log('BulletinService: Using authenticated user ID:', userId);
+          
+          // Include token in headers
+          const token = localStorage.getItem('token');
+          if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
+            console.log('BulletinService: Added authorization token to headers');
+          } else {
+            console.warn('BulletinService: No token found for authenticated user');
+          }
+        } else {
+          console.warn('BulletinService: Authenticated but no user ID available');
+        }
       } else {
-        // For guest users: Ensure required fields are present
-        if (!replyData.name || !replyData.email) {
+        // For guest users: Add name, email, and session ID
+        if (!reply.name || !reply.email) {
           console.error('BulletinService: Name and email are required for guest users');
           throw new Error('Name and email are required for guest users');
         }
         
-        console.log('BulletinService: Using guest user mode with name:', replyData.name);
-        delete replyData.userId; // Remove any potential userId for guest users
-      }
-      
-      // Include session ID for all replies (will be ignored for authenticated users)
-      const sessionId = localStorage.getItem('sessionId');
-      if (sessionId) {
-        console.log('BulletinService: Including session ID for tracking');
+        replyData.name = reply.name;
+        replyData.email = reply.email;
+        
+        console.log('BulletinService: Using guest user mode with name:', reply.name);
+        
+        // Include session ID for guest users in both header and body
+        const sessionId = this.getSessionId();
+        if (sessionId) {
+          replyData.sessionId = sessionId;
+          headers['X-Session-Id'] = sessionId;
+          console.log('BulletinService: Including session ID for tracking:', sessionId);
+        } else {
+          console.warn('BulletinService: No session ID available for guest user');
+          // Create a new session ID if none exists
+          const newSessionId = crypto.randomUUID();
+          localStorage.setItem('sessionId', newSessionId);
+          replyData.sessionId = newSessionId;
+          headers['X-Session-Id'] = newSessionId;
+          console.log('BulletinService: Created new session ID:', newSessionId);
+        }
       }
       
       console.log('BulletinService: Final reply data:', replyData);
+      console.log('BulletinService: Request headers:', headers);
       
       // Set a timeout for the request to avoid hanging
       const response = await api.post(`/bulletin/${bulletinId}/replies`, replyData, {
         timeout: 15000, // 15 seconds timeout
-        headers: sessionId ? { 'Session-ID': sessionId } : {}
+        headers: headers
       });
       
       console.log('BulletinService: Reply added successfully');
       return response;
     } catch (error) {
       console.error('BulletinService: Error adding reply:', error.message);
-      console.error('BulletinService: Error details:', error.response?.data);
       
-      // Improve error context
       if (error.response) {
         console.error(`BulletinService: Server returned status ${error.response.status}`);
+        console.error('BulletinService: Error response data:', error.response.data);
         
         const authStore = useAuthStore();
         const contextInfo = {
           isAuthenticated: authStore.isAuthenticated,
           hasUserId: !!authStore.userId,
+          userId: authStore.userId,
           sessionId: localStorage.getItem('sessionId'),
           responseData: error.response.data
         };

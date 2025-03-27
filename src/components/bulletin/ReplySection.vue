@@ -409,70 +409,95 @@ const submitReply = async () => {
     // Validate form
     if (authStore.isAuthenticated) {
       // For logged-in users, only content is required
-      if (!replyForm.content) {
-        showToast('Bitte geben Sie einen Inhalt ein', 'error')
-        return
+      if (!replyForm.content || replyForm.content.trim() === '') {
+        showToast('Bitte geben Sie einen Inhalt ein', 'error');
+        return;
       }
     } else {
       // For guests, name, email, content and privacy policy are required
       if (!replyForm.name || !replyForm.email || !replyForm.content || !replyForm.privacyPolicyAccepted) {
-        showToast('Bitte füllen Sie alle Pflichtfelder aus', 'error')
-        return
+        showToast('Bitte füllen Sie alle Pflichtfelder aus', 'error');
+        return;
       }
       
       // Validate email format
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(replyForm.email)) {
-        showToast('Bitte geben Sie eine gültige E-Mail-Adresse ein', 'error')
-        return
+        showToast('Bitte geben Sie eine gültige E-Mail-Adresse ein', 'error');
+        return;
       }
     }
     
-    isSubmitting.value = true
+    isSubmitting.value = true;
     
     // Add debug info
-    console.log('Submitting reply as:', authStore.isAuthenticated ? 'Authenticated user' : 'Guest')
+    console.log('Submitting reply as:', authStore.isAuthenticated ? 'Authenticated user' : 'Guest');
     console.log('Auth state from store:', { 
       isAuth: authStore.isAuthenticated,
       userId: authStore.userId, 
       userName: authStore.userName
-    })
+    });
     
-    const response = await bulletinProxyService.addReply(props.message.id, {
-      ...replyForm,
-      timestamp: new Date()
-    })
+    // Prepare form data based on user authentication status
+    let formData;
+    
+    if (authStore.isAuthenticated) {
+      // For authenticated users
+      formData = {
+        content: replyForm.content,
+        privacyPolicyAccepted: true  // Always set to true for authenticated users
+      };
+    } else {
+      // For guest users
+      formData = {
+        name: replyForm.name,
+        email: replyForm.email,
+        content: replyForm.content,
+        privacyPolicyAccepted: true  // Ensure this is always true when submitting
+      };
+      
+      // Session ID will be handled by the bulletin service
+    }
+    
+    console.log('Sending form data:', {
+      content: formData.content.substring(0, 20) + '...',
+      name: formData.name || 'Using authenticated name',
+      email: formData.email || 'Using authenticated email',
+      privacyPolicyAccepted: formData.privacyPolicyAccepted
+    });
+    
+    const response = await bulletinProxyService.addReply(props.message.id, formData);
     
     if (response && response.data) {
-      showToast('Ihre Antwort wurde erfolgreich gesendet', 'success')
-      emit('reply-added', response.data)
-      closeReplyForm()
+      showToast('Ihre Antwort wurde erfolgreich gesendet', 'success');
+      emit('reply-added', response.data);
+      closeReplyForm();
     }
   } catch (error) {
-    console.error('Error submitting reply:', error)
-    console.error('Error response data:', error.response?.data)
+    console.error('Error submitting reply:', error);
+    console.error('Error response data:', error.response?.data);
     
     if (error.response?.status === 401) {
-      showToast('Bitte melden Sie sich an, um eine Antwort zu senden', 'error')
+      showToast('Bitte melden Sie sich an, um eine Antwort zu senden', 'error');
     } else if (error.response?.status === 400) {
       // Handle validation errors from server
-      const errorMessage = error.response.data?.error || 'Validierungsfehler beim Senden der Antwort'
-      showToast(errorMessage, 'error')
+      const errorMessage = error.response.data?.error || 'Validierungsfehler beim Senden der Antwort';
+      showToast(errorMessage, 'error');
       
       // If the error involves authentication, force guest mode
       if (errorMessage.includes('Name and email') || errorMessage.includes('required for guest')) {
-        showToast('Ihre Sitzung scheint abgelaufen zu sein. Bitte überprüfen Sie Ihre Daten.', 'warning')
+        showToast('Ihre Sitzung scheint abgelaufen zu sein. Bitte überprüfen Sie Ihre Daten.', 'warning');
       }
     } else if (error.response?.status === 500) {
-      showToast('Server-Fehler beim Verarbeiten der Antwort. Bitte versuchen Sie es später erneut.', 'error')
-      console.error('Server error details:', error.response?.data)
+      showToast('Server-Fehler beim Verarbeiten der Antwort. Bitte versuchen Sie es später erneut.', 'error');
+      console.error('Server error details:', error.response?.data);
     } else if (error.response?.data?.error) {
-      showToast(error.response.data.error, 'error')
+      showToast(error.response.data.error, 'error');
     } else {
-      showToast('Fehler beim Senden der Antwort. Bitte überprüfen Sie Ihre Internetverbindung.', 'error')
+      showToast('Fehler beim Senden der Antwort. Bitte überprüfen Sie Ihre Internetverbindung.', 'error');
     }
   } finally {
-    isSubmitting.value = false
+    isSubmitting.value = false;
   }
 }
 
