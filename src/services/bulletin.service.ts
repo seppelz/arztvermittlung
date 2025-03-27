@@ -282,48 +282,45 @@ async function addReply(bulletinId: string, reply: Partial<BulletinReply>): Prom
     const userName = authStore.userName || 'Angemeldeter Benutzer';
     const userEmail = authStore.userEmail || '';
     
-    // Create the reply data with all required fields
+    // Create a simplified data structure that exactly matches what the backend expects
     const replyData = {
       content: reply.content,
-      name: userName,
-      email: userEmail,
-      privacyPolicyAccepted: true,
-      userId: authStore.userId  // Explicitly include userId for server-side validation
+      privacyPolicyAccepted: true
     };
     
-    console.log('BulletinService: Using reply data structure:', {
+    console.log('BulletinService: Sending minimal reply data:', {
       content: replyData.content?.substring(0, 20) + '...',
-      name: replyData.name,
-      email: replyData.email,
-      userId: replyData.userId ? 'Provided' : 'Not provided'
+      privacyPolicyAccepted: true
     });
     
-    // Set up auth header explicitly
-    const config = {
+    // Try direct fetch approach with explicit headers to avoid any framework issues
+    const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+    const url = `${apiBaseUrl}/bulletin/${bulletinId}/replies`;
+    console.log('BulletinService: Making direct fetch to:', url);
+    
+    const fetchResponse = await fetch(url, {
+      method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      }
-    };
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify(replyData)
+    });
     
-    // Use api module with explicit authorization header
-    const response = await api.post(`/bulletin/${bulletinId}/replies`, replyData, config);
-    
-    // Handle successful response
-    console.log('BulletinService: Reply added successfully');
-    return { data: response };
-  } catch (error: any) {
-    console.error('BulletinService: Error adding reply:', error.message);
-    
-    // Add more detailed error handling
-    if (error.response && error.response.status === 400) {
-      console.error('BulletinService: Bad request data', error.response.data);
-      // Extract error message if available
-      if (error.response.data && error.response.data.error) {
-        throw new Error(`Fehler: ${error.response.data.error}`);
-      }
+    if (!fetchResponse.ok) {
+      const errorData = await fetchResponse.json();
+      console.error('BulletinService: Reply submission failed with status', fetchResponse.status);
+      console.error('BulletinService: Server error data:', errorData);
+      throw new Error(`Server-Fehler: ${errorData?.error || errorData?.message || fetchResponse.statusText}`);
     }
     
+    // Handle successful response
+    const data = await fetchResponse.json();
+    console.log('BulletinService: Reply added successfully');
+    return { data };
+  } catch (error: any) {
+    console.error('BulletinService: Error adding reply:', error.message);
     // Bubble up the error to the UI
     throw error;
   }
