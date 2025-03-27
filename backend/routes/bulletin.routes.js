@@ -81,6 +81,8 @@ router.get('/', bulletinController.getAllBulletins);
 router.get('/:id', bulletinController.getBulletin);
 router.post('/', createWithNotification);
 router.post('/:id/replies', bulletinController.addReply);
+router.patch('/:id/replies/:replyId', bulletinController.updateReply);
+router.delete('/:id/replies/:replyId', bulletinController.deleteReply);
 
 // Geschützte Routen (Admin-Bereich)
 router.use(authMiddleware.protect);

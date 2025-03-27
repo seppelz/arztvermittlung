@@ -190,6 +190,9 @@ All notable changes to this project will be documented in this file.
 - Added better error logging for bulletin reply operations
 - Fixed bulletin reply functionality by removing client-side timestamp
 - Improved error handling in bulletin reply controller
+- Added proper authorization checks for reply editing and deletion
+- Added user ID tracking for bulletin replies
+- Fixed reply update and delete endpoints in backend routes
 
 ### Added
 - Created test scripts for MongoDB Atlas connection testing

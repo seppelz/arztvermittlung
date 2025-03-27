@@ -254,9 +254,10 @@ exports.addReply = async (req, res) => {
   try {
     const bulletinId = req.params.id;
     const { content, name, email, privacyPolicyAccepted } = req.body;
+    const userId = req.user?._id; // Get user ID from authenticated request
 
     console.log('Adding reply to bulletin:', bulletinId);
-    console.log('Reply data:', { content, name, email, privacyPolicyAccepted });
+    console.log('Reply data:', { content, name, email, privacyPolicyAccepted, userId });
 
     // Validate required fields
     if (!content || !name || !email || !privacyPolicyAccepted) {
@@ -290,7 +291,8 @@ exports.addReply = async (req, res) => {
       name,
       email,
       timestamp: new Date(),
-      privacyPolicyAccepted
+      privacyPolicyAccepted,
+      userId // Add user ID to the reply
     };
 
     // Add reply to bulletin
@@ -328,6 +330,94 @@ exports.addReply = async (req, res) => {
     });
     res.status(500).json({ 
       message: 'Error adding reply',
+      error: error.message 
+    });
+  }
+};
+
+exports.updateReply = async (req, res) => {
+  try {
+    const { id, replyId } = req.params;
+    const { content } = req.body;
+    const userId = req.user?._id; // Get user ID from authenticated request
+
+    console.log('Updating reply:', { bulletinId: id, replyId, userId });
+
+    // Find the bulletin
+    const bulletin = await Bulletin.findById(id);
+    if (!bulletin) {
+      return res.status(404).json({ message: 'Bulletin not found' });
+    }
+
+    // Find the reply
+    const reply = bulletin.replies.id(replyId);
+    if (!reply) {
+      return res.status(404).json({ message: 'Reply not found' });
+    }
+
+    // Check authorization
+    const isAdmin = req.user?.role === 'admin';
+    const isReplyOwner = reply.userId?.equals(userId);
+    
+    if (!isAdmin && !isReplyOwner) {
+      return res.status(403).json({ message: 'Not authorized to edit this reply' });
+    }
+
+    // Update reply content
+    reply.content = content;
+    await bulletin.save();
+
+    console.log('Reply updated successfully:', reply);
+    res.json({
+      message: 'Reply updated successfully',
+      reply
+    });
+  } catch (error) {
+    console.error('Error updating reply:', error);
+    res.status(500).json({ 
+      message: 'Error updating reply',
+      error: error.message 
+    });
+  }
+};
+
+exports.deleteReply = async (req, res) => {
+  try {
+    const { id, replyId } = req.params;
+    const userId = req.user?._id; // Get user ID from authenticated request
+
+    console.log('Deleting reply:', { bulletinId: id, replyId, userId });
+
+    // Find the bulletin
+    const bulletin = await Bulletin.findById(id);
+    if (!bulletin) {
+      return res.status(404).json({ message: 'Bulletin not found' });
+    }
+
+    // Find the reply
+    const reply = bulletin.replies.id(replyId);
+    if (!reply) {
+      return res.status(404).json({ message: 'Reply not found' });
+    }
+
+    // Check authorization
+    const isAdmin = req.user?.role === 'admin';
+    const isReplyOwner = reply.userId?.equals(userId);
+    
+    if (!isAdmin && !isReplyOwner) {
+      return res.status(403).json({ message: 'Not authorized to delete this reply' });
+    }
+
+    // Remove the reply
+    reply.remove();
+    await bulletin.save();
+
+    console.log('Reply deleted successfully');
+    res.json({ message: 'Reply deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting reply:', error);
+    res.status(500).json({ 
+      message: 'Error deleting reply',
       error: error.message 
     });
   }
