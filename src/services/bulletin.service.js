@@ -221,13 +221,17 @@ class BulletinService {
       // Remove timestamp from reply data as it will be set by the server
       const { timestamp, ...dataToSend } = replyData;
       
-      const response = await api.post(`/bulletin/${bulletinId}/replies`, {
-        ...dataToSend,
-        userId: this.authStore.isAuthenticated ? this.authStore.userId : null,
-        sessionId: this.getSessionId()
-      });
+      // Ensure user is authenticated
+      if (!this.authStore.isAuthenticated) {
+        throw new Error('Please log in to add replies');
+      }
+
+      // Add user ID to reply data
+      dataToSend.userId = this.authStore.userId;
+      
+      const response = await api.post(`/bulletin/${bulletinId}/replies`, dataToSend);
       console.log('BulletinService: Reply added successfully:', response.data);
-      return response;
+      return response.data;
     } catch (error) {
       console.error('Error adding reply:', error);
       console.error('Error details:', {

@@ -84,7 +84,6 @@ router.get('/:id', bulletinController.getBulletin);
 
 // Guest routes (require session)
 router.post('/', sessionMiddleware.validateSession, bulletinController.createBulletin);
-router.post('/:bulletinId/replies', sessionMiddleware.validateSession, bulletinController.addReply);
 
 // Protected routes (require auth)
 router.use(authMiddleware.protect);
@@ -95,6 +94,9 @@ router.get('/user/bulletins', bulletinController.getUserBulletins);
 // Bulletin management routes
 router.patch('/:id', bulletinController.updateBulletin);
 router.delete('/:id', bulletinController.deleteBulletin);
+
+// Reply routes (require auth)
+router.post('/:bulletinId/replies', bulletinController.addReply);
 router.patch('/:bulletinId/replies/:replyId', bulletinController.updateReply);
 router.delete('/:bulletinId/replies/:replyId', bulletinController.deleteReply);
 

@@ -274,12 +274,17 @@ exports.updateBulletinStatus = async (req, res) => {
 exports.addReply = async (req, res) => {
   try {
     const { bulletinId } = req.params;
-    const { name, email, content, privacyPolicyAccepted } = req.body;
+    const { content, privacyPolicyAccepted } = req.body;
 
-    // Get user ID if authenticated, otherwise generate session ID
-    const userId = req.user?._id;
-    const sessionId = !userId ? generateSessionId() : null;
+    // Validate required fields
+    if (!content || !privacyPolicyAccepted) {
+      return res.status(400).json({
+        success: false,
+        error: 'Content and privacy policy acceptance are required'
+      });
+    }
 
+    // Find the bulletin
     const bulletin = await Bulletin.findById(bulletinId);
     if (!bulletin) {
       return res.status(404).json({
@@ -288,22 +293,23 @@ exports.addReply = async (req, res) => {
       });
     }
 
-    bulletin.replies.push({
-      name,
-      email,
+    // Create new reply with user data
+    const reply = {
       content,
+      name: req.user.name,
+      email: req.user.email,
       privacyPolicyAccepted,
-      userId,
-      sessionId
-    });
+      userId: req.user._id
+    };
 
+    bulletin.replies.push(reply);
     await bulletin.save();
 
     // Send email notification for new reply
     await sendEmail({
       to: bulletin.email,
       subject: 'New Reply to Your Bulletin Entry',
-      text: `A new reply has been added to your bulletin entry by ${name} (${email}).`
+      text: `A new reply has been added to your bulletin entry by ${req.user.name} (${req.user.email}).`
     });
 
     res.status(201).json({

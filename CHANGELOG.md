@@ -204,6 +204,12 @@ All notable changes to this project will be documented in this file.
 - Improved error handling for unauthenticated users in reply deletion
 - Added proper user feedback for authentication errors in reply deletion
 - Enhanced reply section component with better authentication checks for deletion
+- Fixed bulletin reply authentication issues by properly handling user authentication
+- Improved error handling for unauthenticated users in reply operations
+- Fixed reply routes to require authentication
+- Enhanced reply controller to use authenticated user data
+- Fixed session handling for guest users in bulletin operations
+- Improved error messages for authentication failures
 
 ### Added
 - Auto-fill bulletin reply form with user data when logged in
@@ -253,6 +259,10 @@ All notable changes to this project will be documented in this file.
 - Added client-side validation for doctor profile form
 - Improved error messages for missing required fields
 - Added visual feedback for validation errors in doctor profile form
+- Updated bulletin routes to properly handle authentication for replies
+- Enhanced bulletin service to enforce authentication for replies
+- Improved reply controller to use authenticated user data
+- Updated error handling for authentication failures
 
 ## [1.0.0] - 2024-03-26
 
