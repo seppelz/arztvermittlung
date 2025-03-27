@@ -508,9 +508,22 @@ All notable changes to this project will be documented in this file.
 - Added backend endpoint for handling bulletin replies
 - Added validation for reply submissions
 
-## [Unreleased]
-
 ### Added
 - Implemented bulletin reply functionality with email notifications
 - Added backend endpoint for handling bulletin replies
 - Added validation for reply submissions
+- Added authorization checks for reply management (edit/delete)
+- Added user ownership tracking for bulletin replies
+- Added bulletin search functionality with filters
+- Added user-specific bulletin listing endpoint
+- Added bulletin status update endpoint
+- Added pagination support for bulletin listings
+
+### Fixed
+- Fixed bulletin reply endpoints to use correct path (/bulletin instead of /bulletins)
+- Added better error logging for bulletin reply operations
+- Fixed bulletin reply functionality by removing client-side timestamp
+- Improved error handling in bulletin reply controller
+- Added proper authorization checks for reply editing and deletion
+- Added user ID tracking for bulletin replies
+- Fixed reply update and delete endpoints in backend routes

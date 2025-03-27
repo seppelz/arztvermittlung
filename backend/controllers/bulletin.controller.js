@@ -421,4 +421,88 @@ exports.deleteReply = async (req, res) => {
       error: error.message 
     });
   }
+};
+
+// Search bulletins with filters
+exports.searchBulletins = async (req, res) => {
+  try {
+    const {
+      messageType,
+      userType,
+      federalState,
+      status,
+      startDate,
+      endDate,
+      page = 1,
+      limit = 10
+    } = req.query;
+
+    const query = {};
+
+    // Build query based on filters
+    if (messageType) query.messageType = messageType;
+    if (userType) query.userType = userType;
+    if (federalState) query.federalState = federalState;
+    if (status) query.status = status;
+    if (startDate || endDate) {
+      query.startDate = {};
+      if (startDate) query.startDate.$gte = new Date(startDate);
+      if (endDate) query.startDate.$lte = new Date(endDate);
+    }
+
+    // Execute query with pagination
+    const bulletins = await Bulletin.find(query)
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(parseInt(limit));
+
+    const total = await Bulletin.countDocuments(query);
+
+    res.status(200).json({
+      status: 'success',
+      data: bulletins,
+      pagination: {
+        total,
+        page: parseInt(page),
+        pages: Math.ceil(total / limit)
+      }
+    });
+  } catch (error) {
+    console.error('Error searching bulletins:', error);
+    res.status(500).json({ 
+      message: 'Error searching bulletins',
+      error: error.message 
+    });
+  }
+};
+
+// Get bulletins by user ID
+exports.getBulletinsByUser = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { page = 1, limit = 10 } = req.query;
+
+    const bulletins = await Bulletin.find({ userId })
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(parseInt(limit));
+
+    const total = await Bulletin.countDocuments({ userId });
+
+    res.status(200).json({
+      status: 'success',
+      data: bulletins,
+      pagination: {
+        total,
+        page: parseInt(page),
+        pages: Math.ceil(total / limit)
+      }
+    });
+  } catch (error) {
+    console.error('Error getting user bulletins:', error);
+    res.status(500).json({ 
+      message: 'Error getting user bulletins',
+      error: error.message 
+    });
+  }
 }; 

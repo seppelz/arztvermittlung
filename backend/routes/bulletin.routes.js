@@ -78,6 +78,7 @@ const createWithNotification = async (req, res) => {
 
 // Öffentliche Routen
 router.get('/', bulletinController.getAllBulletins);
+router.get('/search', bulletinController.searchBulletins);
 router.get('/:id', bulletinController.getBulletin);
 router.post('/', createWithNotification);
 router.post('/:id/replies', bulletinController.addReply);
@@ -88,5 +89,9 @@ router.delete('/:id/replies/:replyId', bulletinController.deleteReply);
 router.use(authMiddleware.protect);
 router.patch('/:id', bulletinController.updateBulletin);
 router.delete('/:id', bulletinController.deleteBulletin);
+router.patch('/:id/status', bulletinController.updateBulletinStatus);
+
+// User-specific routes
+router.get('/user/:userId', bulletinController.getBulletinsByUser);
 
 module.exports = router; 
