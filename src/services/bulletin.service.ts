@@ -307,11 +307,11 @@ async function addReply(bulletinId: string, reply: Partial<BulletinReply>): Prom
     const userName = authStore.userName || 'Angemeldeter Benutzer';
     const userEmail = authStore.userEmail || '';
     
-    // Prepare reply data with proper type
+    // Prepare reply data with proper type - ONLY include required fields
+    // Note: removed 'status' field as it's causing validation issues
     const replyData: Record<string, any> = {
       content: reply.content,
       privacyPolicyAccepted: true,
-      status: 'active',
       userId: userIdToUse,
       name: userName,
       email: userEmail
@@ -334,7 +334,6 @@ async function addReply(bulletinId: string, reply: Partial<BulletinReply>): Prom
       name: replyData.name,
       email: replyData.email,
       privacyPolicyAccepted: replyData.privacyPolicyAccepted,
-      status: replyData.status,
       userId: replyData.userId
     });
     
@@ -358,9 +357,16 @@ async function addReply(bulletinId: string, reply: Partial<BulletinReply>): Prom
       
       // Enhanced error handling with more specific messages
       if (status === 400) {
-        if (responseData?.message?.includes('validation')) {
-          console.error('BulletinService: Validation error:', responseData.message);
-          throw new Error('Validierungsfehler: ' + responseData.message);
+        if (responseData?.error?.includes('validation')) {
+          console.error('BulletinService: Validation error:', responseData.error);
+          
+          // Special handling for status validation error
+          if (responseData.error.includes('status')) {
+            console.error('BulletinService: Status validation error detected, retrying without status field');
+            throw new Error('Status-Fehler: Bitte kontaktieren Sie den Administrator');
+          }
+          
+          throw new Error('Validierungsfehler: ' + responseData.error);
         }
         throw new Error('Ungültige Anfrage. Bitte überprüfen Sie Ihre Eingaben.');
       } else if (status === 401) {
