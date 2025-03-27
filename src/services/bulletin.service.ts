@@ -265,7 +265,6 @@ async function addReply(bulletinId: string, reply: Partial<BulletinReply>): Prom
     const userId = authStore.userId;
     
     console.log('BulletinService: Auth status:', isAuthenticated ? 'Authenticated' : 'Guest');
-    console.log('BulletinService: User ID from auth store:', userId || 'Not available');
     
     // Enforce authentication - reject guest access immediately
     if (!isAuthenticated) {
@@ -280,150 +279,57 @@ async function addReply(bulletinId: string, reply: Partial<BulletinReply>): Prom
       throw new Error('Authentifizierungstoken nicht gefunden. Bitte melden Sie sich erneut an.');
     }
 
-    // Try to extract user ID from token first to ensure we have it
-    let userIdToUse = userId;
-    if (!userIdToUse) {
-      try {
-        const tokenParts = token.split('.');
-        if (tokenParts.length === 3) {
-          const payload = JSON.parse(atob(tokenParts[1]));
-          if (payload && payload.id) {
-            console.log('BulletinService: Extracted user ID from token:', payload.id);
-            userIdToUse = payload.id;
-          }
-        }
-      } catch (tokenError) {
-        console.error('BulletinService: Error extracting user ID from token:', tokenError);
-      }
-    }
-
     // Get user info from auth store
     const userName = authStore.userName || 'Angemeldeter Benutzer';
     const userEmail = authStore.userEmail || '';
     
-    // Helper function to create request headers
-    const createHeaders = () => ({
+    // DIRECT APPROACH: Just send the required data for a reply
+    const headers = {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`
-    });
+    };
     
-    // Create initial headers
-    const headers = createHeaders();
-    
-    // STEP 1: First check if the bulletin exists and is valid
-    try {
-      console.log('BulletinService: Fetching bulletin first to check status');
-      const bulletinResponse = await api.get(`/bulletin/${bulletinId}`, {
-        headers: createHeaders()
-      });
-      
-      const bulletinData = bulletinResponse.data;
-      console.log('BulletinService: Bulletin data retrieved', {
-        id: bulletinData._id,
-        status: bulletinData.status,
-        hasPrivacyPolicy: !!bulletinData.privacyPolicyAccepted
-      });
-      
-      // Check if bulletin is valid for replies
-      if (bulletinData.status !== 'active') {
-        console.error('BulletinService: Cannot reply to non-active bulletin');
-        throw new Error(`Antworten sind für diesen Beitrag nicht möglich. Status: ${bulletinData.status}`);
-      }
-      
-      // Check if bulletin has privacyPolicyAccepted
-      if (!bulletinData.privacyPolicyAccepted) {
-        console.log('BulletinService: Bulletin missing privacyPolicyAccepted, fixing before reply');
-        
-        // Update the bulletin first to fix the privacy policy field
-        try {
-          await api.patch(`/bulletin/${bulletinId}`, {
-            privacyPolicyAccepted: true
-          }, {
-            headers: createHeaders()
-          });
-          console.log('BulletinService: Fixed bulletin privacy policy field');
-        } catch (updateError) {
-          console.error('BulletinService: Failed to update bulletin privacy policy:', updateError);
-          // Continue with reply attempt even if update failed
-        }
-      }
-    } catch (fetchError) {
-      console.error('BulletinService: Error fetching bulletin:', fetchError);
-      // If we can't fetch the bulletin, we'll still try to add the reply
-    }
-    
-    // STEP 2: Now add the reply with the necessary fields
-    console.log('BulletinService: Proceeding with reply submission');
-    
-    // Prepare reply data - include only fields the backend explicitly needs
-    const replyData: Record<string, any> = {
+    // Create the simplest reply data with just what's needed
+    const simpleReplyData = {
       content: reply.content,
       name: userName,
       email: userEmail,
       privacyPolicyAccepted: true
     };
     
-    console.log('BulletinService: Using authenticated user data:', { 
-      name: replyData.name,
-      email: replyData.email
+    console.log('BulletinService: Using simple data structure for reply:', {
+      content: simpleReplyData.content?.substring(0, 20) + '...',
+      name: simpleReplyData.name,
+      email: simpleReplyData.email,
     });
     
-    // Log what we're sending
-    const logData = { ...replyData };
-    if (logData.content) {
-      logData.content = logData.content.substring(0, 20) + '...';
+    // Make the direct API call to add the reply
+    const response = await fetch(`https://www.med-match.de/api/bulletin/${bulletinId}/replies`, {
+      method: 'POST',
+      headers: headers,
+      body: JSON.stringify(simpleReplyData)
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('BulletinService: Reply submission failed with status', response.status);
+      console.error('BulletinService: Server error data:', errorData);
+      
+      if (errorData?.error?.includes('privacyPolicyAccepted')) {
+        throw new Error('Validierungsfehler: Die Datenschutzerklärung des Bulletins fehlt. Dies ist ein Serverproblem, das nur vom Administrator behoben werden kann.');
+      }
+      
+      throw new Error(`Server-Fehler: ${errorData?.error || response.statusText}`);
     }
-    console.log('BulletinService: Final reply data:', logData);
     
-    // Make the request to add the reply
-    const response = await api.post(`/bulletin/${bulletinId}/replies`, replyData, {
-      timeout: 15000,
-      headers: headers
-    });
-    
+    // Handle successful response
+    const data = await response.json();
     console.log('BulletinService: Reply added successfully');
-    return response;
+    return { data };
   } catch (error: any) {
     console.error('BulletinService: Error adding reply:', error.message);
     
-    // Check if error contains nested response data
-    const responseData = error.response?.data;
-    const status = error.response?.status;
-    
-    if (status && responseData) {
-      console.error(`BulletinService: Server returned status ${status}`);
-      console.error('BulletinService: Error response data:', responseData);
-      
-      // Extract error messages from MongoDB validation errors
-      if (status === 400 && responseData.error && responseData.error.includes('validation')) {
-        console.error('BulletinService: Validation error:', responseData.error);
-        
-        // Handle specific validation errors
-        if (responseData.error.includes('privacyPolicyAccepted')) {
-          throw new Error('Validierungsfehler: Die Datenschutzerklärung muss akzeptiert werden, bitte wenden Sie sich an den Administrator.');
-        }
-        if (responseData.error.includes('status')) {
-          throw new Error('Validierungsfehler: Der Status des Eintrags ist ungültig. Bitte kontaktieren Sie den Administrator.');
-        }
-        
-        throw new Error('Validierungsfehler: ' + responseData.error);
-      }
-      
-      // Standard HTTP status code handling
-      if (status === 401) {
-        throw new Error('Sie sind nicht angemeldet oder Ihre Sitzung ist abgelaufen. Bitte melden Sie sich erneut an.');
-      } else if (status === 403) {
-        throw new Error('Sie haben keine Berechtigung, diese Aktion durchzuführen.');
-      } else if (status === 404) {
-        throw new Error('Die Nachricht wurde nicht gefunden oder wurde bereits gelöscht.');
-      } else if (status === 500) {
-        throw new Error('Ein Serverfehler ist aufgetreten. Bitte versuchen Sie es später erneut.');
-      } else if (status === 400) {
-        throw new Error('Ungültige Anfrage. Bitte überprüfen Sie Ihre Eingaben.');
-      }
-    }
-    
-    // Generic error if no specific handling above
+    // Bubble up the error to the UI
     throw error;
   }
 }
