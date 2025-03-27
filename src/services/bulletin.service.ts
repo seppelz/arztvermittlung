@@ -282,28 +282,47 @@ async function addReply(bulletinId: string, reply: Partial<BulletinReply>): Prom
     const userName = authStore.userName || 'Angemeldeter Benutzer';
     const userEmail = authStore.userEmail || '';
     
-    // Create the simplest reply data with just what's needed
-    const simpleReplyData = {
+    // Create the reply data with all required fields
+    const replyData = {
       content: reply.content,
       name: userName,
       email: userEmail,
-      privacyPolicyAccepted: true
+      privacyPolicyAccepted: true,
+      userId: authStore.userId  // Explicitly include userId for server-side validation
     };
     
-    console.log('BulletinService: Using simple data structure for reply:', {
-      content: simpleReplyData.content?.substring(0, 20) + '...',
-      name: simpleReplyData.name,
-      email: simpleReplyData.email,
+    console.log('BulletinService: Using reply data structure:', {
+      content: replyData.content?.substring(0, 20) + '...',
+      name: replyData.name,
+      email: replyData.email,
+      userId: replyData.userId ? 'Provided' : 'Not provided'
     });
     
-    // Use api module instead of direct fetch
-    const response = await api.post(`/bulletin/${bulletinId}/replies`, simpleReplyData);
+    // Set up auth header explicitly
+    const config = {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    };
+    
+    // Use api module with explicit authorization header
+    const response = await api.post(`/bulletin/${bulletinId}/replies`, replyData, config);
     
     // Handle successful response
     console.log('BulletinService: Reply added successfully');
     return { data: response };
   } catch (error: any) {
     console.error('BulletinService: Error adding reply:', error.message);
+    
+    // Add more detailed error handling
+    if (error.response && error.response.status === 400) {
+      console.error('BulletinService: Bad request data', error.response.data);
+      // Extract error message if available
+      if (error.response.data && error.response.data.error) {
+        throw new Error(`Fehler: ${error.response.data.error}`);
+      }
+    }
     
     // Bubble up the error to the UI
     throw error;

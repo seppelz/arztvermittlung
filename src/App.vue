@@ -37,8 +37,8 @@ async function checkApiStatus() {
   apiStatusMessage.value = 'Checking API connection...'
   
   try {
-    // Try to fetch a simple resource from the API
-    await api.get('/health')
+    // Try to fetch a simple resource from the API that's guaranteed to exist
+    await api.get('/bulletin?limit=1')
     
     // If successful, set status to online
     apiStatus.value = 'online'
