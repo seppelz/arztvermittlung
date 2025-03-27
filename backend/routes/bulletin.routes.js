@@ -95,10 +95,10 @@ router.get('/user/bulletins', bulletinController.getUserBulletins);
 router.patch('/:id', bulletinController.updateBulletin);
 router.delete('/:id', bulletinController.deleteBulletin);
 
-// Reply routes (require auth)
-router.post('/:bulletinId/replies', bulletinController.addReply);
-router.patch('/:bulletinId/replies/:replyId', bulletinController.updateReply);
-router.delete('/:bulletinId/replies/:replyId', bulletinController.deleteReply);
+// Reply routes (allow both auth and guest users with session)
+router.post('/:bulletinId/replies', sessionMiddleware.validateOrCreateSession, bulletinController.addReply);
+router.patch('/:bulletinId/replies/:replyId', sessionMiddleware.validateOrCreateSession, bulletinController.updateReply);
+router.delete('/:bulletinId/replies/:replyId', sessionMiddleware.validateOrCreateSession, bulletinController.deleteReply);
 
 // Admin routes
 router.use(authMiddleware.restrictToAdmin);
