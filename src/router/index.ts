@@ -352,10 +352,15 @@ function fastAuthCheck(): boolean {
 // Global navigation guard to check authentication
 router.beforeEach(async (to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext) => {
   try {
-    // Emit events for analytics tracking
-    window.dispatchEvent(new CustomEvent('router:before-navigation', {
-      detail: { to, from }
-    }));
+    // Wrap in try-catch to handle potential errors in event dispatching
+    try {
+      // Emit events for analytics tracking
+      window.dispatchEvent(new CustomEvent('router:before-navigation', {
+        detail: { to, from }
+      }));
+    } catch (eventError) {
+      console.warn('Error dispatching navigation event:', eventError);
+    }
     
     // Simple flag to avoid rate limiting of auth checks
     const now = Date.now();
@@ -368,12 +373,32 @@ router.beforeEach(async (to: RouteLocationNormalized, from: RouteLocationNormali
       console.warn('Error accessing sessionStorage:', error);
     }
     
+    let needsAuth = false;
+    try {
+      // Check if route requires authentication
+      needsAuth = requiresAuth(to);
+    } catch (routeError) {
+      console.error('Error checking route authentication requirements:', routeError);
+      // Default to false if there's an error
+      needsAuth = false;
+    }
+    
     // If checks are happening too frequently (within 1 second), 
     // skip detailed checks and proceed
     if (now - lastCheck < 1000) {
-      if (requiresAuth(to)) {
-        const isAuthed = await Promise.resolve(fastAuthCheck());
-        return isAuthed ? next() : next('/login');
+      if (needsAuth) {
+        try {
+          const isAuthed = fastAuthCheck();
+          if (isAuthed) {
+            return next();
+          } else {
+            return next('/login');
+          }
+        } catch (authError) {
+          console.error('Error during fast auth check:', authError);
+          // Default to allowing navigation if there's an error
+          return next();
+        }
       } else {
         return next();
       }
@@ -386,25 +411,37 @@ router.beforeEach(async (to: RouteLocationNormalized, from: RouteLocationNormali
       console.warn('Error writing to sessionStorage:', error);
     }
     
-    if (requiresAuth(to)) {
-      // Check if user is authenticated
-      const authenticated = await isAuthenticated();
-      
-      if (!authenticated) {
-        // Redirect to login page with return URL
-        return next({
-          path: '/login',
-          query: { redirect: to.fullPath }
-        });
-      }
-      
-      // For admin routes, check if user is admin
-      if (to.path.startsWith('/admin') && to.path !== '/admin/login') {
-        const admin = await isAdmin();
-        if (!admin) {
-          // Redirect non-admins trying to access admin routes
-          return next('/');
+    if (needsAuth) {
+      try {
+        // Check if user is authenticated
+        const authenticated = await isAuthenticated();
+        
+        if (!authenticated) {
+          // Redirect to login page with return URL
+          return next({
+            path: '/login',
+            query: { redirect: to.fullPath }
+          });
         }
+        
+        // For admin routes, check if user is admin
+        if (to.path.startsWith('/admin') && to.path !== '/admin/login') {
+          try {
+            const admin = await isAdmin();
+            if (!admin) {
+              // Redirect non-admins trying to access admin routes
+              return next('/');
+            }
+          } catch (adminError) {
+            console.error('Error checking admin status:', adminError);
+            // By default, don't allow access to admin routes on error
+            return next('/');
+          }
+        }
+      } catch (authError) {
+        console.error('Error checking authentication status:', authError);
+        // Default to allowing navigation if there's an error
+        return next();
       }
     }
     
@@ -412,29 +449,56 @@ router.beforeEach(async (to: RouteLocationNormalized, from: RouteLocationNormali
     next();
   } catch (error) {
     console.error('Navigation guard error:', error);
-    next('/');
+    // Log more detailed information about the navigation
+    console.error('Navigation details:', {
+      from: from.path,
+      to: to.path,
+      fromName: from.name,
+      toName: to.name
+    });
+    
+    // Safely continue navigation
+    next();
   }
 });
 
-// Optimized check for routes that require authentication
+// Modified to be safer - check if route.matched exists before accessing
 function requiresAuth(route: RouteLocationNormalized): boolean {
-  return route.matched.some(record => record.meta.requiresAuth === true);
-}
-
-// Navigation analytics tracking
-router.afterEach((to, from) => {
-  window.dispatchEvent(new CustomEvent('router:after-navigation', {
-    detail: { to, from }
-  }));
-  
-  // Automatically update document title based on route name
-  if (to.name) {
-    const siteName = 'Arztvermittlung';
-    const pageTitle = typeof to.name === 'string' ? to.name : 'Page';
-    document.title = `${pageTitle} | ${siteName}`;
+  if (!route || !route.matched || !Array.isArray(route.matched)) {
+    console.warn('Invalid route object in requiresAuth check:', route);
+    return false;
   }
   
-  // Track page view - handled in main.js with analytics service
+  try {
+    return route.matched.some(record => 
+      record && record.meta && record.meta.requiresAuth === true
+    );
+  } catch (error) {
+    console.error('Error in requiresAuth checking route meta:', error);
+    return false;
+  }
+}
+
+// Navigation analytics tracking - add error handling
+router.afterEach((to, from) => {
+  try {
+    window.dispatchEvent(new CustomEvent('router:after-navigation', {
+      detail: { to, from }
+    }));
+    
+    // Safely update document title based on route name
+    if (to && to.name) {
+      try {
+        const siteName = 'Arztvermittlung';
+        const pageTitle = typeof to.name === 'string' ? to.name : 'Page';
+        document.title = `${pageTitle} | ${siteName}`;
+      } catch (titleError) {
+        console.warn('Error updating document title:', titleError);
+      }
+    }
+  } catch (error) {
+    console.error('Error in afterEach navigation guard:', error);
+  }
 });
 
 // Add safer push method with error handling
