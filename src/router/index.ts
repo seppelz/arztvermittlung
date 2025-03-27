@@ -333,6 +333,22 @@ const router = createRouter({
   }
 });
 
+// Fast authentication check that only reads from localStorage to avoid delays
+function fastAuthCheck(): boolean {
+  try {
+    // Check if localStorage is available
+    if (typeof localStorage === 'undefined') {
+      console.warn('localStorage is not available, cannot perform fast auth check');
+      return false;
+    }
+    
+    return !!localStorage.getItem('token');
+  } catch (error) {
+    console.error('Error in fastAuthCheck:', error);
+    return false;
+  }
+}
+
 // Global navigation guard to check authentication
 router.beforeEach(async (to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext) => {
   try {
@@ -344,16 +360,31 @@ router.beforeEach(async (to: RouteLocationNormalized, from: RouteLocationNormali
     // Simple flag to avoid rate limiting of auth checks
     const now = Date.now();
     const lastCheckKey = '_lastAuthCheck';
-    const lastCheck = parseInt(sessionStorage.getItem(lastCheckKey) || '0');
+    let lastCheck = 0;
+    
+    try {
+      lastCheck = parseInt(sessionStorage.getItem(lastCheckKey) || '0');
+    } catch (error) {
+      console.warn('Error accessing sessionStorage:', error);
+    }
     
     // If checks are happening too frequently (within 1 second), 
     // skip detailed checks and proceed
     if (now - lastCheck < 1000) {
-      return requiresAuth(to) ? (await fastAuthCheck() ? next() : next('/login')) : next();
+      if (requiresAuth(to)) {
+        const isAuthed = await Promise.resolve(fastAuthCheck());
+        return isAuthed ? next() : next('/login');
+      } else {
+        return next();
+      }
     }
     
     // Update last check timestamp
-    sessionStorage.setItem(lastCheckKey, now.toString());
+    try {
+      sessionStorage.setItem(lastCheckKey, now.toString());
+    } catch (error) {
+      console.warn('Error writing to sessionStorage:', error);
+    }
     
     if (requiresAuth(to)) {
       // Check if user is authenticated
@@ -388,11 +419,6 @@ router.beforeEach(async (to: RouteLocationNormalized, from: RouteLocationNormali
 // Optimized check for routes that require authentication
 function requiresAuth(route: RouteLocationNormalized): boolean {
   return route.matched.some(record => record.meta.requiresAuth === true);
-}
-
-// Fast authentication check that only reads from localStorage to avoid delays
-function fastAuthCheck(): boolean {
-  return !!localStorage.getItem('token');
 }
 
 // Navigation analytics tracking
