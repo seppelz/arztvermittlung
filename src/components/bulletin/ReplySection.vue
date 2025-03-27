@@ -286,10 +286,17 @@ const editReply = (reply) => {
 // Add method to handle reply update
 const updateReply = async () => {
   try {
+    if (!authStore.isAuthenticated) {
+      showToast('Bitte melden Sie sich an, um Antworten zu bearbeiten', 'error')
+      return
+    }
+
     isSubmitting.value = true
-    const response = await bulletinProxyService.updateReply(props.message.id, selectedReply.value._id, {
-      content: selectedReply.value.content
-    })
+    const response = await bulletinProxyService.updateReply(
+      props.message.id, 
+      selectedReply.value._id, 
+      selectedReply.value.content
+    )
     
     if (response && response.data) {
       showToast('Antwort wurde erfolgreich aktualisiert', 'success')
@@ -299,7 +306,11 @@ const updateReply = async () => {
     }
   } catch (error) {
     console.error('Error updating reply:', error)
-    showToast('Fehler beim Aktualisieren der Antwort', 'error')
+    if (error.message === 'Please log in to update replies') {
+      showToast('Bitte melden Sie sich an, um Antworten zu bearbeiten', 'error')
+    } else {
+      showToast('Fehler beim Aktualisieren der Antwort', 'error')
+    }
   } finally {
     isSubmitting.value = false
   }

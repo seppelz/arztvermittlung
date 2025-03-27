@@ -1,4 +1,5 @@
 import api from './api';
+import { useAuthStore } from '../stores/auth';
 
 /**
  * Service for bulletin board related API calls
@@ -252,15 +253,16 @@ class BulletinService {
     try {
       console.log('BulletinService: Updating reply', replyId, 'in bulletin', bulletinId);
       
-      // Get user ID from localStorage
-      const user = JSON.parse(localStorage.getItem('user'));
-      if (!user || !user._id) {
-        throw new Error('User not authenticated');
+      // Get user from auth store instead of localStorage
+      const authStore = useAuthStore();
+      if (!authStore.isAuthenticated || !authStore.user) {
+        console.error('BulletinService: User not authenticated');
+        throw new Error('Please log in to update replies');
       }
 
       const dataToSend = {
         content,
-        userId: user._id
+        userId: authStore.user._id
       };
 
       console.log('BulletinService: Sending update data:', dataToSend);
