@@ -12,12 +12,20 @@
     
     <div v-else-if="entries.length === 0" class="text-center py-8 bg-gray-50 rounded-lg">
       <p class="text-gray-500">Sie haben noch keine Einträge erstellt.</p>
-      <button 
-        @click="goToBulletinBoard"
-        class="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-      >
-        Neuen Eintrag erstellen
-      </button>
+      <div class="mt-4 space-x-4">
+        <button 
+          @click="goToBulletinBoard"
+          class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+        >
+          Neuen Pinnwand-Eintrag erstellen
+        </button>
+        <button 
+          @click="goToJobBoard"
+          class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+        >
+          {{ isHospital ? 'Neues Angebot erstellen' : 'Neues Gesuch erstellen' }}
+        </button>
+      </div>
     </div>
     
     <div v-else class="space-y-6">
@@ -186,7 +194,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useToast } from '@/composables/useToast'
 import { useAuthStore } from '@/stores/auth'
@@ -204,6 +212,10 @@ const showEditModal = ref(false)
 const showDeleteModal = ref(false)
 const editingEntry = ref({})
 const deletingEntryId = ref(null)
+
+const isHospital = computed(() => {
+  return authStore.user?.userType === 'hospital'
+})
 
 const federalStates = [
   'Baden-Württemberg', 'Bayern', 'Berlin', 'Brandenburg', 'Bremen',
@@ -227,6 +239,11 @@ const formatDate = (dateString) => {
 // Navigate to bulletin board page
 const goToBulletinBoard = () => {
   router.push('/bulletin-board')
+}
+
+// Navigate to job board page
+const goToJobBoard = () => {
+  router.push('/arztboerse')
 }
 
 // Load user's bulletin entries

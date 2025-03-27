@@ -321,6 +321,8 @@ All notable changes to this project will be documented in this file.
 - BulletinService now tries multiple approaches to fetch data before failing
 - Main.js initialization process now handles router initialization more safely
 - Components now provide feedback to users when using demo data instead of real data
+- Updated favicon to use Med-Match logo instead of Vue.js default favicon
+- Reordered profile completion form to appear above bulletin entries in profile page for better user experience
 
 ## [1.0.0] - 2024-03-26
 
@@ -453,3 +455,8 @@ All notable changes to this project will be documented in this file.
 - Added delete functionality for both hospital and doctor profiles
 - Bulletin entries management component for users to view, edit, and delete their entries
 - Enhanced profile page to support both doctor and hospital user types
+
+### Added
+- Split "Neuen Eintrag erstellen" button into two separate buttons on profile page:
+  - "Neuen Pinnwand-Eintrag erstellen" for bulletin board entries
+  - "Neues Angebot erstellen" for hospitals or "Neues Gesuch erstellen" for doctors

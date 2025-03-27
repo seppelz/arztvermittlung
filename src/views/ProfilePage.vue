@@ -184,11 +184,6 @@
         </div>
       </div>
 
-      <!-- Bulletin Entries -->
-      <div class="mt-8">
-        <BulletinEntries />
-      </div>
-      
       <!-- Profile Completion Form -->
       <HospitalProfileForm
         v-if="showProfileForm && isHospital"
@@ -201,6 +196,11 @@
         @close="showProfileForm = false"
         @profile-updated="handleDoctorProfileUpdate"
       />
+
+      <!-- Bulletin Entries -->
+      <div class="mt-8">
+        <BulletinEntries />
+      </div>
       
       <!-- Delete Profile Confirmation Modal -->
       <div v-if="showDeleteConfirm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
