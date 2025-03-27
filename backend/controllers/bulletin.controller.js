@@ -1,4 +1,6 @@
 const Bulletin = require('../models/bulletin.model');
+const { sendEmail } = require('../utils/email');
+const { generateSessionId } = require('../utils/session');
 
 // Alle Pinnwand-Einträge abrufen
 exports.getAllBulletins = async (req, res) => {
@@ -111,64 +113,45 @@ exports.getBulletin = async (req, res) => {
 // Neuen Pinnwand-Eintrag erstellen
 exports.createBulletin = async (req, res) => {
   try {
-    const bulletinData = req.body;
+    const { name, email, content, messageType, specialty, federalState, startDate, phone, privacyPolicyAccepted } = req.body;
     
-    // Validierung der grundlegenden Eingabedaten
-    if (!bulletinData.title || !bulletinData.content || !bulletinData.email || !bulletinData.userType || !bulletinData.messageType) {
-      return res.status(400).json({ 
-        message: 'Unvollständige Daten', 
-        details: 'Titel, Inhalt, E-Mail, Benutzertyp und Nachrichtentyp sind erforderlich' 
-      });
-    }
-    
-    // Validierung für Angebote und Gesuche
-    if ((bulletinData.messageType === 'Angebot' || bulletinData.messageType === 'Gesuch') && !bulletinData.startDate) {
-      return res.status(400).json({ 
-        message: 'Unvollständige Daten', 
-        details: 'Für Angebote und Gesuche ist ein Startdatum erforderlich' 
-      });
-    }
-    
-    // Validierung für Klinik-Angebote
-    if (bulletinData.userType === 'Klinik' && bulletinData.messageType === 'Angebot' && !bulletinData.federalState) {
-      return res.status(400).json({ 
-        message: 'Unvollständige Daten', 
-        details: 'Für Klinik-Angebote ist ein Bundesland erforderlich' 
-      });
-    }
-    
-    // Datenschutzerklärung Validierung
-    if (!bulletinData.privacyPolicyAccepted) {
-      return res.status(400).json({ 
-        message: 'Unvollständige Daten', 
-        details: 'Die Datenschutzerklärung muss akzeptiert werden' 
-      });
-    }
-    
-    const newBulletin = new Bulletin(bulletinData);
-    const savedBulletin = await newBulletin.save();
-    
-    res.status(201).json({ 
-      message: 'Pinnwand-Eintrag erfolgreich erstellt',
-      data: savedBulletin 
+    // Get user ID if authenticated, otherwise generate session ID
+    const userId = req.user?._id;
+    const sessionId = !userId ? generateSessionId() : null;
+
+    const bulletin = new Bulletin({
+      name,
+      email,
+      content,
+      messageType,
+      specialty,
+      federalState,
+      startDate,
+      phone,
+      privacyPolicyAccepted,
+      userId,
+      sessionId
     });
-    
-    // Das erstellte Bulletin-Objekt zurückgeben, damit es für E-Mail-Benachrichtigungen verwendet werden kann
-    return savedBulletin;
+
+    await bulletin.save();
+
+    // Send email notification for new bulletin
+    await sendEmail({
+      to: process.env.ADMIN_EMAIL,
+      subject: `New ${messageType} Bulletin Entry`,
+      text: `A new ${messageType} bulletin entry has been created by ${name} (${email}).`
+    });
+
+    res.status(201).json({
+      success: true,
+      data: bulletin
+    });
   } catch (error) {
     console.error('Error creating bulletin:', error);
-    
-    // Mongoose Validierungsfehler speziell behandeln
-    if (error.name === 'ValidationError') {
-      const validationErrors = Object.values(error.errors).map(err => err.message);
-      return res.status(400).json({ 
-        message: 'Validierungsfehler', 
-        details: validationErrors.join(', ') 
-      });
-    }
-    
-    res.status(500).json({ message: 'Ein Fehler ist aufgetreten', error: error.message });
-    return null;
+    res.status(500).json({
+      success: false,
+      error: 'Error creating bulletin entry'
+    });
   }
 };
 
@@ -176,25 +159,44 @@ exports.createBulletin = async (req, res) => {
 exports.updateBulletin = async (req, res) => {
   try {
     const { id } = req.params;
-    const updateData = req.body;
-    
-    const updatedBulletin = await Bulletin.findByIdAndUpdate(
-      id,
-      updateData,
-      { new: true } // Gibt das aktualisierte Dokument zurück
-    );
-    
-    if (!updatedBulletin) {
-      return res.status(404).json({ message: 'Pinnwand-Eintrag nicht gefunden' });
+    const { content, specialty, federalState, startDate, phone } = req.body;
+
+    const bulletin = await Bulletin.findById(id);
+    if (!bulletin) {
+      return res.status(404).json({
+        success: false,
+        error: 'Bulletin not found'
+      });
     }
-    
-    res.status(200).json({ 
-      message: 'Pinnwand-Eintrag erfolgreich aktualisiert',
-      data: updatedBulletin 
+
+    // Check if user can edit this bulletin
+    const canEdit = bulletin.canEdit(req.user?._id, req.session?.id);
+    if (!canEdit) {
+      return res.status(403).json({
+        success: false,
+        error: 'You are not authorized to edit this bulletin'
+      });
+    }
+
+    // Update only allowed fields
+    bulletin.content = content;
+    bulletin.specialty = specialty;
+    bulletin.federalState = federalState;
+    bulletin.startDate = startDate;
+    bulletin.phone = phone;
+
+    await bulletin.save();
+
+    res.status(200).json({
+      success: true,
+      data: bulletin
     });
   } catch (error) {
     console.error('Error updating bulletin:', error);
-    res.status(500).json({ message: 'Ein Fehler ist aufgetreten', error: error.message });
+    res.status(500).json({
+      success: false,
+      error: 'Error updating bulletin'
+    });
   }
 };
 
@@ -202,19 +204,37 @@ exports.updateBulletin = async (req, res) => {
 exports.deleteBulletin = async (req, res) => {
   try {
     const { id } = req.params;
-    const deletedBulletin = await Bulletin.findByIdAndDelete(id);
-    
-    if (!deletedBulletin) {
-      return res.status(404).json({ message: 'Pinnwand-Eintrag nicht gefunden' });
+
+    const bulletin = await Bulletin.findById(id);
+    if (!bulletin) {
+      return res.status(404).json({
+        success: false,
+        error: 'Bulletin not found'
+      });
     }
-    
-    res.status(200).json({ 
-      message: 'Pinnwand-Eintrag erfolgreich gelöscht',
-      data: deletedBulletin
+
+    // Check if user can delete this bulletin
+    const canEdit = bulletin.canEdit(req.user?._id, req.session?.id);
+    if (!canEdit) {
+      return res.status(403).json({
+        success: false,
+        error: 'You are not authorized to delete this bulletin'
+      });
+    }
+
+    bulletin.status = 'deleted';
+    await bulletin.save();
+
+    res.status(200).json({
+      success: true,
+      data: {}
     });
   } catch (error) {
     console.error('Error deleting bulletin:', error);
-    res.status(500).json({ message: 'Ein Fehler ist aufgetreten', error: error.message });
+    res.status(500).json({
+      success: false,
+      error: 'Error deleting bulletin'
+    });
   }
 };
 
@@ -250,177 +270,130 @@ exports.updateBulletinStatus = async (req, res) => {
   }
 };
 
+// Add a reply to a bulletin
 exports.addReply = async (req, res) => {
   try {
-    const bulletinId = req.params.id;
-    const { content, name, email, privacyPolicyAccepted } = req.body;
-    const userId = req.user?._id; // Get user ID from authenticated request
+    const { bulletinId } = req.params;
+    const { name, email, content, privacyPolicyAccepted } = req.body;
 
-    console.log('Adding reply to bulletin:', bulletinId);
-    console.log('Reply data:', { content, name, email, privacyPolicyAccepted, userId });
+    // Get user ID if authenticated, otherwise generate session ID
+    const userId = req.user?._id;
+    const sessionId = !userId ? generateSessionId() : null;
 
-    // Validate required fields
-    if (!content || !name || !email || !privacyPolicyAccepted) {
-      console.log('Missing required fields:', {
-        content: !content,
-        name: !name,
-        email: !email,
-        privacyPolicyAccepted: !privacyPolicyAccepted
-      });
-      return res.status(400).json({
-        message: 'Required fields are missing',
-        required: {
-          content: !content,
-          name: !name,
-          email: !email,
-          privacyPolicyAccepted: !privacyPolicyAccepted
-        }
-      });
-    }
-
-    // Find the bulletin
     const bulletin = await Bulletin.findById(bulletinId);
     if (!bulletin) {
-      console.log('Bulletin not found:', bulletinId);
-      return res.status(404).json({ message: 'Bulletin not found' });
+      return res.status(404).json({
+        success: false,
+        error: 'Bulletin not found'
+      });
     }
 
-    // Create new reply
-    const reply = {
-      content,
+    bulletin.replies.push({
       name,
       email,
-      timestamp: new Date(),
+      content,
       privacyPolicyAccepted,
-      userId // Add user ID to the reply
-    };
+      userId,
+      sessionId
+    });
 
-    // Add reply to bulletin
-    bulletin.replies.push(reply);
     await bulletin.save();
 
-    console.log('Reply added successfully:', reply);
+    // Send email notification for new reply
+    await sendEmail({
+      to: bulletin.email,
+      subject: 'New Reply to Your Bulletin Entry',
+      text: `A new reply has been added to your bulletin entry by ${name} (${email}).`
+    });
 
-    // Send email notification to bulletin author
-    if (bulletin.email) {
-      try {
-        await sendEmail({
-          to: bulletin.email,
-          subject: 'Neue Antwort auf Ihr Bulletin',
-          text: `Eine neue Antwort wurde auf Ihr Bulletin "${bulletin.title}" veröffentlicht.\n\nAntwort von: ${name}\nE-Mail: ${email}\n\nInhalt:\n${content}`
-        });
-        console.log('Email notification sent to:', bulletin.email);
-      } catch (emailError) {
-        console.error('Error sending email notification:', emailError);
-        // Don't fail the request if email sending fails
-      }
-    }
-
-    res.json({
-      message: 'Reply added successfully',
-      reply
+    res.status(201).json({
+      success: true,
+      data: bulletin
     });
   } catch (error) {
     console.error('Error adding reply:', error);
-    console.error('Error details:', {
-      message: error.message,
-      stack: error.stack,
-      bulletinId: req.params.id,
-      replyData: req.body
-    });
-    res.status(500).json({ 
-      message: 'Error adding reply',
-      error: error.message 
+    res.status(500).json({
+      success: false,
+      error: 'Error adding reply'
     });
   }
 };
 
+// Update a reply
 exports.updateReply = async (req, res) => {
   try {
-    const bulletin = await Bulletin.findById(req.params.id);
+    const { bulletinId, replyId } = req.params;
+    const { content } = req.body;
+
+    const bulletin = await Bulletin.findById(bulletinId);
     if (!bulletin) {
       return res.status(404).json({
-        status: 'error',
-        message: 'Bulletin not found'
+        success: false,
+        error: 'Bulletin not found'
       });
     }
 
-    const reply = bulletin.replies.id(req.params.replyId);
-    if (!reply) {
-      return res.status(404).json({
-        status: 'error',
-        message: 'Reply not found'
-      });
-    }
-
-    // Check if user is authorized to update the reply
-    if (reply.userId && reply.userId.toString() !== req.user._id.toString()) {
+    // Check if user can edit this reply
+    const canEdit = bulletin.canEditReply(replyId, req.user?._id, req.session?.id);
+    if (!canEdit) {
       return res.status(403).json({
-        status: 'error',
-        message: 'You are not authorized to update this reply'
+        success: false,
+        error: 'You are not authorized to edit this reply'
       });
     }
 
-    // Update reply fields
-    reply.content = req.body.content;
-    reply.updatedAt = Date.now();
+    const reply = bulletin.replies.id(replyId);
+    reply.content = content;
 
     await bulletin.save();
 
     res.status(200).json({
-      status: 'success',
-      data: {
-        bulletin
-      }
+      success: true,
+      data: bulletin
     });
   } catch (error) {
     console.error('Error updating reply:', error);
     res.status(500).json({
-      status: 'error',
-      message: 'Error updating reply',
-      error: error.message
+      success: false,
+      error: 'Error updating reply'
     });
   }
 };
 
+// Delete a reply
 exports.deleteReply = async (req, res) => {
   try {
-    const { id, replyId } = req.params;
-    const userId = req.user?._id; // Get user ID from authenticated request
+    const { bulletinId, replyId } = req.params;
 
-    console.log('Deleting reply:', { bulletinId: id, replyId, userId });
-
-    // Find the bulletin
-    const bulletin = await Bulletin.findById(id);
+    const bulletin = await Bulletin.findById(bulletinId);
     if (!bulletin) {
-      return res.status(404).json({ message: 'Bulletin not found' });
+      return res.status(404).json({
+        success: false,
+        error: 'Bulletin not found'
+      });
     }
 
-    // Find the reply
-    const reply = bulletin.replies.id(replyId);
-    if (!reply) {
-      return res.status(404).json({ message: 'Reply not found' });
+    // Check if user can delete this reply
+    const canEdit = bulletin.canEditReply(replyId, req.user?._id, req.session?.id);
+    if (!canEdit) {
+      return res.status(403).json({
+        success: false,
+        error: 'You are not authorized to delete this reply'
+      });
     }
 
-    // Check authorization
-    const isAdmin = req.user?.role === 'admin';
-    const isReplyOwner = reply.userId?.equals(userId);
-    
-    if (!isAdmin && !isReplyOwner) {
-      return res.status(403).json({ message: 'Not authorized to delete this reply' });
-    }
-
-    // Remove the reply
-    reply.remove();
+    bulletin.replies.pull(replyId);
     await bulletin.save();
 
-    console.log('Reply deleted successfully');
-    res.json({ message: 'Reply deleted successfully' });
+    res.status(200).json({
+      success: true,
+      data: bulletin
+    });
   } catch (error) {
     console.error('Error deleting reply:', error);
-    res.status(500).json({ 
-      message: 'Error deleting reply',
-      error: error.message 
+    res.status(500).json({
+      success: false,
+      error: 'Error deleting reply'
     });
   }
 };
@@ -505,6 +478,77 @@ exports.getBulletinsByUser = async (req, res) => {
     res.status(500).json({ 
       message: 'Error getting user bulletins',
       error: error.message 
+    });
+  }
+};
+
+// Get all bulletins with optional filters
+exports.getBulletins = async (req, res) => {
+  try {
+    const { messageType, status = 'active', page = 1, limit = 10 } = req.query;
+    const query = { status };
+
+    if (messageType) {
+      query.messageType = messageType;
+    }
+
+    const bulletins = await Bulletin.find(query)
+      .sort({ timestamp: -1 })
+      .skip((page - 1) * limit)
+      .limit(parseInt(limit));
+
+    const total = await Bulletin.countDocuments(query);
+
+    res.status(200).json({
+      success: true,
+      data: bulletins,
+      pagination: {
+        total,
+        page: parseInt(page),
+        pages: Math.ceil(total / limit)
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching bulletins:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Error fetching bulletins'
+    });
+  }
+};
+
+// Get user's bulletins
+exports.getUserBulletins = async (req, res) => {
+  try {
+    const { page = 1, limit = 10 } = req.query;
+    const query = {
+      $or: [
+        { userId: req.user._id },
+        { sessionId: req.session.id }
+      ]
+    };
+
+    const bulletins = await Bulletin.find(query)
+      .sort({ timestamp: -1 })
+      .skip((page - 1) * limit)
+      .limit(parseInt(limit));
+
+    const total = await Bulletin.countDocuments(query);
+
+    res.status(200).json({
+      success: true,
+      data: bulletins,
+      pagination: {
+        total,
+        page: parseInt(page),
+        pages: Math.ceil(total / limit)
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching user bulletins:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Error fetching user bulletins'
     });
   }
 }; 

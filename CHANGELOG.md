@@ -419,3 +419,26 @@ All notable changes to this project will be documented in this file.
 - Added proper authorization checks for reply editing and deletion
 - Added user ID tracking for bulletin replies
 - Fixed reply update and delete endpoints in backend routes
+
+### Added
+- Guest user support for bulletin board with session-based tracking
+- Session management for guest users to edit/delete their own posts
+- Enhanced bulletin model with sessionId support for guest users
+- Added utility functions for session management
+- Improved authorization checks for bulletin and reply operations
+- Added user-specific bulletin listing endpoint
+- Added helper methods to check edit/delete permissions
+
+### Changed
+- Updated bulletin controller to handle both authenticated and guest users
+- Enhanced bulletin service to support guest user operations
+- Improved error handling for unauthorized operations
+- Updated bulletin model to support session-based tracking
+- Enhanced security checks for bulletin and reply operations
+
+### Fixed
+- Fixed bulletin reply authentication issues
+- Improved error handling for unauthenticated users
+- Fixed authorization checks for bulletin operations
+- Enhanced session management for guest users
+- Fixed reply ownership tracking

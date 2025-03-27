@@ -15,21 +15,27 @@ const bulletinSchema = new mongoose.Schema({
   },
   name: {
     type: String,
+    required: true,
     trim: true
   },
   email: {
     type: String,
-    required: [true, 'Bitte geben Sie eine E-Mail-Adresse ein'],
+    required: true,
     trim: true,
     lowercase: true
   },
   phone: {
     type: String,
-    trim: true
+    required: false
   },
   userId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
+    ref: 'User',
+    required: false
+  },
+  sessionId: {
+    type: String,
+    required: false
   },
   userType: {
     type: String,
@@ -38,8 +44,8 @@ const bulletinSchema = new mongoose.Schema({
   },
   messageType: {
     type: String,
-    required: [true, 'Bitte geben Sie den Nachrichtentyp ein'],
-    enum: ['Angebot', 'Gesuch', 'Information']
+    enum: ['Information', 'Angebot', 'Gesuch'],
+    required: true
   },
   timestamp: {
     type: Date,
@@ -47,12 +53,12 @@ const bulletinSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['active', 'pending', 'archived'],
-    default: 'pending'
+    enum: ['active', 'inactive', 'deleted'],
+    default: 'active'
   },
   specialty: {
     type: String,
-    trim: true
+    required: false
   },
   specialtyOther: {
     type: String,
@@ -60,10 +66,11 @@ const bulletinSchema = new mongoose.Schema({
   },
   federalState: {
     type: String,
-    trim: true
+    required: false
   },
   startDate: {
-    type: Date
+    type: Date,
+    required: false
   },
   category: {
     type: String,
@@ -86,23 +93,22 @@ const bulletinSchema = new mongoose.Schema({
   },
   privacyPolicyAccepted: {
     type: Boolean,
-    required: [true, 'Bitte akzeptieren Sie die Datenschutzerklärung']
+    required: true
   },
   replies: [{
     content: {
       type: String,
-      required: [true, 'Bitte geben Sie eine Antwort ein'],
-      trim: true,
-      maxlength: [1000, 'Die Antwort darf nicht länger als 1000 Zeichen sein']
+      required: true,
+      trim: true
     },
     name: {
       type: String,
-      required: [true, 'Bitte geben Sie Ihren Namen ein'],
+      required: true,
       trim: true
     },
     email: {
       type: String,
-      required: [true, 'Bitte geben Sie eine E-Mail-Adresse ein'],
+      required: true,
       trim: true,
       lowercase: true
     },
@@ -112,16 +118,41 @@ const bulletinSchema = new mongoose.Schema({
     },
     userId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'User'
+      ref: 'User',
+      required: false
+    },
+    sessionId: {
+      type: String,
+      required: false
     },
     privacyPolicyAccepted: {
       type: Boolean,
-      required: [true, 'Bitte akzeptieren Sie die Datenschutzerklärung']
+      required: true
     }
   }]
 }, {
   timestamps: true
 });
+
+// Add indexes for better query performance
+bulletinSchema.index({ messageType: 1, status: 1 });
+bulletinSchema.index({ userId: 1 });
+bulletinSchema.index({ sessionId: 1 });
+bulletinSchema.index({ timestamp: -1 });
+
+// Add method to check if a user can edit/delete a bulletin
+bulletinSchema.methods.canEdit = function(userId, sessionId) {
+  if (!userId && !sessionId) return false;
+  return this.userId?.equals(userId) || this.sessionId === sessionId;
+};
+
+// Add method to check if a user can edit/delete a reply
+bulletinSchema.methods.canEditReply = function(replyId, userId, sessionId) {
+  const reply = this.replies.id(replyId);
+  if (!reply) return false;
+  if (!userId && !sessionId) return false;
+  return reply.userId?.equals(userId) || reply.sessionId === sessionId;
+};
 
 const Bulletin = mongoose.model('Bulletin', bulletinSchema);
 

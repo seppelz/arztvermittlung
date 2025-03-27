@@ -1,10 +1,14 @@
 import api from './api';
-import { useAuthStore } from '../stores/auth';
+import { useAuthStore } from '@/stores/auth';
 
 /**
  * Service for bulletin board related API calls
  */
 class BulletinService {
+  constructor() {
+    this.authStore = useAuthStore();
+  }
+
   /**
    * Get all bulletins
    * @param {Object} params - Query parameters for filtering
@@ -132,7 +136,11 @@ class BulletinService {
         console.log('BulletinService: No startDate provided, using current date:', processedData.startDate);
       }
       
-      const response = await api.post('/bulletin', processedData);
+      const response = await api.post('/bulletin', {
+        ...processedData,
+        userId: this.authStore.isAuthenticated ? this.authStore.userId : null,
+        sessionId: !this.authStore.isAuthenticated ? localStorage.getItem('guestSessionId') : null
+      });
       console.log('BulletinService: Bulletin created successfully:', response.data);
       return response.data;
     } catch (error) {
@@ -201,15 +209,11 @@ class BulletinService {
       // Remove timestamp from reply data as it will be set by the server
       const { timestamp, ...dataToSend } = replyData;
       
-      // Get user ID from localStorage
-      const userJson = localStorage.getItem('user');
-      const user = userJson ? JSON.parse(userJson) : null;
-      
-      if (user && user._id) {
-        dataToSend.userId = user._id;
-      }
-      
-      const response = await api.post(`/bulletin/${bulletinId}/replies`, dataToSend);
+      const response = await api.post(`/bulletin/${bulletinId}/replies`, {
+        ...dataToSend,
+        userId: this.authStore.isAuthenticated ? this.authStore.userId : null,
+        sessionId: !this.authStore.isAuthenticated ? localStorage.getItem('guestSessionId') : null
+      });
       console.log('BulletinService: Reply added successfully:', response.data);
       return response;
     } catch (error) {
@@ -234,13 +238,6 @@ class BulletinService {
     try {
       console.log('BulletinService: Deleting reply', replyId, 'from bulletin', bulletinId);
       
-      // Get user from auth store instead of localStorage
-      const authStore = useAuthStore();
-      if (!authStore.isAuthenticated || !authStore.user) {
-        console.error('BulletinService: User not authenticated');
-        throw new Error('Please log in to delete replies');
-      }
-
       const response = await api.delete(`/bulletin/${bulletinId}/replies/${replyId}`);
       
       console.log('BulletinService: Reply deleted successfully');
@@ -262,16 +259,10 @@ class BulletinService {
     try {
       console.log('BulletinService: Updating reply', replyId, 'in bulletin', bulletinId);
       
-      // Get user from auth store instead of localStorage
-      const authStore = useAuthStore();
-      if (!authStore.isAuthenticated || !authStore.user) {
-        console.error('BulletinService: User not authenticated');
-        throw new Error('Please log in to update replies');
-      }
-
       const dataToSend = {
         content,
-        userId: authStore.user._id
+        userId: this.authStore.isAuthenticated ? this.authStore.userId : null,
+        sessionId: !this.authStore.isAuthenticated ? localStorage.getItem('guestSessionId') : null
       };
 
       console.log('BulletinService: Sending update data:', dataToSend);
@@ -284,6 +275,37 @@ class BulletinService {
       console.error('BulletinService: Error updating reply:', error);
       throw error;
     }
+  }
+
+  // Get user's bulletins (both authenticated and guest)
+  async getUserBulletins(params = {}) {
+    try {
+      const response = await api.get('/bulletin/user', { params });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching user bulletins:', error);
+      throw error;
+    }
+  }
+
+  // Check if a user can edit/delete a bulletin
+  canEditBulletin(bulletin) {
+    if (!bulletin) return false;
+    if (this.authStore.isAdmin) return true;
+    if (this.authStore.isAuthenticated) {
+      return bulletin.userId === this.authStore.userId;
+    }
+    return bulletin.sessionId === localStorage.getItem('guestSessionId');
+  }
+
+  // Check if a user can edit/delete a reply
+  canEditReply(reply) {
+    if (!reply) return false;
+    if (this.authStore.isAdmin) return true;
+    if (this.authStore.isAuthenticated) {
+      return reply.userId === this.authStore.userId;
+    }
+    return reply.sessionId === localStorage.getItem('guestSessionId');
   }
 }
 
