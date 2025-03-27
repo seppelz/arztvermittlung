@@ -59,9 +59,10 @@
       </div>
     </div>
 
-    <!-- Reply form -->
-    <div v-if="!showReplyForm" class="text-center">
+    <!-- Reply button or registration message -->
+    <div v-if="!showReplyForm" class="text-center mt-4">
       <button
+        v-if="authStore.isAuthenticated"
         @click="showReplyForm = true"
         class="inline-flex items-center px-3 py-1.5 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
       >
@@ -70,37 +71,28 @@
         </svg>
         Antworten
       </button>
+      
+      <!-- Message for non-authenticated users -->
+      <div v-else class="bg-gray-50 rounded-lg p-4 border border-gray-200 text-center">
+        <p class="text-gray-700 mb-2">Um auf Beiträge zu antworten, müssen Sie angemeldet sein.</p>
+        <div class="flex justify-center gap-3">
+          <router-link to="/login" class="inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+            Anmelden
+          </router-link>
+          <router-link to="/register" class="inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-md text-blue-600 border border-blue-600 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+            Registrieren
+          </router-link>
+        </div>
+      </div>
     </div>
 
-    <!-- Reply form modal -->
+    <!-- Reply form modal - only for authenticated users -->
     <div v-if="showReplyForm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div class="bg-white rounded-lg shadow-xl p-6 max-w-lg w-full mx-4">
         <h3 class="text-lg font-medium text-gray-900 mb-4">Antwort verfassen</h3>
         <p class="text-sm text-gray-500 mb-4">Sie antworten auf die Nachricht von {{ message.name }}</p>
         
         <form @submit.prevent="submitReply" class="space-y-4">
-          <div v-if="!authStore.isAuthenticated">
-            <label for="replyName" class="block text-sm font-medium text-gray-700">Ihr Name*</label>
-            <input
-              id="replyName"
-              v-model="replyForm.name"
-              type="text"
-              required
-              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            >
-          </div>
-          
-          <div v-if="!authStore.isAuthenticated">
-            <label for="replyEmail" class="block text-sm font-medium text-gray-700">Ihre E-Mail*</label>
-            <input
-              id="replyEmail"
-              v-model="replyForm.email"
-              type="email"
-              required
-              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            >
-          </div>
-          
           <div>
             <label for="replyContent" class="block text-sm font-medium text-gray-700">Ihre Antwort*</label>
             <textarea
@@ -110,19 +102,6 @@
               required
               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             ></textarea>
-          </div>
-          
-          <div v-if="!authStore.isAuthenticated" class="flex items-start">
-            <input
-              type="checkbox"
-              id="replyPrivacyPolicy"
-              v-model="replyForm.privacyPolicyAccepted"
-              required
-              class="mt-1 mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-            >
-            <label for="replyPrivacyPolicy" class="text-sm text-gray-700">
-              Ich habe die <router-link to="/privacy" class="text-blue-600 hover:underline">Datenschutzerklärung</router-link> gelesen und akzeptiere diese.*
-            </label>
           </div>
           
           <div class="flex justify-end space-x-3 mt-6">
@@ -249,7 +228,7 @@ const selectedReply = ref<BulletinReply | null>(null)
 const selectedReplies = ref<Set<string>>(new Set())
 const editedContent = ref<string>('')
 
-// Form data
+// Form data - simplified since guests can't reply
 const replyForm = reactive<ReplyForm>({
   name: '',
   email: '',
@@ -306,7 +285,7 @@ function canDeleteReply(reply: BulletinReply): boolean {
 }
 
 /**
- * Submit a new reply
+ * Submit a new reply - simplified for authenticated users only
  */
 async function submitReply(): Promise<void> {
   try {
@@ -317,13 +296,6 @@ async function submitReply(): Promise<void> {
     const replyData: Partial<BulletinReply> = {
       content: replyForm.content,
       privacyPolicyAccepted: true
-    }
-    
-    // Add name/email if not authenticated
-    if (!authStore.isAuthenticated) {
-      replyData.name = replyForm.name
-      replyData.email = replyForm.email
-      replyData.privacyPolicyAccepted = replyForm.privacyPolicyAccepted
     }
     
     // Send the reply
@@ -343,7 +315,6 @@ async function submitReply(): Promise<void> {
     
     // Reset and close form
     replyForm.content = ''
-    replyForm.privacyPolicyAccepted = false
     showReplyForm.value = false
     
     showToast('Antwort erfolgreich gesendet', 'success')
@@ -362,9 +333,6 @@ async function submitReply(): Promise<void> {
 function closeReplyForm(): void {
   showReplyForm.value = false
   replyForm.content = ''
-  replyForm.name = ''
-  replyForm.email = ''
-  replyForm.privacyPolicyAccepted = false
 }
 
 /**
