@@ -447,13 +447,22 @@ const submitReply = async () => {
         content: replyForm.content,
         privacyPolicyAccepted: true  // Always set to true for authenticated users
       };
+      
+      // Add name and email from auth store for compatibility
+      if (authStore.userName) {
+        formData.name = authStore.userName;
+      }
+      
+      if (authStore.userEmail) {
+        formData.email = authStore.userEmail;
+      }
     } else {
       // For guest users
       formData = {
         name: replyForm.name,
         email: replyForm.email,
         content: replyForm.content,
-        privacyPolicyAccepted: true  // Ensure this is always true when submitting
+        privacyPolicyAccepted: true  // Always set to true when submitting
       };
       
       // Session ID will be handled by the bulletin service

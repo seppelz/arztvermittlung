@@ -80,7 +80,7 @@ api.interceptors.request.use(
     
     // Include session ID for guest operations if exists
     if (sessionId && !token) {
-      config.headers['Session-ID'] = sessionId;
+      config.headers['X-Session-Id'] = sessionId;
     }
     
     // Log request for debugging

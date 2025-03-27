@@ -225,10 +225,10 @@ class BulletinService {
       console.log('BulletinService: Auth status:', isAuthenticated ? 'Authenticated' : 'Guest');
       console.log('BulletinService: User ID from auth store:', userId || 'Not available');
       
-      // Prepare reply data
+      // Prepare reply data - ensure privacyPolicyAccepted is always included
       const replyData = {
         content: reply.content,
-        privacyPolicyAccepted: true // Always include this field
+        privacyPolicyAccepted: true // Always include this field, regardless of authentication status
       };
       
       // Add authorization headers
@@ -238,21 +238,26 @@ class BulletinService {
       
       if (isAuthenticated) {
         // For authenticated users: Use ID from auth store
-        if (userId) {
-          // Don't send userId in body as the backend will extract it from the token
-          console.log('BulletinService: Using authenticated user ID:', userId);
-          
-          // Include token in headers
-          const token = localStorage.getItem('token');
-          if (token) {
-            headers['Authorization'] = `Bearer ${token}`;
-            console.log('BulletinService: Added authorization token to headers');
-          } else {
-            console.warn('BulletinService: No token found for authenticated user');
-          }
+        const token = localStorage.getItem('token');
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`;
+          console.log('BulletinService: Added authorization token to headers');
         } else {
-          console.warn('BulletinService: Authenticated but no user ID available');
+          console.warn('BulletinService: No token found for authenticated user');
         }
+        
+        // Get user info from auth store
+        const userName = authStore.userName;
+        const userEmail = authStore.userEmail;
+        
+        // Include name and email for authenticated users to ensure backward compatibility
+        if (userName) replyData.name = userName;
+        if (userEmail) replyData.email = userEmail;
+        
+        console.log('BulletinService: Using authenticated user data:', { 
+          name: replyData.name || 'Not available', 
+          email: replyData.email || 'Not available'
+        });
       } else {
         // For guest users: Add name, email, and session ID
         if (!reply.name || !reply.email) {
@@ -282,7 +287,14 @@ class BulletinService {
         }
       }
       
-      console.log('BulletinService: Final reply data:', replyData);
+      console.log('BulletinService: Final reply data:', { 
+        content: replyData.content?.substring(0, 20) + '...',
+        name: replyData.name || 'Not available',
+        email: replyData.email || 'Not available',
+        privacyPolicyAccepted: replyData.privacyPolicyAccepted,
+        sessionId: replyData.sessionId || 'Not applicable (authenticated user)'
+      });
+      
       console.log('BulletinService: Request headers:', headers);
       
       // Set a timeout for the request to avoid hanging

@@ -283,6 +283,7 @@ exports.addReply = async (req, res) => {
       name, 
       email, 
       content: content?.substring(0, 20) + '...',
+      privacyPolicyAccepted: privacyPolicyAccepted ? 'Accepted' : 'Not provided',
       userId: userId ? 'Provided' : 'Not provided',
       clientSessionId: clientSessionId ? 'Provided' : 'Not provided'
     });
@@ -295,10 +296,12 @@ exports.addReply = async (req, res) => {
       });
     }
     
-    if (!privacyPolicyAccepted) {
+    // For authenticated users, always assume privacy policy is accepted
+    // For unauthenticated users, require explicit acceptance
+    if (!req.user && !privacyPolicyAccepted) {
       return res.status(400).json({
         success: false,
-        error: 'Privacy policy acceptance is required'
+        error: 'Privacy policy acceptance is required for guest users'
       });
     }
     
@@ -334,7 +337,7 @@ exports.addReply = async (req, res) => {
     // Create new reply with appropriate data
     const reply = {
       content,
-      privacyPolicyAccepted
+      privacyPolicyAccepted: req.user ? true : !!privacyPolicyAccepted // Always true for authenticated users
     };
     
     // Set user information based on authentication state
@@ -356,7 +359,8 @@ exports.addReply = async (req, res) => {
       name: reply.name, 
       email: reply.email,
       userId: reply.userId ? 'Set' : 'Not set',
-      sessionId: reply.sessionId ? 'Set' : 'Not set'
+      sessionId: reply.sessionId ? 'Set' : 'Not set',
+      privacyPolicyAccepted: reply.privacyPolicyAccepted
     });
 
     // Initialize replies array if it doesn't exist
