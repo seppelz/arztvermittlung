@@ -182,6 +182,10 @@ All notable changes to this project will be documented in this file.
   - Fixed backend validation error when registering new users
   - Maintained role="user" for database compatibility while using userType="Arzt"/"Klinik" for UI
   - Adapted frontend logic to support dual-checking of both role and userType fields
+- Fixed job listings not showing in Stellenbörse by removing status filter restriction
+  - Added comprehensive logging to debug data filtering issues
+  - Improved date handling in sorting functionality
+  - Fixed pagination display issues
 
 ### Added
 - Created test scripts for MongoDB Atlas connection testing
