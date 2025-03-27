@@ -63,7 +63,7 @@
     <div v-if="!showReplyForm" class="text-center mt-4">
       <button
         v-if="authStore.isAuthenticated"
-        @click="showReplyForm = true"
+        @click="openReplyForm"
         class="inline-flex items-center px-3 py-1.5 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
       >
         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -83,6 +83,11 @@
             Registrieren
           </router-link>
         </div>
+      </div>
+      
+      <!-- Debug message - remove in production -->
+      <div class="mt-2 text-xs text-gray-400">
+        Auth Status: {{ authStore.isAuthenticated ? 'Angemeldet' : 'Nicht angemeldet' }}
       </div>
     </div>
 
@@ -285,10 +290,31 @@ function canDeleteReply(reply: BulletinReply): boolean {
 }
 
 /**
+ * Safely open the reply form - ensuring the user is authenticated
+ */
+function openReplyForm(): void {
+  // Double-check authentication before showing the form
+  if (!authStore.isAuthenticated) {
+    showToast('Sie müssen angemeldet sein, um zu antworten', 'error')
+    return
+  }
+  
+  showReplyForm.value = true
+}
+
+/**
  * Submit a new reply - simplified for authenticated users only
  */
 async function submitReply(): Promise<void> {
   try {
+    // Verify user is authenticated before proceeding
+    if (!authStore.isAuthenticated) {
+      errorMessage.value = 'Sie müssen angemeldet sein, um zu antworten'
+      showToast('Sie müssen angemeldet sein, um zu antworten', 'error')
+      showReplyForm.value = false
+      return
+    }
+    
     isSubmitting.value = true
     errorMessage.value = ''
     
@@ -297,6 +323,8 @@ async function submitReply(): Promise<void> {
       content: replyForm.content,
       privacyPolicyAccepted: true
     }
+    
+    console.log('Preparing to submit reply as authenticated user:', authStore.isAuthenticated)
     
     // Send the reply
     const response = await bulletinService.addReply(props.message._id, replyData)
@@ -320,8 +348,16 @@ async function submitReply(): Promise<void> {
     showToast('Antwort erfolgreich gesendet', 'success')
   } catch (error) {
     console.error('Error submitting reply:', error)
-    errorMessage.value = 'Fehler beim Senden der Antwort. Bitte versuchen Sie es später erneut.'
-    showToast('Fehler beim Senden der Antwort', 'error')
+    
+    // Handle authentication error specifically
+    if (error instanceof Error && error.message.includes('401')) {
+      errorMessage.value = 'Sie müssen angemeldet sein, um zu antworten'
+      showToast('Sie müssen angemeldet sein, um zu antworten', 'error')
+      showReplyForm.value = false
+    } else {
+      errorMessage.value = 'Fehler beim Senden der Antwort. Bitte versuchen Sie es später erneut.'
+      showToast('Fehler beim Senden der Antwort', 'error')
+    }
   } finally {
     isSubmitting.value = false
   }

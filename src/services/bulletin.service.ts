@@ -267,12 +267,17 @@ async function addReply(bulletinId: string, reply: Partial<BulletinReply>): Prom
     console.log('BulletinService: Auth status:', isAuthenticated ? 'Authenticated' : 'Guest');
     console.log('BulletinService: User ID from auth store:', userId || 'Not available');
     
+    // Enforce authentication - reject guest access immediately
+    if (!isAuthenticated) {
+      console.error('BulletinService: Authentication required to add replies');
+      throw new Error('Sie müssen angemeldet sein, um Antworten zu verfassen.');
+    }
+    
     // Prepare reply data with proper type
     const replyData: Record<string, any> = {
       content: reply.content,
-      privacyPolicyAccepted: true, // Always include this field, regardless of authentication status
-      // Add status field to fix validation error
-      status: 'active'
+      privacyPolicyAccepted: true, // Always include this field
+      status: 'active'             // Ensure valid status value
     };
     
     // Add authorization headers
@@ -280,84 +285,56 @@ async function addReply(bulletinId: string, reply: Partial<BulletinReply>): Prom
       'Content-Type': 'application/json'
     };
     
-    if (isAuthenticated) {
-      // For authenticated users
-      const token = localStorage.getItem('token');
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
-        console.log('BulletinService: Added authorization token to headers');
-        
-        // Extract user ID from JWT token if not available in auth store
-        if (!userId) {
-          try {
-            const tokenParts = token.split('.');
-            if (tokenParts.length === 3) {
-              const payload = JSON.parse(atob(tokenParts[1]));
-              if (payload && payload.id) {
-                console.log('BulletinService: Extracted user ID from token:', payload.id);
-                // Add userId to request data
-                replyData.userId = payload.id;
-              }
-            }
-          } catch (tokenError) {
-            console.error('BulletinService: Error extracting user ID from token:', tokenError);
-          }
-        } else {
-          // Use userId from auth store
-          replyData.userId = userId;
-        }
-      } else {
-        console.warn('BulletinService: No token found for authenticated user');
-      }
-      
-      // Get user info from auth store
-      const userName = authStore.userName;
-      const userEmail = authStore.userEmail;
-      
-      // Include name and email for authenticated users to ensure backward compatibility
-      if (userName) replyData.name = userName;
-      if (userEmail) replyData.email = userEmail;
-      
-      console.log('BulletinService: Using authenticated user data:', { 
-        name: replyData.name || 'Not available', 
-        email: replyData.email || 'Not available',
-        userId: replyData.userId || 'Not available'
-      });
+    // Get token for authenticated users
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.error('BulletinService: No token found for authenticated user');
+      throw new Error('Authentifizierungstoken nicht gefunden. Bitte melden Sie sich erneut an.');
+    }
+    
+    // Add token to headers
+    headers['Authorization'] = `Bearer ${token}`;
+    console.log('BulletinService: Added authorization token to headers');
+    
+    // Get user info from auth store
+    const userName = authStore.userName;
+    const userEmail = authStore.userEmail;
+    
+    // Include name and email for authenticated users
+    if (userName) replyData.name = userName;
+    if (userEmail) replyData.email = userEmail;
+    
+    // Add userId to request data explicitly
+    if (userId) {
+      replyData.userId = userId;
     } else {
-      // For guest users: Add name, email, and session ID
-      if (!reply.name || !reply.email) {
-        console.error('BulletinService: Name and email are required for guest users');
-        throw new Error('Name and email are required for guest users');
-      }
-      
-      replyData.name = reply.name;
-      replyData.email = reply.email;
-      
-      console.log('BulletinService: Using guest user mode with name:', reply.name);
-      
-      // Include session ID for guest users in both header and body
-      const sessionId = getSessionId();
-      if (sessionId) {
-        replyData.sessionId = sessionId;
-        headers['X-Session-Id'] = sessionId;
-        console.log('BulletinService: Including session ID for tracking:', sessionId);
-      } else {
-        console.warn('BulletinService: No session ID available for guest user');
-        // Create a new session ID if none exists
-        const newSessionId = crypto.randomUUID();
-        localStorage.setItem('sessionId', newSessionId);
-        replyData.sessionId = newSessionId;
-        headers['X-Session-Id'] = newSessionId;
-        console.log('BulletinService: Created new session ID:', newSessionId);
+      // Extract user ID from JWT token if not available in auth store
+      try {
+        const tokenParts = token.split('.');
+        if (tokenParts.length === 3) {
+          const payload = JSON.parse(atob(tokenParts[1]));
+          if (payload && payload.id) {
+            console.log('BulletinService: Extracted user ID from token:', payload.id);
+            replyData.userId = payload.id;
+          }
+        }
+      } catch (tokenError) {
+        console.error('BulletinService: Error extracting user ID from token:', tokenError);
       }
     }
+    
+    console.log('BulletinService: Using authenticated user data:', { 
+      name: replyData.name || 'Not available', 
+      email: replyData.email || 'Not available',
+      userId: replyData.userId || 'Not available'
+    });
     
     console.log('BulletinService: Final reply data:', { 
       content: replyData.content?.substring(0, 20) + '...',
       name: replyData.name || 'Not available',
       email: replyData.email || 'Not available',
       privacyPolicyAccepted: replyData.privacyPolicyAccepted,
-      sessionId: replyData.sessionId || 'Not applicable (authenticated user)'
+      userId: replyData.userId || 'Not available'
     });
     
     console.log('BulletinService: Request headers:', headers);
