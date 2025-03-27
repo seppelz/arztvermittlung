@@ -233,10 +233,12 @@ const handleSubmit = async (): Promise<void> => {
   isSubmitting.value = true;
   
   try {
-    // Add role based on userType
+    // Map userType properly according to backend expectations
+    // The backend expects userType to be 'Arzt' or 'Klinik' and role to be 'user'
     const userData: RegisterUserData = {
       ...formData,
-      role: 'user'  // Keep using 'user' as role since backend only accepts this enum value
+      role: 'user', // Backend only accepts 'user' or 'admin' for role
+      userType: formData.userType // This should already be 'Arzt' or 'Klinik'
     };
     
     await authService.register(userData);

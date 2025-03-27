@@ -262,7 +262,6 @@ async function addReply(bulletinId: string, reply: Partial<BulletinReply>): Prom
     
     // Get auth status and user info safely
     const isAuthenticated = authStore.isAuthenticated;
-    const userId = authStore.userId;
     
     console.log('BulletinService: Auth status:', isAuthenticated ? 'Authenticated' : 'Guest');
     
@@ -303,29 +302,12 @@ async function addReply(bulletinId: string, reply: Partial<BulletinReply>): Prom
       email: simpleReplyData.email,
     });
     
-    // Make the direct API call to add the reply
-    const response = await fetch(`https://www.med-match.de/api/bulletin/${bulletinId}/replies`, {
-      method: 'POST',
-      headers: headers,
-      body: JSON.stringify(simpleReplyData)
-    });
-    
-    if (!response.ok) {
-      const errorData = await response.json();
-      console.error('BulletinService: Reply submission failed with status', response.status);
-      console.error('BulletinService: Server error data:', errorData);
-      
-      if (errorData?.error?.includes('privacyPolicyAccepted')) {
-        throw new Error('Validierungsfehler: Die Datenschutzerklärung des Bulletins fehlt. Dies ist ein Serverproblem, das nur vom Administrator behoben werden kann.');
-      }
-      
-      throw new Error(`Server-Fehler: ${errorData?.error || response.statusText}`);
-    }
+    // Use api module instead of direct fetch
+    const response = await api.post(`/bulletin/${bulletinId}/replies`, simpleReplyData);
     
     // Handle successful response
-    const data = await response.json();
     console.log('BulletinService: Reply added successfully');
-    return { data };
+    return { data: response };
   } catch (error: any) {
     console.error('BulletinService: Error adding reply:', error.message);
     

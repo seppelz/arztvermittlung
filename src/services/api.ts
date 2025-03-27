@@ -81,11 +81,37 @@ apiClient.interceptors.response.use(
           console.warn('API: Token expired or invalid, logging out');
           authStore.clearAuth();
           
+          // Dispatch a global event for authentication errors
+          window.dispatchEvent(new CustomEvent('auth:error', { 
+            detail: { 
+              status: error.response.status,
+              message: 'Ihre Sitzung ist abgelaufen. Bitte melden Sie sich erneut an.'
+            } 
+          }));
+          
           // Redirect to login if needed
           if (!window.location.pathname.includes('/login')) {
+            // Use a more user-friendly approach by storing the current path
+            // so we can redirect back after login
+            const currentPath = window.location.pathname;
+            if (currentPath !== '/' && !currentPath.includes('/admin')) {
+              sessionStorage.setItem('redirectAfterLogin', currentPath);
+            }
+            
             window.location.href = '/login?session=expired';
           }
         }
+      } else if (error.response.status === 403) {
+        // Forbidden - user doesn't have permission
+        console.error('API: Permission denied', error.config.url);
+        
+        // Dispatch a global event for permission errors
+        window.dispatchEvent(new CustomEvent('auth:forbidden', { 
+          detail: { 
+            status: error.response.status,
+            message: 'Sie haben keine Berechtigung für diese Aktion.'
+          } 
+        }));
       }
     } else if (error.request) {
       // Request made but no response received
@@ -93,6 +119,14 @@ apiClient.interceptors.response.use(
         url: error.config.url,
         message: 'No response received from server'
       });
+      
+      // Dispatch a global event for network errors
+      window.dispatchEvent(new CustomEvent('api:networkError', { 
+        detail: { 
+          url: error.config.url,
+          message: 'Der Server antwortet nicht. Bitte überprüfen Sie Ihre Internetverbindung.'
+        } 
+      }));
     } else {
       // Error in setting up request
       console.error('API Request Setup Error:', error.message);

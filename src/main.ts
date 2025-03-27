@@ -51,30 +51,6 @@ const initTimeout = setTimeout(() => {
 // Create app with enhanced error handler
 const app = createApp(App)
 app.config.errorHandler = (err, _vm, info) => {
-  // Check if this is a navigation-related error (which appears to be the common case)
-  const isNavigationError = err instanceof Error && 
-    (err.stack?.includes('vue-router') || info?.includes('router'));
-  
-  if (isNavigationError) {
-    // Don't log the full stack for common router-related errors as they're usually benign
-    console.warn('Vue Router warning:', err.message);
-    console.warn('Error Info:', info);
-    
-    // Log detailed info about the error for debugging
-    if (typeof window !== 'undefined' && window.location) {
-      console.debug('Current location:', window.location.href);
-    }
-    
-    // Only log stack trace at debug level
-    if (err.stack) {
-      console.debug('Router error stack trace:', err.stack);
-    }
-    
-    // No need to take further action, let the app continue
-    return;
-  }
-  
-  // For other errors, log them fully
   console.error('Vue Error Handler:', err);
   console.error('Error Info:', info);
   

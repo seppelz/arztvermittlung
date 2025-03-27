@@ -121,9 +121,34 @@ async function addReplyProxy(bulletinId: string, replyData: Partial<BulletinRepl
       status: 200,
       message: 'Reply added successfully'
     };
-  } catch (error) {
+  } catch (error: any) {
     console.error(`[BulletinProxyService] Error adding reply to bulletin ${bulletinId}:`, error);
-    throw error;
+    
+    // Enhanced error handling with more specific error messages
+    let errorMessage = 'Error adding reply';
+    let statusCode = 500;
+    
+    if (error.message.includes('angemeldet sein')) {
+      errorMessage = 'Sie müssen angemeldet sein, um Antworten zu verfassen.';
+      statusCode = 401;
+    } else if (error.message.includes('Validierungsfehler')) {
+      errorMessage = error.message;
+      statusCode = 400;
+    } else if (error.message.includes('Server-Fehler')) {
+      errorMessage = error.message;
+      statusCode = 500;
+    } else if (error.response) {
+      // Handle axios error responses
+      statusCode = error.response.status;
+      errorMessage = error.response.data?.message || error.response.data?.error || error.message;
+    }
+    
+    return {
+      data: null as any,
+      success: false,
+      status: statusCode,
+      message: errorMessage
+    };
   }
 }
 
@@ -139,9 +164,30 @@ async function deleteReplyProxy(bulletinId: string, replyId: string): Promise<Ap
       status: 200,
       message: 'Reply deleted successfully'
     };
-  } catch (error) {
+  } catch (error: any) {
     console.error(`[BulletinProxyService] Error deleting reply ${replyId} from bulletin ${bulletinId}:`, error);
-    throw error;
+    
+    // Enhanced error handling
+    let errorMessage = 'Error deleting reply';
+    let statusCode = 500;
+    
+    if (error.response) {
+      statusCode = error.response.status;
+      errorMessage = error.response.data?.message || error.response.data?.error || error.message;
+      
+      if (statusCode === 404) {
+        errorMessage = 'Die Antwort wurde nicht gefunden oder wurde bereits gelöscht.';
+      } else if (statusCode === 403) {
+        errorMessage = 'Sie haben keine Berechtigung, diese Antwort zu löschen.';
+      }
+    }
+    
+    return {
+      data: null as any,
+      success: false,
+      status: statusCode,
+      message: errorMessage
+    };
   }
 }
 
@@ -157,9 +203,32 @@ async function updateReplyProxy(bulletinId: string, replyId: string, content: st
       status: 200,
       message: 'Reply updated successfully'
     };
-  } catch (error) {
+  } catch (error: any) {
     console.error(`[BulletinProxyService] Error updating reply ${replyId} in bulletin ${bulletinId}:`, error);
-    throw error;
+    
+    // Enhanced error handling
+    let errorMessage = 'Error updating reply';
+    let statusCode = 500;
+    
+    if (error.response) {
+      statusCode = error.response.status;
+      errorMessage = error.response.data?.message || error.response.data?.error || error.message;
+      
+      if (statusCode === 404) {
+        errorMessage = 'Die Antwort wurde nicht gefunden.';
+      } else if (statusCode === 403) {
+        errorMessage = 'Sie haben keine Berechtigung, diese Antwort zu bearbeiten.';
+      } else if (statusCode === 400) {
+        errorMessage = 'Die Antwort enthält ungültige Daten.';
+      }
+    }
+    
+    return {
+      data: null as any,
+      success: false,
+      status: statusCode,
+      message: errorMessage
+    };
   }
 }
 

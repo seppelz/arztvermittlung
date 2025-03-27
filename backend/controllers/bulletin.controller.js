@@ -110,16 +110,90 @@ exports.getBulletin = async (req, res) => {
   }
 };
 
+// Validate bulletin data for create and update
+function validateBulletinData(data, isUpdate = false) {
+  const errors = {};
+  
+  // Basic required fields check (skip on update if not provided)
+  if (!isUpdate || data.title !== undefined) {
+    if (!data.title || data.title.trim() === '') {
+      errors.title = 'Title is required';
+    } else if (data.title.length > 100) {
+      errors.title = 'Title cannot exceed 100 characters';
+    }
+  }
+  
+  if (!isUpdate || data.content !== undefined) {
+    if (!data.content || data.content.trim() === '') {
+      errors.content = 'Content is required';
+    } else if (data.content.length > 1000) {
+      errors.content = 'Content cannot exceed 1000 characters';
+    }
+  }
+  
+  if (!isUpdate) {
+    if (!data.name || data.name.trim() === '') {
+      errors.name = 'Name is required';
+    }
+    
+    if (!data.email || data.email.trim() === '') {
+      errors.email = 'Email is required';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
+      errors.email = 'Invalid email format';
+    }
+  }
+  
+  if (!isUpdate || data.messageType !== undefined) {
+    if (!data.messageType || !['Information', 'Angebot', 'Gesuch'].includes(data.messageType)) {
+      errors.messageType = 'Valid message type is required';
+    }
+  }
+  
+  // Special validations for job listings
+  if ((data.messageType === 'Angebot' || data.messageType === 'Gesuch') && 
+      (!isUpdate || data.startDate !== undefined)) {
+    if (!data.startDate) {
+      errors.startDate = 'Start date is required for job listings';
+    } else {
+      const startDate = new Date(data.startDate);
+      if (isNaN(startDate.getTime())) {
+        errors.startDate = 'Invalid start date format';
+      }
+    }
+  }
+  
+  // Check privacy policy acceptance
+  if (!isUpdate && !data.privacyPolicyAccepted) {
+    errors.privacyPolicyAccepted = 'Privacy policy must be accepted';
+  }
+  
+  return {
+    isValid: Object.keys(errors).length === 0,
+    errors
+  };
+}
+
 // Neuen Pinnwand-Eintrag erstellen
 exports.createBulletin = async (req, res) => {
   try {
-    const { name, email, content, messageType, specialty, federalState, startDate, phone, privacyPolicyAccepted } = req.body;
+    const { name, email, content, messageType, specialty, federalState, startDate, phone, privacyPolicyAccepted, title } = req.body;
+    
+    // Validate bulletin data
+    const validation = validateBulletinData(req.body);
+    if (!validation.isValid) {
+      return res.status(400).json({
+        success: false,
+        errors: validation.errors,
+        message: 'Validation failed'
+      });
+    }
     
     // Get user ID if authenticated, otherwise generate session ID
     const userId = req.user?._id;
     const sessionId = !userId ? generateSessionId() : null;
 
     const bulletin = new Bulletin({
+      title,
       name,
       email,
       content,
@@ -159,7 +233,17 @@ exports.createBulletin = async (req, res) => {
 exports.updateBulletin = async (req, res) => {
   try {
     const { id } = req.params;
-    const { content, specialty, federalState, startDate, phone } = req.body;
+    const updateData = req.body;
+
+    // Validate update data
+    const validation = validateBulletinData(updateData, true);
+    if (!validation.isValid) {
+      return res.status(400).json({
+        success: false,
+        errors: validation.errors,
+        message: 'Validation failed'
+      });
+    }
 
     const bulletin = await Bulletin.findById(id);
     if (!bulletin) {
@@ -179,11 +263,12 @@ exports.updateBulletin = async (req, res) => {
     }
 
     // Update only allowed fields
-    bulletin.content = content;
-    bulletin.specialty = specialty;
-    bulletin.federalState = federalState;
-    bulletin.startDate = startDate;
-    bulletin.phone = phone;
+    const allowedFields = ['title', 'content', 'specialty', 'federalState', 'startDate', 'phone'];
+    allowedFields.forEach(field => {
+      if (updateData[field] !== undefined) {
+        bulletin[field] = updateData[field];
+      }
+    });
 
     await bulletin.save();
 

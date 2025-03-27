@@ -175,44 +175,52 @@ const rules = {
 const v$ = useVuelidate(rules, { email, password });
 
 const handleLogin = async (): Promise<void> => {
-  error.value = '';
-  
   // Form validation
   const isFormCorrect = await v$.value.$validate();
   if (!isFormCorrect) return;
   
   isSubmitting.value = true;
+  error.value = '';
   
   try {
-    const response = await authService.login({
+    const { token, user } = await authService.login({
       email: email.value,
       password: password.value
     });
     
-    // Store user data in Pinia store
-    authStore.setAuth(response);
+    // Show success message
+    showToast('Login erfolgreich!', 'success');
     
-    // Show success toast
-    showToast('Erfolgreich angemeldet!', 'success');
-    
-    // Redirect based on role
-    if (response.user.role === 'admin') {
-      router.push('/admin');
+    // Check if there's a redirect after login
+    const redirectPath = sessionStorage.getItem('redirectAfterLogin');
+    if (redirectPath) {
+      // Clear the stored path
+      sessionStorage.removeItem('redirectAfterLogin');
+      
+      // Redirect to the original page
+      router.push(redirectPath);
     } else {
-      router.push('/profile');
+      // Default redirect to dashboard or home
+      if (user.role === 'admin') {
+        router.push('/admin');
+      } else {
+        router.push('/');
+      }
     }
-    
-  } catch (err) {
+  } catch (err: unknown) {
     console.error('Login error:', err);
-    const error_obj = err as LoginError;
     
+    // Using type assertion to access error details
+    const error_obj = err as { response?: { data?: { message?: string } }, message?: string };
+    
+    // Set appropriate error message
     if (error_obj.response?.data?.message) {
       error.value = error_obj.response.data.message;
-      showToast(error_obj.response.data.message, 'error');
     } else {
-      error.value = 'Anmeldung fehlgeschlagen. Bitte überprüfen Sie Ihre Anmeldedaten und versuchen Sie es erneut.';
-      showToast('Anmeldung fehlgeschlagen', 'error');
+      error.value = 'Ein Fehler ist beim Login aufgetreten. Bitte versuchen Sie es später erneut.';
     }
+    
+    showToast(error.value, 'error');
   } finally {
     isSubmitting.value = false;
   }
