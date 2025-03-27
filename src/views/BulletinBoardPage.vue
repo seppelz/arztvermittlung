@@ -61,16 +61,26 @@
                       <p class="font-medium text-gray-700">{{ message.name }}</p>
                       <p class="text-sm text-gray-500">{{ message.userType }}</p>
                     </div>
-                    <button 
-                      @click="contactPoster(message)" 
-                      class="text-white bg-primary hover:bg-primary-dark font-medium px-4 py-1 rounded-lg shadow-sm transform hover:scale-105 transition-all"
-                      title="Kontakt aufnehmen"
-                    >
-                      Kontakt
-                    </button>
+                    <div class="flex space-x-2">
+                      <button 
+                        @click="contactPoster(message)" 
+                        class="text-white bg-primary hover:bg-primary-dark font-medium px-4 py-1 rounded-lg shadow-sm transform hover:scale-105 transition-all"
+                        title="Kontakt aufnehmen"
+                      >
+                        Kontakt
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
+              
+              <!-- Reply Section -->
+              <ReplySection 
+                :message="message"
+                @reply-added="handleReplyAdded"
+                @reply-deleted="handleReplyDeleted"
+                @reply-updated="handleReplyUpdated"
+              />
             </div>
           </div>
           
@@ -269,6 +279,7 @@
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
 import bulletinProxyService from '@/services/bulletinProxyService'
+import ReplySection from '@/components/bulletin/ReplySection.vue'
 
 // Zustandsvariablen
 const messages = ref([]);
@@ -474,6 +485,37 @@ function sendContact() {
   // Schließe das Modal und zeige eine Erfolgsmeldung
   alert('Ihre Nachricht wurde gesendet!');
   closeContactModal();
+}
+
+const handleReplyAdded = (reply) => {
+  // Find the message and add the reply to its replies array
+  const message = messages.value.find(m => m.id === reply.bulletinId)
+  if (message) {
+    if (!message.replies) {
+      message.replies = []
+    }
+    message.replies.push(reply)
+  }
+}
+
+const handleReplyDeleted = (replyId) => {
+  // Find the message and remove the reply from its replies array
+  messages.value.forEach(message => {
+    if (message.replies) {
+      message.replies = message.replies.filter(reply => reply._id !== replyId)
+    }
+  })
+}
+
+const handleReplyUpdated = (updatedReply) => {
+  // Find the message and update the reply in its replies array
+  messages.value.forEach(message => {
+    if (message.replies) {
+      message.replies = message.replies.map(reply => 
+        reply._id === updatedReply._id ? updatedReply : reply
+      )
+    }
+  })
 }
 
 // Load bulletins when component mounts

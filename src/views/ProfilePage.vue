@@ -201,12 +201,36 @@
       <div class="mt-8">
         <BulletinEntries />
       </div>
+
+      <!-- Account Deletion Section -->
+      <div class="mt-12 border-t border-gray-200 pt-8">
+        <div class="bg-red-50 border border-red-200 rounded-lg p-6">
+          <h2 class="text-xl font-semibold text-red-800 mb-2">Konto löschen</h2>
+          <p class="text-red-700 mb-4">
+            Wenn Sie Ihr Konto löschen, werden alle Ihre Daten, einschließlich Ihres Profils, Ihrer Einträge und Ihrer Einstellungen, unwiderruflich gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.
+          </p>
+          <button
+            @click="showDeleteConfirm = true"
+            class="inline-flex items-center px-4 py-2 border border-red-300 text-sm font-medium rounded-md text-red-700 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+          >
+            Konto löschen
+          </button>
+        </div>
+      </div>
       
-      <!-- Delete Profile Confirmation Modal -->
+      <!-- Delete Account Confirmation Modal -->
       <div v-if="showDeleteConfirm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
-          <h3 class="text-lg font-medium text-gray-900 mb-4">Profil löschen</h3>
-          <p class="text-gray-700 mb-6">Sind Sie sicher, dass Sie Ihr Profil löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.</p>
+          <h3 class="text-lg font-medium text-red-800 mb-4">Konto löschen</h3>
+          <p class="text-gray-700 mb-4">
+            Sind Sie sicher, dass Sie Ihr Konto löschen möchten? Diese Aktion:
+          </p>
+          <ul class="list-disc list-inside text-gray-700 mb-6 space-y-2">
+            <li>Löscht Ihr gesamtes Konto unwiderruflich</li>
+            <li>Entfernt alle Ihre Profilinformationen</li>
+            <li>Löscht alle Ihre Einträge in der Stellenbörse</li>
+            <li>Kann nicht rückgängig gemacht werden</li>
+          </ul>
           
           <div class="flex justify-end space-x-3">
             <button
@@ -216,11 +240,11 @@
               Abbrechen
             </button>
             <button
-              @click="deleteProfile"
+              @click="deleteAccount"
               :disabled="isDeleting"
-              class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+              class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {{ isDeleting ? 'Wird gelöscht...' : 'Löschen' }}
+              {{ isDeleting ? 'Wird gelöscht...' : 'Konto löschen' }}
             </button>
           </div>
         </div>
@@ -458,6 +482,22 @@ const deleteProfile = async () => {
 const logout = async () => {
   await authStore.logout()
   router.push('/login')
+}
+
+// Delete account
+const deleteAccount = async () => {
+  try {
+    isDeleting.value = true
+    await api.delete('/user/account')
+    showToast('Ihr Konto wurde erfolgreich gelöscht', 'success')
+    await logout()
+  } catch (error) {
+    console.error('Error deleting account:', error)
+    showToast('Fehler beim Löschen des Kontos', 'error')
+  } finally {
+    isDeleting.value = false
+    showDeleteConfirm.value = false
+  }
 }
 
 // Load profile on mount

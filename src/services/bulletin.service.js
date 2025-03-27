@@ -190,6 +190,50 @@ class BulletinService {
       throw error;
     }
   }
+
+  // Add reply to a bulletin message
+  async addReply(bulletinId, replyData) {
+    try {
+      const response = await api.post(`/bulletins/${bulletinId}/replies`, replyData)
+      return response
+    } catch (error) {
+      console.error('Error adding reply:', error)
+      throw error
+    }
+  }
+
+  /**
+   * Delete a reply from a bulletin message
+   * @param {String} bulletinId - Bulletin ID
+   * @param {String} replyId - Reply ID to delete
+   * @returns {Promise} - Promise with the delete response
+   */
+  async deleteReply(bulletinId, replyId) {
+    try {
+      const response = await api.delete(`/bulletins/${bulletinId}/replies/${replyId}`);
+      return response;
+    } catch (error) {
+      console.error('Error deleting reply:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Update a reply in a bulletin message
+   * @param {String} bulletinId - Bulletin ID
+   * @param {String} replyId - Reply ID to update
+   * @param {Object} replyData - Updated reply data
+   * @returns {Promise} - Promise with the update response
+   */
+  async updateReply(bulletinId, replyId, replyData) {
+    try {
+      const response = await api.patch(`/bulletins/${bulletinId}/replies/${replyId}`, replyData);
+      return response;
+    } catch (error) {
+      console.error('Error updating reply:', error);
+      throw error;
+    }
+  }
 }
 
 export default new BulletinService(); 

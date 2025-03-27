@@ -87,7 +87,38 @@ const bulletinSchema = new mongoose.Schema({
   privacyPolicyAccepted: {
     type: Boolean,
     required: [true, 'Bitte akzeptieren Sie die Datenschutzerklärung']
-  }
+  },
+  replies: [{
+    content: {
+      type: String,
+      required: [true, 'Bitte geben Sie eine Antwort ein'],
+      trim: true,
+      maxlength: [1000, 'Die Antwort darf nicht länger als 1000 Zeichen sein']
+    },
+    name: {
+      type: String,
+      required: [true, 'Bitte geben Sie Ihren Namen ein'],
+      trim: true
+    },
+    email: {
+      type: String,
+      required: [true, 'Bitte geben Sie eine E-Mail-Adresse ein'],
+      trim: true,
+      lowercase: true
+    },
+    timestamp: {
+      type: Date,
+      default: Date.now
+    },
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User'
+    },
+    privacyPolicyAccepted: {
+      type: Boolean,
+      required: [true, 'Bitte akzeptieren Sie die Datenschutzerklärung']
+    }
+  }]
 }, {
   timestamps: true
 });

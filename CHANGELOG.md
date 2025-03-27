@@ -323,6 +323,27 @@ All notable changes to this project will be documented in this file.
 - Components now provide feedback to users when using demo data instead of real data
 - Updated favicon to use Med-Match logo instead of Vue.js default favicon
 - Reordered profile completion form to appear above bulletin entries in profile page for better user experience
+- Updated favicon to use Med-Match logo instead of Vue.js default favicon
+- Improved account deletion functionality with clearer UI and proper account-wide deletion
+
+### Added
+- Added reply functionality to bulletin board messages, allowing users to respond directly to posts
+- Added ReplySection component for handling bulletin message replies
+- Added delete functionality for replies (admin and message owner)
+- Added email notifications for new replies
+- Added spam protection for replies with rate limiting and content validation
+- Added confirmation dialogs for reply deletion
+- Added bulk delete functionality for admin users
+- Added reply editing functionality for message owners and admins
+
+### Changed
+- Improved reply management with proper authorization checks
+- Enhanced reply UI with delete buttons for authorized users
+- Added proper error handling for reply operations
+- Added checkboxes for bulk reply selection in admin view
+- Added edit buttons for authorized users
+- Added confirmation modals for destructive actions
+- Added edit modal for reply content updates
 
 ## [1.0.0] - 2024-03-26
 
@@ -460,3 +481,7 @@ All notable changes to this project will be documented in this file.
 - Split "Neuen Eintrag erstellen" button into two separate buttons on profile page:
   - "Neuen Pinnwand-Eintrag erstellen" for bulletin board entries
   - "Neues Angebot erstellen" for hospitals or "Neues Gesuch erstellen" for doctors
+
+### Added
+- Added reply functionality to bulletin board messages, allowing users to respond directly to posts
+- Added ReplySection component for handling bulletin message replies
