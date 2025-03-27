@@ -5,8 +5,6 @@ import ToastNotification from '@/components/ToastNotification.vue'
 import CookieBanner from '@/components/CookieBanner.vue'
 import { onMounted, ref, computed } from 'vue'
 import { useAuthStore } from '@/stores/auth'
-import NavBar from '@/components/layout/NavBar.vue'
-import Footer from '@/components/layout/Footer.vue'
 import api from '@/services/api'
 import { useToast } from '@/composables/useToast'
 
@@ -85,13 +83,10 @@ const showApiWarning = computed(() => {
       </button>
     </div>
     
-    <NavBar />
-    
     <main class="flex-grow main-content">
       <RouterView />
     </main>
     
-    <Footer />
     <AppFooter />
     <ToastNotification />
     <CookieBanner />
