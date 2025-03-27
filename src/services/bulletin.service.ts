@@ -256,181 +256,129 @@ async function deleteBulletin(id: string): Promise<{ success: boolean; message: 
  * @returns Promise with the updated bulletin
  */
 async function addReply(bulletinId: string, reply: Partial<BulletinReply>): Promise<any> {
-  // Track if we're retrying with different status values
-  let isRetry = false;
-  let validStatusValues = ['active', 'approved', undefined]; // Try these values in order
-  let currentStatusIndex = 0;
-
-  async function attemptReply(statusValue: string | undefined): Promise<any> {
-    try {
-      console.log(`BulletinService: ${isRetry ? 'Retrying' : 'Adding'} reply to bulletin ${bulletinId}${statusValue ? ` with status: ${statusValue}` : ' without status'}`);
-      const authStore = useAuthStore();
-      
-      // Get auth status and user info safely
-      const isAuthenticated = authStore.isAuthenticated;
-      const userId = authStore.userId;
-      
-      console.log('BulletinService: Auth status:', isAuthenticated ? 'Authenticated' : 'Guest');
-      console.log('BulletinService: User ID from auth store:', userId || 'Not available');
-      
-      // Enforce authentication - reject guest access immediately
-      if (!isAuthenticated) {
-        console.error('BulletinService: Authentication required to add replies');
-        throw new Error('Sie müssen angemeldet sein, um Antworten zu verfassen.');
-      }
-      
-      // Get token for authenticated users
-      const token = localStorage.getItem('token');
-      if (!token) {
-        console.error('BulletinService: No token found for authenticated user');
-        throw new Error('Authentifizierungstoken nicht gefunden. Bitte melden Sie sich erneut an.');
-      }
-
-      // Try to extract user ID from token first to ensure we have it
-      let userIdToUse = userId;
-      if (!userIdToUse) {
-        try {
-          const tokenParts = token.split('.');
-          if (tokenParts.length === 3) {
-            const payload = JSON.parse(atob(tokenParts[1]));
-            if (payload && payload.id) {
-              console.log('BulletinService: Extracted user ID from token:', payload.id);
-              userIdToUse = payload.id;
-            }
-          }
-        } catch (tokenError) {
-          console.error('BulletinService: Error extracting user ID from token:', tokenError);
-        }
-      }
-
-      // Still no userId, reject the operation
-      if (!userIdToUse) {
-        console.error('BulletinService: Unable to determine user ID for reply');
-        throw new Error('Benutzer-ID konnte nicht ermittelt werden. Bitte aktualisieren Sie die Seite und versuchen Sie es erneut.');
-      }
-      
-      // Get user info from auth store
-      const userName = authStore.userName || 'Angemeldeter Benutzer';
-      const userEmail = authStore.userEmail || '';
-      
-      // Prepare reply data with proper type - include only what's needed
-      const replyData: Record<string, any> = {
-        content: reply.content,
-        privacyPolicyAccepted: true,
-        userId: userIdToUse,
-        name: userName,
-        email: userEmail
-      };
-      
-      // Only add status if a value is provided (might be undefined in some attempts)
-      if (statusValue !== undefined) {
-        replyData.status = statusValue;
-      }
-      
-      // Add authorization headers
-      const headers: Record<string, string> = { 
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      };
-      
-      console.log('BulletinService: Using authenticated user data:', { 
-        name: replyData.name,
-        email: replyData.email,
-        userId: replyData.userId
-      });
-      
-      // Log what we're sending
-      const logData = { ...replyData };
-      if (logData.content) {
-        logData.content = logData.content.substring(0, 20) + '...';
-      }
-      console.log('BulletinService: Final reply data:', logData);
-      
-      // Set a timeout for the request to avoid hanging
-      const response = await api.post(`/bulletin/${bulletinId}/replies`, replyData, {
-        timeout: 15000, // 15 seconds timeout
-        headers: headers
-      });
-      
-      console.log('BulletinService: Reply added successfully');
-      return response;
-    } catch (error: any) {
-      console.error('BulletinService: Error adding reply:', error.message);
-      
-      if (error.response) {
-        const status = error.response.status;
-        const responseData = error.response.data;
-        
-        console.error(`BulletinService: Server returned status ${status}`);
-        console.error('BulletinService: Error response data:', responseData);
-        
-        // Check for status validation errors specifically
-        if (status === 400 && 
-            responseData?.error?.includes('validation') && 
-            responseData.error.includes('status')) {
-          
-          console.error('BulletinService: Status validation error detected');
-          
-          // If we have more status values to try, throw a special error
-          if (currentStatusIndex < validStatusValues.length - 1) {
-            throw new Error('STATUS_VALIDATION_ERROR');
-          }
-          
-          // If we've tried all values, give up
-          console.error('BulletinService: All status values failed validation');
-          throw new Error('Der Server akzeptiert keine Antworten momentan. Bitte versuchen Sie es später erneut oder kontaktieren Sie den Administrator.');
-        }
-        
-        // Enhanced error handling with more specific messages
-        if (status === 400) {
-          if (responseData?.error?.includes('validation')) {
-            console.error('BulletinService: Validation error:', responseData.error);
-            throw new Error('Validierungsfehler: ' + responseData.error);
-          }
-          throw new Error('Ungültige Anfrage. Bitte überprüfen Sie Ihre Eingaben.');
-        } else if (status === 401) {
-          throw new Error('Sie sind nicht angemeldet oder Ihre Sitzung ist abgelaufen. Bitte melden Sie sich erneut an.');
-        } else if (status === 403) {
-          throw new Error('Sie haben keine Berechtigung, diese Aktion durchzuführen.');
-        } else if (status === 404) {
-          throw new Error('Die Nachricht wurde nicht gefunden oder wurde bereits gelöscht.');
-        } else if (status === 500) {
-          throw new Error('Ein Serverfehler ist aufgetreten. Bitte versuchen Sie es später erneut.');
-        }
-      }
-      
-      // If we get here, it's a generic error
-      throw error;
-    }
-  }
-  
-  // Try posting with various status values until one works
   try {
-    return await attemptReply(validStatusValues[currentStatusIndex]);
-  } catch (error) {
-    if (error instanceof Error && error.message === 'STATUS_VALIDATION_ERROR') {
-      // Try the next status value
-      isRetry = true;
-      currentStatusIndex++;
-      
-      console.log(`BulletinService: Retrying with status value: ${validStatusValues[currentStatusIndex] || 'undefined'}`);
-      
+    console.log('BulletinService: Adding reply to bulletin', bulletinId);
+    const authStore = useAuthStore();
+    
+    // Get auth status and user info safely
+    const isAuthenticated = authStore.isAuthenticated;
+    const userId = authStore.userId;
+    
+    console.log('BulletinService: Auth status:', isAuthenticated ? 'Authenticated' : 'Guest');
+    console.log('BulletinService: User ID from auth store:', userId || 'Not available');
+    
+    // Enforce authentication - reject guest access immediately
+    if (!isAuthenticated) {
+      console.error('BulletinService: Authentication required to add replies');
+      throw new Error('Sie müssen angemeldet sein, um Antworten zu verfassen.');
+    }
+    
+    // Get token for authenticated users
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.error('BulletinService: No token found for authenticated user');
+      throw new Error('Authentifizierungstoken nicht gefunden. Bitte melden Sie sich erneut an.');
+    }
+
+    // Try to extract user ID from token first to ensure we have it
+    let userIdToUse = userId;
+    if (!userIdToUse) {
       try {
-        return await attemptReply(validStatusValues[currentStatusIndex]);
-      } catch (retryError) {
-        if (retryError instanceof Error && retryError.message === 'STATUS_VALIDATION_ERROR') {
-          // Try one more time with the last option
-          isRetry = true;
-          currentStatusIndex++;
-          
-          console.log(`BulletinService: Final retry with status value: ${validStatusValues[currentStatusIndex] || 'undefined'}`);
-          return await attemptReply(validStatusValues[currentStatusIndex]);
+        const tokenParts = token.split('.');
+        if (tokenParts.length === 3) {
+          const payload = JSON.parse(atob(tokenParts[1]));
+          if (payload && payload.id) {
+            console.log('BulletinService: Extracted user ID from token:', payload.id);
+            userIdToUse = payload.id;
+          }
         }
-        throw retryError;
+      } catch (tokenError) {
+        console.error('BulletinService: Error extracting user ID from token:', tokenError);
+      }
+    }
+
+    // Still no userId, reject the operation
+    if (!userIdToUse) {
+      console.error('BulletinService: Unable to determine user ID for reply');
+      throw new Error('Benutzer-ID konnte nicht ermittelt werden. Bitte aktualisieren Sie die Seite und versuchen Sie es erneut.');
+    }
+    
+    // Get user info from auth store
+    const userName = authStore.userName || 'Angemeldeter Benutzer';
+    const userEmail = authStore.userEmail || '';
+    
+    // Prepare reply data with proper type - IMPORTANT: DON'T include status field
+    // From the backend schema, we see the replies array doesn't have a status field
+    const replyData: Record<string, any> = {
+      content: reply.content,
+      privacyPolicyAccepted: true,
+      userId: userIdToUse,
+      name: userName,
+      email: userEmail
+    };
+    
+    // Add authorization headers
+    const headers: Record<string, string> = { 
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    };
+    
+    console.log('BulletinService: Using authenticated user data:', { 
+      name: replyData.name,
+      email: replyData.email,
+      userId: replyData.userId
+    });
+    
+    // Log what we're sending
+    const logData = { ...replyData };
+    if (logData.content) {
+      logData.content = logData.content.substring(0, 20) + '...';
+    }
+    console.log('BulletinService: Final reply data:', logData);
+    
+    // Set a timeout for the request to avoid hanging
+    const response = await api.post(`/bulletin/${bulletinId}/replies`, replyData, {
+      timeout: 15000, // 15 seconds timeout
+      headers: headers
+    });
+    
+    console.log('BulletinService: Reply added successfully');
+    return response;
+  } catch (error: any) {
+    console.error('BulletinService: Error adding reply:', error.message);
+    
+    if (error.response) {
+      const status = error.response.status;
+      const responseData = error.response.data;
+      
+      console.error(`BulletinService: Server returned status ${status}`);
+      console.error('BulletinService: Error response data:', responseData);
+      
+      // Enhanced error handling with more specific messages
+      if (status === 400) {
+        if (responseData?.error?.includes('validation')) {
+          console.error('BulletinService: Validation error:', responseData.error);
+          
+          // Special handling for various validation errors
+          if (responseData.error.includes('status')) {
+            throw new Error('Statusfehler: Ein interner Fehler ist aufgetreten. Der Status-Wert wird vom Server nicht akzeptiert.');
+          }
+          
+          throw new Error('Validierungsfehler: ' + responseData.error);
+        }
+        throw new Error('Ungültige Anfrage. Bitte überprüfen Sie Ihre Eingaben.');
+      } else if (status === 401) {
+        throw new Error('Sie sind nicht angemeldet oder Ihre Sitzung ist abgelaufen. Bitte melden Sie sich erneut an.');
+      } else if (status === 403) {
+        throw new Error('Sie haben keine Berechtigung, diese Aktion durchzuführen.');
+      } else if (status === 404) {
+        throw new Error('Die Nachricht wurde nicht gefunden oder wurde bereits gelöscht.');
+      } else if (status === 500) {
+        throw new Error('Ein Serverfehler ist aufgetreten. Bitte versuchen Sie es später erneut.');
       }
     }
     
-    // Re-throw other errors
+    // If we get here, it's a generic error
     throw error;
   }
 }
