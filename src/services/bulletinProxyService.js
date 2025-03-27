@@ -11,18 +11,44 @@ class BulletinProxyService {
    * @returns {Promise} - Promise with bulletins data
    */
   async getAllBulletins(params = {}) {
-    console.log('BulletinService: Fetching bulletins with params:', params);
+    console.log('BulletinProxyService: Fetching bulletins with params:', params);
     
-    // No fallback to demo data - use real API only
-    const response = await bulletinService.getAllBulletins(params);
-    
-    if (!response.data || !Array.isArray(response.data)) {
-      console.warn('BulletinService: API returned empty or invalid data');
+    try {
+      // No fallback to demo data - use real API only
+      const response = await bulletinService.getAllBulletins(params);
+      
+      console.log('BulletinProxyService: Raw response from service:', 
+        response ? 'Response received' : 'No response',
+        'Status:', response?.status);
+        
+      // Check data structure more carefully
+      if (!response) {
+        console.warn('BulletinProxyService: No response received from bulletin service');
+        return { data: [] };
+      }
+      
+      // Handle case where response.data is an object with a data property (nested data)
+      if (response.data && !Array.isArray(response.data) && response.data.data && Array.isArray(response.data.data)) {
+        console.log('BulletinProxyService: Found nested data array with', response.data.data.length, 'items');
+        return { data: response.data.data };
+      }
+      
+      // Handle case where response.data is directly an array
+      if (response.data && Array.isArray(response.data)) {
+        console.log('BulletinProxyService: Found direct data array with', response.data.length, 'items');
+        return { data: response.data };
+      }
+      
+      // If we get here, we have a response but data isn't in expected format
+      console.warn('BulletinProxyService: API returned unexpected data format:', 
+        typeof response.data, 
+        response.data ? 'has data' : 'no data');
+      
+      return { data: [] };
+    } catch (error) {
+      console.error('BulletinProxyService: Error fetching bulletins:', error.message);
       return { data: [] };
     }
-    
-    console.log('BulletinService: Successfully fetched from API, found', response.data.length, 'entries');
-    return response;
   }
 
   /**
