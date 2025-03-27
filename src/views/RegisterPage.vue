@@ -239,7 +239,7 @@ const handleSubmit = async (): Promise<void> => {
       role: 'user'  // Keep using 'user' as role since backend only accepts this enum value
     };
     
-    const response = await authService.register(userData);
+    await authService.register(userData);
     
     // Show success message
     successMessage.value = 'Registrierung erfolgreich! Sie können sich jetzt anmelden.';

@@ -159,7 +159,6 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
 import { useToast } from '@/composables/useToast'
 import { useAnalytics } from '@/composables/useAnalytics'
 import { useAuthStore } from '@/stores/auth'
@@ -204,7 +203,6 @@ interface FormErrors {
   };
 }
 
-const router = useRouter()
 const { showToast } = useToast()
 const { trackForm } = useAnalytics()
 const authStore = useAuthStore()

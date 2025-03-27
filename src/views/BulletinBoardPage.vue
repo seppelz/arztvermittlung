@@ -280,7 +280,7 @@
 import { ref, reactive, computed, onMounted } from 'vue'
 import bulletinProxyService from '@/services/bulletinProxyService'
 import ReplySection from '@/components/bulletin/ReplySection.vue'
-import { Bulletin, BulletinReply as ServerBulletinReply, ApiResponse } from '@/types'
+import { Bulletin, BulletinReply } from '@/types'
 
 // Define interfaces for type safety
 interface BulletinMessage extends Omit<Bulletin, 'replies'> {
@@ -299,6 +299,9 @@ interface UIBulletinReply {
   name: string;
   timestamp: string | Date;
   email?: string;
+  privacyPolicyAccepted: boolean;
+  userId?: string;
+  sessionId?: string;
 }
 
 interface NewMessage {
@@ -343,7 +346,10 @@ function convertServerReplies(bulletin: Bulletin): UIBulletinReply[] {
     content: reply.content,
     name: reply.name,
     email: reply.email,
-    timestamp: reply.timestamp instanceof Date ? reply.timestamp : new Date(reply.timestamp)
+    timestamp: reply.timestamp instanceof Date ? reply.timestamp : new Date(reply.timestamp),
+    privacyPolicyAccepted: reply.privacyPolicyAccepted,
+    userId: reply.userId,
+    sessionId: reply.sessionId
   }));
 }
 

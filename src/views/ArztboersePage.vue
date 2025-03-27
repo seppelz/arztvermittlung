@@ -391,13 +391,6 @@ interface NewBulletin {
   [key: string]: any; // Allow indexing with strings
 }
 
-// Helper function to get API URL (copied from BulletinBoardPage)
-function getApiUrl(endpoint: string): string {
-  // Try to use global config first
-  const baseUrl = import.meta.env.VITE_API_URL || 'https://www.med-match.de/api';
-  return `${baseUrl}/${endpoint}`;
-}
-
 // State variables
 const messages = ref<JobBulletin[]>([]);
 const currentFilter = ref<string>('all');

@@ -497,48 +497,52 @@ const handleDoctorProfileUpdate = (updatedProfile: DoctorProfile): void => {
   showProfileForm.value = false
 }
 
-// Delete profile
+// Delete profile - commented out but preserved for future use
+/*
 const deleteProfile = async (): Promise<void> => {
-  isDeleting.value = true
+  isDeleting.value = true;
   
   try {
-    let url = ''
+    let url = '';
     // Check if user is a hospital (either by role or userType)
-    const isHospitalUser = user.value?.role === 'hospital' || (user.value?.role === 'user' && user.value?.userType === 'Klinik')
+    const isHospitalUser = user.value?.role === 'hospital' || (user.value?.role === 'user' && user.value?.userType === 'Klinik');
     // Check if user is a doctor (either by role or userType)
-    const isDoctorUser = user.value?.role === 'doctor' || (user.value?.role === 'user' && user.value?.userType === 'Arzt')
+    const isDoctorUser = user.value?.role === 'doctor' || (user.value?.role === 'user' && user.value?.userType === 'Arzt');
     
     if (isHospitalUser) {
-      url = '/hospital/profile'
+      url = '/hospital/profile';
     } else if (isDoctorUser) {
-      url = '/doctor/profile'
+      url = '/doctor/profile';
     } else {
-      throw new Error('Unbekannter Benutzertyp')
+      throw new Error('Unbekannter Benutzertyp');
     }
     
-    await api.delete(url)
+    await api.delete(url);
     
     // Reset profiles
     if (isHospitalUser) {
-      hospitalProfile.value = null
+      hospitalProfile.value = null;
     } else if (isDoctorUser) {
-      doctorProfile.value = null
+      doctorProfile.value = null;
     }
     
-    showDeleteConfirm.value = false
-    showToast('Profil erfolgreich gelöscht', 'success')
+    showDeleteConfirm.value = false;
+    showToast('Profil erfolgreich gelöscht', 'success');
   } catch (err: any) {
-    console.error('Error deleting profile:', err)
-    showToast(`Fehler beim Löschen des Profils: ${err.message}`, 'error')
+    console.error('Error deleting profile:', err);
+    showToast(`Fehler beim Löschen des Profils: ${err.message}`, 'error');
   } finally {
-    isDeleting.value = false
+    isDeleting.value = false;
   }
-}
+};
+*/
 
-// Close the profile form
+// Close the profile form - commented out but preserved for future use
+/*
 const closeProfileForm = (): void => {
-  showProfileForm.value = false
-}
+  showProfileForm.value = false;
+};
+*/
 
 // Logout user
 const logout = (): void => {
