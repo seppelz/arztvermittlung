@@ -288,23 +288,31 @@ const router = createRouter({
 })
 
 // Navigation guard to check authentication for routes that require it
-router.beforeEach((to, from, next) => {
-  // Add a timeout protection to prevent navigation guard from hanging
-  const guardTimeout = setTimeout(() => {
-    console.warn('Navigation guard timeout triggered - forcing navigation to proceed');
-    next(); // Force navigation after timeout
-  }, 3000); // 3 second timeout
-  
+router.beforeEach(async (to, from, next) => {
   try {
-    // Simple version - only check localStorage directly without any async operations
-    // to completely avoid potential circular dependencies
+    // Wait for auth store to be initialized
+    const { useAuthStore } = await import('@/stores/auth');
+    const authStore = useAuthStore();
+    
+    // If auth store is not initialized yet, wait for it
+    if (!authStore.isInitialized) {
+      await new Promise(resolve => {
+        const checkInitialized = () => {
+          if (authStore.isInitialized) {
+            resolve();
+          } else {
+            setTimeout(checkInitialized, 100);
+          }
+        };
+        checkInitialized();
+      });
+    }
+    
+    // Check if route requires authentication
     if (to.matched.some(record => record.meta.requiresAuth)) {
-      // Check token directly from localStorage
-      const token = localStorage.getItem('token');
-      
-      if (!token) {
-        clearTimeout(guardTimeout); // Clear timeout if we're redirecting
-        // Redirect to login based on route path
+      // Check if user is authenticated
+      if (!authStore.isAuthenticated) {
+        // Not authenticated, redirect to appropriate login page
         if (to.path.startsWith('/admin')) {
           next({ name: 'AdminLogin' });
         } else {
@@ -313,20 +321,9 @@ router.beforeEach((to, from, next) => {
         return;
       }
       
-      // For admin routes, check user role directly
+      // For admin routes, check user role
       if (to.matched.some(record => record.meta.requiresAdmin)) {
-        try {
-          const userJson = localStorage.getItem('user');
-          const user = userJson ? JSON.parse(userJson) : null;
-          
-          if (!user || user.role !== 'admin') {
-            clearTimeout(guardTimeout); // Clear timeout if we're redirecting
-            next({ name: 'Home' });
-            return;
-          }
-        } catch (err) {
-          console.error('Error checking admin status:', err);
-          clearTimeout(guardTimeout); // Clear timeout if we're redirecting
+        if (!authStore.isAdmin) {
           next({ name: 'Home' });
           return;
         }
@@ -334,13 +331,11 @@ router.beforeEach((to, from, next) => {
     }
     
     // Allow navigation to proceed
-    clearTimeout(guardTimeout); // Clear timeout when guard completes normally
     next();
   } catch (error) {
     console.error('Navigation guard error:', error);
-    clearTimeout(guardTimeout); // Clear timeout on error
-    // In case of any error, allow navigation anyway to prevent blocking the user
-    next();
+    // In case of any error, redirect to home page
+    next({ name: 'Home' });
   }
 });
 

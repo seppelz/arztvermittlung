@@ -4,7 +4,8 @@ export const useAuthStore = defineStore('auth', {
   state: () => ({
     user: null,
     token: null,
-    isAuthenticated: false
+    isAuthenticated: false,
+    isInitialized: false
   }),
   
   getters: {
@@ -21,25 +22,38 @@ export const useAuthStore = defineStore('auth', {
   
   actions: {
     setAuth(userData) {
-      // Store user data from login/register response
-      this.user = userData.user
-      this.token = userData.token
-      this.isAuthenticated = true
-      
-      // Save to localStorage for persistence
-      localStorage.setItem('user', JSON.stringify(userData.user))
-      localStorage.setItem('token', userData.token)
+      try {
+        // Store user data from login/register response
+        this.user = userData.user
+        this.token = userData.token
+        this.isAuthenticated = true
+        
+        // Save to localStorage for persistence
+        localStorage.setItem('user', JSON.stringify(userData.user))
+        localStorage.setItem('token', userData.token)
+      } catch (error) {
+        console.error('Error setting auth state:', error)
+        this.clearAuth()
+      }
     },
     
     initAuth() {
-      // Check if user data exists in localStorage
-      const user = JSON.parse(localStorage.getItem('user'))
-      const token = localStorage.getItem('token')
-      
-      if (user && token) {
-        this.user = user
-        this.token = token
-        this.isAuthenticated = true
+      try {
+        // Check if user data exists in localStorage
+        const userJson = localStorage.getItem('user')
+        const token = localStorage.getItem('token')
+        
+        if (userJson && token) {
+          const user = JSON.parse(userJson)
+          this.user = user
+          this.token = token
+          this.isAuthenticated = true
+        }
+      } catch (error) {
+        console.error('Error initializing auth state:', error)
+        this.clearAuth()
+      } finally {
+        this.isInitialized = true
       }
     },
     
@@ -61,9 +75,13 @@ export const useAuthStore = defineStore('auth', {
     },
     
     updateUser(userData) {
-      // Update user data after profile update
-      this.user = { ...this.user, ...userData }
-      localStorage.setItem('user', JSON.stringify(this.user))
+      try {
+        // Update user data after profile update
+        this.user = { ...this.user, ...userData }
+        localStorage.setItem('user', JSON.stringify(this.user))
+      } catch (error) {
+        console.error('Error updating user data:', error)
+      }
     }
   }
 }) 

@@ -154,20 +154,20 @@ const initializeApp = async () => {
     console.log('Initializing auth state...');
     const { useAuthStore } = await import('@/stores/auth');
     const authStore = useAuthStore();
-    authStore.initAuth();
+    await authStore.initAuth();
     console.log('Auth state initialized');
     
-    // 3. Versuchen, den Router zu importieren und zu verwenden
+    // 3. Router initialisieren
     const router = await loadRouter();
     
     // 4. Router an die App anhängen
     app.use(router);
     console.log('Router initialized');
     
-    // Initialize outbound link tracking
+    // 5. Initialize outbound link tracking
     initOutboundLinkTracking();
     
-    // 5. App mounten
+    // 6. App mounten
     app.mount('#app');
     console.log('Application successfully initialized');
     
@@ -183,17 +183,22 @@ const initializeApp = async () => {
       errorDetails += `\n\nStack: ${stackLines.join('\n')}`;
     }
     
-    document.body.innerHTML = `
-      <div style="padding: 20px; text-align: center;">
-        <h1>Anwendungsfehler</h1>
-        <p>Bei der Initialisierung der Anwendung ist ein Fehler aufgetreten.</p>
-        <p>Bitte aktualisieren Sie die Seite oder löschen Sie den Browser-Cache.</p>
-        <details style="margin-top: 20px; text-align: left;">
-          <summary>Technische Details</summary>
-          <pre style="background: #f5f5f5; padding: 10px; border-radius: 4px; overflow: auto; margin-top: 10px;">${errorDetails}</pre>
-        </details>
-      </div>
+    // Show error in a more user-friendly way
+    const errorDiv = document.createElement('div');
+    errorDiv.style.cssText = 'padding: 20px; text-align: center;';
+    errorDiv.innerHTML = `
+      <h1>Anwendungsfehler</h1>
+      <p>Bei der Initialisierung der Anwendung ist ein Fehler aufgetreten.</p>
+      <p>Bitte aktualisieren Sie die Seite oder löschen Sie den Browser-Cache.</p>
+      <details style="margin-top: 20px; text-align: left;">
+        <summary>Technische Details</summary>
+        <pre style="background: #f5f5f5; padding: 10px; border-radius: 4px; overflow: auto; margin-top: 10px;">${errorDetails}</pre>
+      </details>
     `;
+    
+    // Clear any existing content
+    document.body.innerHTML = '';
+    document.body.appendChild(errorDiv);
     
     // Initialisierungs-Timeout löschen
     clearTimeout(initTimeout);
