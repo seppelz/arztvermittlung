@@ -253,7 +253,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
@@ -263,42 +263,100 @@ import DoctorProfileForm from '@/components/profile/DoctorProfileForm.vue'
 import BulletinEntries from '@/components/profile/BulletinEntries.vue'
 import api from '@/services/api'
 
+// Define interfaces
+interface User {
+  _id?: string;
+  name: string;
+  email: string;
+  role?: string;
+  userType?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  [key: string]: any;
+}
+
+interface Address {
+  street: string;
+  city: string;
+  postalCode: string;
+}
+
+interface Contact {
+  phone: string;
+}
+
+interface HospitalProfile {
+  _id?: string;
+  userId?: string;
+  name: string;
+  type: string;
+  address: Address;
+  contact: Contact;
+  specialties: string[];
+  description?: string;
+  website?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  [key: string]: any;
+}
+
+interface DoctorProfile {
+  _id?: string;
+  userId?: string;
+  name: string;
+  specialty: string;
+  qualifications: string[];
+  otherQualifications?: string;
+  contact: {
+    email: string;
+    phone?: string;
+  };
+  availability: {
+    availableFrom: string;
+    federalState?: string;
+  };
+  additionalInfo?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  [key: string]: any;
+}
+
 const router = useRouter()
 const authStore = useAuthStore()
 const { showToast } = useToast()
 
-const isLoading = ref(true)
-const isDeleting = ref(false)
-const error = ref(null)
-const user = ref(null)
-const hospitalProfile = ref(null)
-const doctorProfile = ref(null)
-const showProfileForm = ref(false)
-const showDeleteConfirm = ref(false)
+const isLoading = ref<boolean>(true)
+const isDeleting = ref<boolean>(false)
+const error = ref<string | null>(null)
+const user = ref<User | null>(null)
+const hospitalProfile = ref<HospitalProfile | null>(null)
+const doctorProfile = ref<DoctorProfile | null>(null)
+const showProfileForm = ref<boolean>(false)
+const showDeleteConfirm = ref<boolean>(false)
 
 // Computed property to determine if hospital profile is complete
-const isHospitalProfileComplete = computed(() => {
+const isHospitalProfileComplete = computed<boolean>(() => {
   return !!hospitalProfile.value && Object.keys(hospitalProfile.value).length > 0
 })
 
 // Computed property to determine if doctor profile is complete
-const isDoctorProfileComplete = computed(() => {
+const isDoctorProfileComplete = computed<boolean>(() => {
   return !!doctorProfile.value && Object.keys(doctorProfile.value).length > 0
 })
 
 // Computed property to determine if user is a doctor
-const isDoctor = computed(() => {
-  return user.value && (user.value.role === 'doctor' || (user.value.role === 'user' && user.value.userType === 'Arzt'))
+const isDoctor = computed<boolean>(() => {
+  return !!user.value && (user.value.role === 'doctor' || (user.value.role === 'user' && user.value.userType === 'Arzt'))
 })
 
 // Computed property to determine if user is a hospital
-const isHospital = computed(() => {
-  return user.value && (user.value.role === 'hospital' || (user.value.role === 'user' && user.value.userType === 'Klinik'))
+const isHospital = computed<boolean>(() => {
+  return !!user.value && (user.value.role === 'hospital' || (user.value.role === 'user' && user.value.userType === 'Klinik'))
 })
 
 // Format hospital type for display
-const formatType = (type) => {
-  const types = {
+const formatType = (type: string): string => {
+  const types: Record<string, string> = {
     krankenhaus: 'Krankenhaus',
     klinik: 'Klinik',
     reha: 'Rehabilitationsklinik',
@@ -308,8 +366,8 @@ const formatType = (type) => {
 }
 
 // Format specialty for display
-const formatSpecialty = (specialty) => {
-  const specialties = {
+const formatSpecialty = (specialty: string): string => {
+  const specialties: Record<string, string> = {
     allgemeinmedizin: 'Allgemeinmedizin',
     innere: 'Innere Medizin',
     chirurgie: 'Chirurgie',
@@ -324,8 +382,8 @@ const formatSpecialty = (specialty) => {
 }
 
 // Format qualification for display
-const formatQualification = (qualification) => {
-  const qualifications = {
+const formatQualification = (qualification: string): string => {
+  const qualifications: Record<string, string> = {
     facharzt: 'Facharzt',
     oberarzt: 'Oberarzt',
     chefarzt: 'Chefarzt',
@@ -337,7 +395,7 @@ const formatQualification = (qualification) => {
 }
 
 // Format date for display
-const formatDate = (dateString) => {
+const formatDate = (dateString: string | undefined): string => {
   if (!dateString) return 'Nicht angegeben'
   
   const date = new Date(dateString)
@@ -349,7 +407,7 @@ const formatDate = (dateString) => {
 }
 
 // Load user profile
-const loadProfile = async () => {
+const loadProfile = async (): Promise<void> => {
   try {
     isLoading.value = true
     error.value = null
@@ -375,18 +433,18 @@ const loadProfile = async () => {
     console.log('User profile loaded:', user.value)
     
     // Check if user is a hospital (either by role or userType)
-    const isHospital = user.value.role === 'hospital' || (user.value.role === 'user' && user.value.userType === 'Klinik')
+    const isHospitalUser = user.value.role === 'hospital' || (user.value.role === 'user' && user.value.userType === 'Klinik')
     
     // Check if user is a doctor (either by role or userType)
-    const isDoctor = user.value.role === 'doctor' || (user.value.role === 'user' && user.value.userType === 'Arzt')
+    const isDoctorUser = user.value.role === 'doctor' || (user.value.role === 'user' && user.value.userType === 'Arzt')
     
     // If user is a hospital, load hospital profile
-    if (isHospital) {
+    if (isHospitalUser) {
       try {
         const response = await api.get('/hospital/profile')
         console.log('Hospital profile response:', response)
         hospitalProfile.value = response.data
-      } catch (profileErr) {
+      } catch (profileErr: any) {
         console.error('Error loading hospital profile:', profileErr)
         if (profileErr.response && profileErr.response.status === 404) {
           // Profile doesn't exist yet, which is fine - we'll show the "complete profile" button
@@ -401,12 +459,12 @@ const loadProfile = async () => {
     }
     
     // If user is a doctor, load doctor profile
-    if (isDoctor) {
+    if (isDoctorUser) {
       try {
         const response = await api.get('/doctor/profile')
         console.log('Doctor profile response:', response)
         doctorProfile.value = response.data
-      } catch (profileErr) {
+      } catch (profileErr: any) {
         console.error('Error loading doctor profile:', profileErr)
         if (profileErr.response && profileErr.response.status === 404) {
           // Profile doesn't exist yet, which is fine - we'll show the "complete profile" button
@@ -419,7 +477,7 @@ const loadProfile = async () => {
         }
       }
     }
-  } catch (err) {
+  } catch (err: any) {
     console.error('Error loading profile:', err)
     error.value = err.message
   } finally {
@@ -428,64 +486,68 @@ const loadProfile = async () => {
 }
 
 // Handle hospital profile update
-const handleProfileUpdate = (updatedProfile) => {
+const handleProfileUpdate = (updatedProfile: HospitalProfile): void => {
   hospitalProfile.value = updatedProfile
   showProfileForm.value = false
 }
 
 // Handle doctor profile update
-const handleDoctorProfileUpdate = (updatedProfile) => {
+const handleDoctorProfileUpdate = (updatedProfile: DoctorProfile): void => {
   doctorProfile.value = updatedProfile
   showProfileForm.value = false
 }
 
 // Delete profile
-const deleteProfile = async () => {
+const deleteProfile = async (): Promise<void> => {
   isDeleting.value = true
   
   try {
     let url = ''
     // Check if user is a hospital (either by role or userType)
-    const isHospital = user.value.role === 'hospital' || (user.value.role === 'user' && user.value.userType === 'Klinik')
-    
+    const isHospitalUser = user.value?.role === 'hospital' || (user.value?.role === 'user' && user.value?.userType === 'Klinik')
     // Check if user is a doctor (either by role or userType)
-    const isDoctor = user.value.role === 'doctor' || (user.value.role === 'user' && user.value.userType === 'Arzt')
+    const isDoctorUser = user.value?.role === 'doctor' || (user.value?.role === 'user' && user.value?.userType === 'Arzt')
     
-    if (isHospital) {
+    if (isHospitalUser) {
       url = '/hospital/profile'
-    } else if (isDoctor) {
+    } else if (isDoctorUser) {
       url = '/doctor/profile'
     } else {
-      throw new Error('Ungültiger Benutzertyp')
+      throw new Error('Unbekannter Benutzertyp')
     }
     
-    const response = await api.delete(url)
+    await api.delete(url)
     
-    showToast('Profil erfolgreich gelöscht', 'success')
-    showDeleteConfirm.value = false
-    
-    // Reset profile data
-    if (isHospital) {
+    // Reset profiles
+    if (isHospitalUser) {
       hospitalProfile.value = null
-    } else if (isDoctor) {
+    } else if (isDoctorUser) {
       doctorProfile.value = null
     }
-  } catch (err) {
+    
+    showDeleteConfirm.value = false
+    showToast('Profil erfolgreich gelöscht', 'success')
+  } catch (err: any) {
     console.error('Error deleting profile:', err)
-    showToast(err.message || 'Ein Fehler ist aufgetreten', 'error')
+    showToast(`Fehler beim Löschen des Profils: ${err.message}`, 'error')
   } finally {
     isDeleting.value = false
   }
 }
 
-// Logout function
-const logout = async () => {
-  await authStore.logout()
+// Close the profile form
+const closeProfileForm = (): void => {
+  showProfileForm.value = false
+}
+
+// Logout user
+const logout = (): void => {
+  authStore.clearAuth()
   router.push('/login')
 }
 
 // Delete account
-const deleteAccount = async () => {
+const deleteAccount = async (): Promise<void> => {
   try {
     isDeleting.value = true
     await api.delete('/user/account')
@@ -500,6 +562,8 @@ const deleteAccount = async () => {
   }
 }
 
-// Load profile on mount
-onMounted(loadProfile)
+// Load profile when component is mounted
+onMounted(() => {
+  loadProfile()
+})
 </script> 

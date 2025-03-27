@@ -59,7 +59,7 @@
           <div v-else-if="loadError" class="p-6 bg-red-50 border border-red-200 rounded-lg text-center mb-4">
             <p class="text-red-600 mb-2 font-medium">{{ loadError }}</p>
             <button 
-              @click="fetchMessages" 
+              @click="retryFetch" 
               class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark text-sm"
             >
               Erneut versuchen
@@ -338,32 +338,81 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, reactive, computed, onMounted } from 'vue'
-import bulletinProxyService from '@/services/bulletinProxyService';
+import bulletinProxyService from '@/services/bulletinProxyService'
+import { Bulletin } from '@/types'
+
+// Extend the Bulletin type to include federalState
+declare module '@/types' {
+  interface Bulletin {
+    federalState?: string;
+  }
+}
+
+// Define interfaces
+interface JobBulletin {
+  _id: string;
+  id?: string;
+  title?: string;
+  content: string;
+  name: string;
+  email: string;
+  status: string;
+  messageType: 'Angebot' | 'Gesuch';
+  timestamp: string | Date;
+  createdAt?: Date;
+  updatedAt?: Date;
+  startDate?: Date | string;
+  specialty?: string;
+  federalState?: string;
+  userType?: string;
+  privacyPolicyAccepted: boolean;
+  [key: string]: any; // Allow indexing with strings
+}
+
+interface ContactForm {
+  name: string;
+  email: string;
+  message: string;
+}
+
+interface NewBulletin {
+  name: string;
+  email: string;
+  userType: string;
+  messageType: string;
+  content: string;
+  specialty: string;
+  federalState: string;
+  startDate: string;
+  status: string;
+  privacyPolicyAccepted: boolean;
+  [key: string]: any; // Allow indexing with strings
+}
 
 // Helper function to get API URL (copied from BulletinBoardPage)
-function getApiUrl(endpoint) {
+function getApiUrl(endpoint: string): string {
   // Try to use global config first
   const baseUrl = import.meta.env.VITE_API_URL || 'https://www.med-match.de/api';
   return `${baseUrl}/${endpoint}`;
 }
 
-// Zustandsvariablen
-const messages = ref([]);
-const currentFilter = ref('all');
-const sortOrder = ref('newest');
-const currentPage = ref(1);
+// State variables
+const messages = ref<JobBulletin[]>([]);
+const currentFilter = ref<string>('all');
+const sortOrder = ref<'newest' | 'oldest'>('newest');
+const currentPage = ref<number>(1);
 const itemsPerPage = 6;
-const isSubmitting = ref(false);
-const messageSent = ref(false);
-const showContactModal = ref(false);
-const selectedMessage = ref({});
-const isLoading = ref(true);
-const loadError = ref(null);
+const isSubmitting = ref<boolean>(false);
+const messageSent = ref<boolean>(false);
+const showContactModal = ref<boolean>(false);
+const selectedMessage = ref<JobBulletin>({} as JobBulletin);
+const isLoading = ref<boolean>(true);
+const loadError = ref<string | null>(null);
 
-// Formulare
-const newMessage = reactive({
+// Forms
+const newMessage = reactive<NewBulletin>({
   name: '',
   email: '',
   userType: '',
@@ -371,19 +420,19 @@ const newMessage = reactive({
   content: '',
   specialty: '',
   federalState: '',
-  startDate: new Date().toISOString().split('T')[0], // Heutiges Datum als Standardwert
-  status: 'pending', // Neue Einträge werden standardmäßig auf 'pending' gesetzt
+  startDate: new Date().toISOString().split('T')[0], // Today's date as default
+  status: 'pending', // New entries are set to 'pending' by default
   privacyPolicyAccepted: false
 });
 
-const contactForm = reactive({
+const contactForm = reactive<ContactForm>({
   name: '',
   email: '',
   message: ''
 });
 
-// Berechnete Eigenschaften
-const filteredMessages = computed(() => {
+// Computed properties
+const filteredMessages = computed<JobBulletin[]>(() => {
   let result = [...messages.value];
   
   console.log('Filtering messages:', messages.value.length, 'total entries');
@@ -398,22 +447,22 @@ const filteredMessages = computed(() => {
   result = result.filter(msg => msg.status === 'active' || msg.status === undefined);
   console.log('After status filter:', result.length, 'entries with status active/undefined');
   
-  // Filtern nach Nachrichtentyp
+  // Filter by message type
   if (currentFilter.value !== 'all') {
     result = result.filter(msg => msg.messageType === currentFilter.value);
     console.log('After currentFilter:', result.length, 'entries');
   }
   
-  // Sortieren
+  // Sort
   result.sort((a, b) => {
     if (sortOrder.value === 'newest') {
-      return new Date(b.timestamp) - new Date(a.timestamp);
+      return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
     } else {
-      return new Date(a.timestamp) - new Date(b.timestamp);
+      return new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime();
     }
   });
   
-  // Paginierung
+  // Pagination
   const startIndex = (currentPage.value - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const paginatedResult = result.slice(startIndex, endIndex);
@@ -422,7 +471,7 @@ const filteredMessages = computed(() => {
   return paginatedResult;
 });
 
-const totalPages = computed(() => {
+const totalPages = computed<number>(() => {
   let filteredTotal = messages.value.filter(msg => msg.messageType === 'Angebot' || msg.messageType === 'Gesuch');
   if (currentFilter.value !== 'all') {
     filteredTotal = filteredTotal.filter(msg => msg.messageType === currentFilter.value);
@@ -430,8 +479,8 @@ const totalPages = computed(() => {
   return Math.ceil(filteredTotal.length / itemsPerPage);
 });
 
-// Methoden
-function determineMessageType() {
+// Methods
+function determineMessageType(): void {
   if (newMessage.userType === 'Arzt') {
     newMessage.messageType = 'Gesuch';
   } else if (newMessage.userType === 'Klinik') {
@@ -441,7 +490,7 @@ function determineMessageType() {
   }
 }
 
-async function submitMessage() {
+async function submitMessage(): Promise<void> {
   isSubmitting.value = true;
   
   // Set messageType based on userType
@@ -458,33 +507,62 @@ async function submitMessage() {
   try {
     console.log('Submitting job listing to database');
     
-    // Create the job listing via the direct database API
-    const response = await bulletinProxyService.createBulletin({
-      ...newMessage,
+    // Prepare data for API (convert date string to Date object)
+    const bulletinData: Partial<Bulletin> = {
       title: generatedTitle,
-      timestamp: new Date(),
+      name: newMessage.name,
+      email: newMessage.email,
+      content: newMessage.content,
+      messageType: newMessage.messageType,
+      status: 'pending',
       privacyPolicyAccepted: true,
-      status: 'pending' // Ensure entries start as pending for moderation
-    });
+      specialty: newMessage.specialty || undefined
+    };
+    
+    // Add startDate as a Date object
+    if (newMessage.startDate) {
+      bulletinData.startDate = new Date(newMessage.startDate);
+    }
+    
+    // Add federalState if it exists
+    if (newMessage.federalState) {
+      (bulletinData as any).federalState = newMessage.federalState;
+    }
+    
+    const response = await bulletinProxyService.createBulletin(bulletinData);
     
     if (response && response.data) {
       // If successful, add the new listing to our local list
       const newEntry = response.data;
       
-      // Convert _id to id if needed for consistency
-      const formattedEntry = {
-        ...newEntry,
-        id: newEntry._id || newEntry.id
+      // Convert to our JobBulletin format
+      const formattedEntry: JobBulletin = {
+        _id: newEntry._id,
+        id: newEntry._id,
+        title: newEntry.title,
+        content: newEntry.content,
+        name: newEntry.name,
+        email: newEntry.email,
+        status: newEntry.status,
+        messageType: newEntry.messageType as 'Angebot' | 'Gesuch',
+        timestamp: newEntry.createdAt || new Date(),
+        createdAt: newEntry.createdAt,
+        updatedAt: newEntry.updatedAt,
+        startDate: newEntry.startDate,
+        specialty: newEntry.specialty,
+        federalState: newEntry.federalState,
+        userType: newMessage.userType, // Copy from form
+        privacyPolicyAccepted: true
       };
       
       messages.value.unshift(formattedEntry);
       
       // Reset form
       Object.keys(newMessage).forEach(key => {
-        if (typeof newMessage[key] === 'boolean') {
-          newMessage[key] = false;
+        if (key === 'privacyPolicyAccepted') {
+          newMessage.privacyPolicyAccepted = false;
         } else if (key === 'startDate') {
-          newMessage[key] = new Date().toISOString().split('T')[0]; // Reset to today's date
+          newMessage.startDate = new Date().toISOString().split('T')[0]; // Reset to today's date
         } else {
           newMessage[key] = '';
         }
@@ -497,7 +575,7 @@ async function submitMessage() {
         messageSent.value = false;
       }, 3000);
     }
-  } catch (err) {
+  } catch (err: any) {
     console.error('Error submitting job listing:', err);
     alert('Fehler beim Speichern: ' + (err.message || 'Unbekannter Fehler'));
   } finally {
@@ -505,17 +583,17 @@ async function submitMessage() {
   }
 }
 
-function filterMessages(filter) {
+function filterMessages(filter: string): void {
   currentFilter.value = filter;
-  currentPage.value = 1; // Zurück zur ersten Seite
+  currentPage.value = 1; // Back to first page
 }
 
-function sortMessages() {
-  // Sortierung wird in der computed property angewendet
-  currentPage.value = 1; // Zurück zur ersten Seite
+function sortMessages(): void {
+  // Sorting is applied in the computed property
+  currentPage.value = 1; // Back to first page
 }
 
-function formatDate(date) {
+function formatDate(date: string | Date | undefined): string {
   // Add safety check to handle missing dates
   if (!date) {
     return 'Unbekannt';
@@ -528,111 +606,84 @@ function formatDate(date) {
   });
 }
 
-function prevPage() {
+function prevPage(): void {
   if (currentPage.value > 1) {
     currentPage.value--;
   }
 }
 
-function nextPage() {
+function nextPage(): void {
   if (currentPage.value < totalPages.value) {
     currentPage.value++;
   }
 }
 
-function goToPage(page) {
+function goToPage(page: number): void {
   currentPage.value = page;
 }
 
-function contactPoster(message) {
+function contactPoster(message: JobBulletin): void {
   selectedMessage.value = message;
   showContactModal.value = true;
 }
 
-function closeContactModal() {
+function closeContactModal(): void {
   showContactModal.value = false;
-  // Formular zurücksetzen
+  // Reset form
   contactForm.name = '';
   contactForm.email = '';
   contactForm.message = '';
 }
 
-function sendContact() {
-  // Hier würden wir normalerweise eine API-Anfrage senden
-  console.log('Kontaktanfrage gesendet:', {
+function sendContact(): void {
+  // Here we would normally send an API request
+  console.log('Contact request sent:', {
     to: selectedMessage.value.email,
     from: contactForm
   });
   
-  // Schließe das Modal und zeige eine Erfolgsmeldung
+  // Close the modal and show a success message
   alert('Ihre Nachricht wurde gesendet!');
   closeContactModal();
 }
 
-// Load real data on component mount
-onMounted(async () => {
-  await fetchMessages();
-});
+function retryFetch(): void {
+  window.location.reload();
+}
 
-async function fetchMessages() {
-  isLoading.value = true;
-  loadError.value = null;
-  
+// Fetch job listings on component mount
+onMounted(async () => {
   try {
-    console.log('Fetching job listings from database');
+    console.log('Fetching job listings');
+    isLoading.value = true;
+    loadError.value = null;
     
-    // Fetch both types of job listings - offers and requests
-    const params = {};
-    
-    // Remove messageType filter for testing to get all bulletins
-    // if (currentFilter.value !== 'all') {
-    //   params.messageType = currentFilter.value;
-    // }
-    
-    console.log('API params:', params);
-    
-    const response = await bulletinProxyService.getAllBulletins(params);
-    
-    console.log('API response:', response);
-    console.log('API response data structure:', {
-      hasData: !!response.data,
-      dataType: response.data ? typeof response.data : 'undefined',
-      isArray: response.data ? Array.isArray(response.data) : false,
-      dataLength: response.data && Array.isArray(response.data) ? response.data.length : 'not an array',
-      hasStatus: response.status ? true : false,
-      status: response.status,
-      firstItem: response.data && Array.isArray(response.data) && response.data.length > 0 ? 
-        { 
-          id: response.data[0]._id || response.data[0].id, 
-          type: response.data[0].messageType,
-          status: response.data[0].status 
-        } : 'no items'
+    // Fetch from the bulletinProxyService
+    const response = await bulletinProxyService.getAllBulletins({
+      messageType: currentFilter.value === 'all' ? '' : currentFilter.value,
+      sort: sortOrder.value === 'newest' ? '-timestamp' : 'timestamp'
     });
     
     if (response && response.data) {
-      // Store filtered job listings
-      messages.value = response.data.map(item => ({
-        ...item,
-        id: item._id || item.id // Handle MongoDB _id vs id
-      }));
+      console.log(`Loaded ${response.data.length} job listings`);
       
-      console.log('Loaded job listings from database:', messages.value.length);
-      if (messages.value.length > 0) {
-        console.log('Sample listing:', messages.value[0]);
-        console.log('All message types:', [...new Set(messages.value.map(m => m.messageType))]);
-        console.log('All statuses:', [...new Set(messages.value.map(m => m.status))]);
-      }
+      // Process data and convert _id to id if needed
+      messages.value = response.data.map((item: any) => ({
+        ...item,
+        id: item._id, // Add id field based on _id
+        timestamp: item.createdAt || item.timestamp || new Date(),
+        status: item.status || 'active', // Default to active if status is missing
+        messageType: item.messageType as 'Angebot' | 'Gesuch'
+      }));
     } else {
-      console.warn('No job listings found in database');
+      console.warn('No job listings found or empty response');
       messages.value = [];
-      loadError.value = 'Keine Stellenangebote/Gesuche gefunden.';
     }
-  } catch (err) {
+  } catch (err: any) {
     console.error('Error fetching job listings:', err);
-    loadError.value = 'Fehler beim Laden der Stellenangebote: ' + (err.message || 'Unbekannter Fehler');
-    messages.value = [];
+    loadError.value = `Fehler beim Laden der Daten: ${err.message || 'Unbekannter Fehler'}`;
   } finally {
     isLoading.value = false;
   }
-}
+});
 </script> 

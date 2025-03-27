@@ -11,6 +11,15 @@ All notable changes to this project will be documented in this file.
 - Enhanced header branding with white MedMatch text for better contrast and visibility
 - Increased spacing between navigation items in header menu for improved readability
 - Added more separation between MedMatch logo/text and navigation menu for better visual hierarchy
+- Converted ReplySection component to TypeScript with proper interfaces and type safety
+- Converted ProfilePage.vue to TypeScript with comprehensive typing for User, HospitalProfile and DoctorProfile
+- Converted ArztboersePage.vue to TypeScript with proper typing for job listings and forms
+- Improved type safety throughout the application with proper TypeScript interfaces
+- Enhanced error handling with proper type declarations in async functions
+- Added proper TypeScript interfaces for bulletin data structures
+- Improved type safety in form handling with reactive typing
+- Enhanced emit definitions with proper TypeScript typing for component events
+- Implemented strict type checking for all components with proper linting
 - Stellenbörse: Nachrichten werden anonymisiert angezeigt, um die Vermittlung über die Plattform zu fördern
 - Stellenformular erweitert mit Feldern für Fachrichtung, Bundesland und Verfügbarkeitsdatum
 - Neuer Moderationsprozess für Stellenangebote und -gesuche (Admin-Freigabe erforderlich)
@@ -228,6 +237,19 @@ All notable changes to this project will be documented in this file.
 - Fixed issue with authenticated users not being able to reply to bulletins
 - Added additional logging to help diagnose session and authentication issues
 - Improved error handling for different types of errors in bulletin controllers
+- Fixed bulletin reply system to properly handle both authenticated and guest users
+- Fixed session ID handling in bulletin.service for adding, updating, and deleting replies
+- Improved error handling in bulletin reply forms with better user feedback
+- Ensured privacyPolicyAccepted field is properly included in reply submissions
+- Fixed validation for reply form based on user authentication status
+- Fixed bulletin reply saving issues for authenticated users:
+  - Properly handling privacyPolicyAccepted field in authenticated requests
+  - Ensuring consistent session ID handling with X-Session-Id header
+  - Fixed name and email fields missing for authenticated users
+  - Improved error handling and logging for reply operations
+- Fixed inconsistency in API session header naming (unified to X-Session-Id)
+- Improved controller validation logic for authenticated vs guest users
+- Enhanced error reporting with detailed context for bulletin reply operations
 
 ### Added
 - Auto-fill bulletin reply form with user data when logged in
@@ -555,3 +577,6015 @@ All notable changes to this project will be documented in this file.
 - MongoDB Atlas connection issues
 - Bulletin board display and functionality
 - Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed
+- Updated content on multiple pages (Home, For Doctors, For Hospitals, About, Imprint, Privacy, Terms)
+- Improved footer design
+- Updated dependencies in package.json
+
+### Fixed
+- MongoDB Atlas connection issues
+- Bulletin board display and functionality
+- Updated demo entries in bulletin board
+
+### Changed

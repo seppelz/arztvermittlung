@@ -17,7 +17,7 @@
           </button>
         </div>
       </div>
-      <div v-for="reply in message.replies" :key="reply.timestamp" class="bg-gray-50 rounded-lg p-4">
+      <div v-for="reply in message.replies" :key="reply._id" class="bg-gray-50 rounded-lg p-4">
         <div class="flex justify-between items-start mb-2">
           <div class="flex items-center space-x-2">
             <input
@@ -178,7 +178,7 @@
             <label for="editContent" class="block text-sm font-medium text-gray-700">Ihre Antwort*</label>
             <textarea
               id="editContent"
-              v-model="selectedReply.content"
+              v-model="selectedReply?.content"
               rows="4"
               required
               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
@@ -207,78 +207,248 @@
   </div>
 </template>
 
-<script setup>
-import { ref, reactive, computed, watch } from 'vue'
+<script setup lang="ts">
+import { ref, reactive, computed } from 'vue'
 import { useToast } from '@/composables/useToast'
-import bulletinProxyService from '@/services/bulletinProxyService'
+import * as bulletinService from '@/services/bulletin.service'
 import { useAuthStore } from '@/stores/auth'
+import { Bulletin, BulletinReply } from '@/types'
 
-const props = defineProps({
-  message: {
-    type: Object,
-    required: true
-  }
-})
+interface Props {
+  message: Bulletin;
+}
 
-const emit = defineEmits(['reply-added', 'reply-deleted', 'reply-updated'])
+// UI-specific bulletin reply that includes bulletinId
+interface UIBulletinReply extends BulletinReply {
+  bulletinId: string;
+}
+
+interface ReplyForm {
+  name: string;
+  email: string;
+  content: string;
+  privacyPolicyAccepted: boolean;
+}
+
+const props = defineProps<Props>()
+
+const emit = defineEmits<{
+  'reply-added': [reply: UIBulletinReply];
+  'reply-deleted': [replyId: string];
+  'reply-updated': [reply: UIBulletinReply];
+}>()
 
 const authStore = useAuthStore()
 const { showToast } = useToast()
-const showReplyForm = ref(false)
-const isSubmitting = ref(false)
-const showDeleteConfirm = ref(false)
-const showEditForm = ref(false)
-const selectedReply = ref(null)
-const selectedReplies = ref(new Set())
+const showReplyForm = ref<boolean>(false)
+const isSubmitting = ref<boolean>(false)
+const errorMessage = ref<string>('')
+const showDeleteConfirm = ref<boolean>(false)
+const showEditForm = ref<boolean>(false)
+const selectedReply = ref<BulletinReply | null>(null)
+const selectedReplies = ref<Set<string>>(new Set())
+
+// Form data
+const replyForm = reactive<ReplyForm>({
+  name: '',
+  email: '',
+  content: '',
+  privacyPolicyAccepted: false
+})
 
 // Add computed property for admin status
-const isAdmin = computed(() => authStore.isAdmin)
+const isAdmin = computed<boolean>(() => authStore.isAdmin)
 
 // Add computed property for selected replies count
-const selectedRepliesCount = computed(() => selectedReplies.value.size)
+const selectedRepliesCount = computed<number>(() => selectedReplies.value.size)
 
-// Add computed property to check if user can edit reply
-const canEditReply = (reply) => {
-  if (!reply) return false
-  // Admin can edit any reply
-  if (authStore.isAdmin) return true
+/**
+ * Format date to a user-friendly string
+ */
+function formatDate(date: string | Date): string {
+  return new Date(date).toLocaleDateString('de-DE', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  })
+}
+
+/**
+ * Check if current user can edit a reply
+ */
+function canEditReply(reply: BulletinReply): boolean {
+  if (isAdmin.value) return true
   
-  // Authenticated user can edit their own replies
-  if (authStore.isAuthenticated && reply.userId) {
-    return reply.userId === authStore.userId
+  const authStore = useAuthStore()
+  
+  // Check if user is authenticated and owns the reply
+  if (authStore.isAuthenticated && reply.userId === authStore.userId) {
+    return true
   }
   
-  // Guest user can edit their own replies using sessionId
-  const sessionId = localStorage.getItem('sessionId')
-  if (sessionId && reply.sessionId) {
-    return reply.sessionId === sessionId
+  // For anonymous users, check if they have the same session ID
+  if (!authStore.isAuthenticated && reply.sessionId) {
+    const sessionId = localStorage.getItem('sessionId')
+    if (sessionId && sessionId === reply.sessionId) {
+      return true
+    }
   }
   
   return false
 }
 
-// Add computed property to check if user can delete reply
-const canDeleteReply = (reply) => {
-  if (!reply) return false
-  // Admin can delete any reply
-  if (authStore.isAdmin) return true
-  
-  // Authenticated user can delete their own replies
-  if (authStore.isAuthenticated && reply.userId) {
-    return reply.userId === authStore.userId
-  }
-  
-  // Guest user can delete their own replies using sessionId
-  const sessionId = localStorage.getItem('sessionId')
-  if (sessionId && reply.sessionId) {
-    return reply.sessionId === sessionId
-  }
-  
-  return false
+/**
+ * Check if current user can delete a reply
+ */
+function canDeleteReply(reply: BulletinReply): boolean {
+  return canEditReply(reply)
 }
 
-// Add method to handle reply selection
-const toggleReplySelection = (replyId) => {
+/**
+ * Submit a new reply
+ */
+async function submitReply(): Promise<void> {
+  try {
+    isSubmitting.value = true
+    errorMessage.value = ''
+    
+    // Prepare reply data with proper type
+    const replyData: Partial<BulletinReply> = {
+      content: replyForm.content,
+      privacyPolicyAccepted: true
+    }
+    
+    // Add name/email if not authenticated
+    if (!authStore.isAuthenticated) {
+      replyData.name = replyForm.name
+      replyData.email = replyForm.email
+      replyData.privacyPolicyAccepted = replyForm.privacyPolicyAccepted
+    }
+    
+    // Send the reply
+    const response = await bulletinService.addReply(props.message._id, replyData)
+    
+    // Get the newly created reply
+    const newReply = response.data.replies.slice(-1)[0]
+    
+    // Construct UI-friendly reply object to emit
+    const uiReply: UIBulletinReply = {
+      ...newReply,
+      bulletinId: props.message._id
+    }
+    
+    // Emit event to parent
+    emit('reply-added', uiReply)
+    
+    // Reset and close form
+    replyForm.content = ''
+    replyForm.privacyPolicyAccepted = false
+    showReplyForm.value = false
+    
+    showToast('Antwort erfolgreich gesendet', 'success')
+  } catch (error) {
+    console.error('Error submitting reply:', error)
+    errorMessage.value = 'Fehler beim Senden der Antwort. Bitte versuchen Sie es später erneut.'
+    showToast('Fehler beim Senden der Antwort', 'error')
+  } finally {
+    isSubmitting.value = false
+  }
+}
+
+/**
+ * Close the reply form and reset fields
+ */
+function closeReplyForm(): void {
+  showReplyForm.value = false
+  replyForm.content = ''
+  replyForm.name = ''
+  replyForm.email = ''
+  replyForm.privacyPolicyAccepted = false
+}
+
+/**
+ * Delete a reply
+ */
+async function deleteReply(reply: BulletinReply | null): Promise<void> {
+  if (!reply) return
+  
+  try {
+    isSubmitting.value = true
+    
+    await bulletinService.deleteReply(props.message._id, reply._id)
+    
+    // Emit event to parent
+    emit('reply-deleted', reply._id)
+    
+    // Reset state
+    showDeleteConfirm.value = false
+    selectedReply.value = null
+    
+    showToast('Antwort erfolgreich gelöscht', 'success')
+  } catch (error) {
+    console.error('Error deleting reply:', error)
+    showToast('Fehler beim Löschen der Antwort', 'error')
+  } finally {
+    isSubmitting.value = false
+  }
+}
+
+/**
+ * Prepare to edit a reply
+ */
+function editReply(reply: BulletinReply): void {
+  selectedReply.value = {...reply}
+  showEditForm.value = true
+}
+
+/**
+ * Update a reply
+ */
+async function updateReply(): Promise<void> {
+  if (!selectedReply.value) return
+  
+  try {
+    isSubmitting.value = true
+    
+    const response = await bulletinService.updateReply(
+      props.message._id, 
+      selectedReply.value._id, 
+      selectedReply.value.content
+    )
+    
+    // Get the updated reply from response
+    const updatedReply = response.data.replies.find(
+      (r: BulletinReply) => r._id === selectedReply.value?._id
+    )
+    
+    if (updatedReply) {
+      // Construct UI-friendly reply object to emit
+      const uiReply: UIBulletinReply = {
+        ...updatedReply,
+        bulletinId: props.message._id
+      }
+      
+      // Emit event to parent
+      emit('reply-updated', uiReply)
+    }
+    
+    // Reset state
+    showEditForm.value = false
+    selectedReply.value = null
+    
+    showToast('Antwort erfolgreich aktualisiert', 'success')
+  } catch (error) {
+    console.error('Error updating reply:', error)
+    showToast('Fehler beim Aktualisieren der Antwort', 'error')
+  } finally {
+    isSubmitting.value = false
+  }
+}
+
+/**
+ * Toggle selection of a reply for bulk operations
+ */
+function toggleReplySelection(replyId: string): void {
   if (selectedReplies.value.has(replyId)) {
     selectedReplies.value.delete(replyId)
   } else {
@@ -286,252 +456,33 @@ const toggleReplySelection = (replyId) => {
   }
 }
 
-// Add method to handle bulk delete
-const handleBulkDelete = async () => {
-  if (!selectedReplies.value.size) return
+/**
+ * Delete multiple replies at once
+ */
+async function handleBulkDelete(): Promise<void> {
+  if (selectedReplies.value.size === 0) return
   
-  try {
-    for (const replyId of selectedReplies.value) {
-      await bulletinProxyService.deleteReply(props.message.id, replyId)
-      emit('reply-deleted', replyId)
-    }
-    selectedReplies.value.clear()
-    showToast('Ausgewählte Antworten wurden erfolgreich gelöscht', 'success')
-  } catch (error) {
-    console.error('Error deleting replies:', error)
-    showToast('Fehler beim Löschen der Antworten', 'error')
-  }
-}
-
-// Add method to handle reply editing
-const editReply = (reply) => {
-  selectedReply.value = { ...reply }
-  showEditForm.value = true
-}
-
-// Add method to handle reply update
-const updateReply = async () => {
+  const confirmed = confirm(`Sind Sie sicher, dass Sie ${selectedReplies.value.size} Antworten löschen möchten?`)
+  if (!confirmed) return
+  
   try {
     isSubmitting.value = true
     
-    // Check if content is provided
-    if (!selectedReply.value.content || selectedReply.value.content.trim() === '') {
-      showToast('Bitte geben Sie einen Inhalt ein', 'error')
-      isSubmitting.value = false
-      return
+    // Delete each selected reply
+    for (const replyId of selectedReplies.value) {
+      await bulletinService.deleteReply(props.message._id, replyId)
+      emit('reply-deleted', replyId)
     }
     
-    console.log('Updating reply as:', authStore.isAuthenticated ? 'Authenticated user' : 'Guest')
-    console.log('Auth state for update:', { 
-      isAuth: authStore.isAuthenticated,
-      userId: authStore.userId, 
-      userName: authStore.userName
-    })
+    // Clear selection
+    selectedReplies.value.clear()
     
-    const response = await bulletinProxyService.updateReply(
-      props.message.id, 
-      selectedReply.value._id, 
-      selectedReply.value.content
-    )
-    
-    if (response && response.data) {
-      showToast('Antwort wurde erfolgreich aktualisiert', 'success')
-      emit('reply-updated', response.data)
-      showEditForm.value = false
-      selectedReply.value = null
-    }
+    showToast('Antworten erfolgreich gelöscht', 'success')
   } catch (error) {
-    console.error('Error updating reply:', error)
-    console.error('Error response data:', error.response?.data)
-    
-    if (error.response?.status === 401) {
-      showToast('Bitte melden Sie sich an, um Antworten zu bearbeiten', 'error')
-    } else if (error.response?.status === 403) {
-      showToast('Sie haben keine Berechtigung, diese Antwort zu bearbeiten', 'error')
-    } else if (error.response?.status === 400) {
-      const errorMessage = error.response.data?.error || 'Validierungsfehler beim Aktualisieren der Antwort'
-      showToast(errorMessage, 'error')
-    } else if (error.response?.status === 500) {
-      showToast('Server-Fehler beim Verarbeiten der Antwort. Bitte versuchen Sie es später erneut.', 'error')
-    } else {
-      showToast('Fehler beim Aktualisieren der Antwort', 'error')
-    }
+    console.error('Error deleting replies:', error)
+    showToast('Fehler beim Löschen der Antworten', 'error')
   } finally {
     isSubmitting.value = false
-  }
-}
-
-const replyForm = reactive({
-  name: '',
-  email: '',
-  content: '',
-  privacyPolicyAccepted: false
-})
-
-// Add method to initialize form with user data
-const initializeFormWithUserData = () => {
-  if (authStore.isAuthenticated && authStore.user) {
-    replyForm.name = authStore.user.name || ''
-    replyForm.email = authStore.user.email || ''
-    replyForm.privacyPolicyAccepted = true // Since user is logged in, they've already accepted the privacy policy
-  }
-}
-
-// Update showReplyForm watcher to initialize form
-watch(showReplyForm, (newValue) => {
-  if (newValue) {
-    initializeFormWithUserData()
-  }
-})
-
-// Update closeReplyForm to reset form
-const closeReplyForm = () => {
-  showReplyForm.value = false
-  // Reset form
-  replyForm.name = ''
-  replyForm.email = ''
-  replyForm.content = ''
-  replyForm.privacyPolicyAccepted = false
-}
-
-const formatDate = (date) => {
-  return new Date(date).toLocaleDateString('de-DE', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  })
-}
-
-const submitReply = async () => {
-  try {
-    // Validate form
-    if (authStore.isAuthenticated) {
-      // For logged-in users, only content is required
-      if (!replyForm.content || replyForm.content.trim() === '') {
-        showToast('Bitte geben Sie einen Inhalt ein', 'error');
-        return;
-      }
-    } else {
-      // For guests, name, email, content and privacy policy are required
-      if (!replyForm.name || !replyForm.email || !replyForm.content || !replyForm.privacyPolicyAccepted) {
-        showToast('Bitte füllen Sie alle Pflichtfelder aus', 'error');
-        return;
-      }
-      
-      // Validate email format
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(replyForm.email)) {
-        showToast('Bitte geben Sie eine gültige E-Mail-Adresse ein', 'error');
-        return;
-      }
-    }
-    
-    isSubmitting.value = true;
-    
-    // Add debug info
-    console.log('Submitting reply as:', authStore.isAuthenticated ? 'Authenticated user' : 'Guest');
-    console.log('Auth state from store:', { 
-      isAuth: authStore.isAuthenticated,
-      userId: authStore.userId, 
-      userName: authStore.userName
-    });
-    
-    // Prepare form data based on user authentication status
-    let formData;
-    
-    if (authStore.isAuthenticated) {
-      // For authenticated users
-      formData = {
-        content: replyForm.content,
-        privacyPolicyAccepted: true  // Always set to true for authenticated users
-      };
-      
-      // Add name and email from auth store for compatibility
-      if (authStore.userName) {
-        formData.name = authStore.userName;
-      }
-      
-      if (authStore.userEmail) {
-        formData.email = authStore.userEmail;
-      }
-    } else {
-      // For guest users
-      formData = {
-        name: replyForm.name,
-        email: replyForm.email,
-        content: replyForm.content,
-        privacyPolicyAccepted: true  // Always set to true when submitting
-      };
-      
-      // Session ID will be handled by the bulletin service
-    }
-    
-    console.log('Sending form data:', {
-      content: formData.content.substring(0, 20) + '...',
-      name: formData.name || 'Using authenticated name',
-      email: formData.email || 'Using authenticated email',
-      privacyPolicyAccepted: formData.privacyPolicyAccepted
-    });
-    
-    const response = await bulletinProxyService.addReply(props.message.id, formData);
-    
-    if (response && response.data) {
-      showToast('Ihre Antwort wurde erfolgreich gesendet', 'success');
-      emit('reply-added', response.data);
-      closeReplyForm();
-    }
-  } catch (error) {
-    console.error('Error submitting reply:', error);
-    console.error('Error response data:', error.response?.data);
-    
-    if (error.response?.status === 401) {
-      showToast('Bitte melden Sie sich an, um eine Antwort zu senden', 'error');
-    } else if (error.response?.status === 400) {
-      // Handle validation errors from server
-      const errorMessage = error.response.data?.error || 'Validierungsfehler beim Senden der Antwort';
-      showToast(errorMessage, 'error');
-      
-      // If the error involves authentication, force guest mode
-      if (errorMessage.includes('Name and email') || errorMessage.includes('required for guest')) {
-        showToast('Ihre Sitzung scheint abgelaufen zu sein. Bitte überprüfen Sie Ihre Daten.', 'warning');
-      }
-    } else if (error.response?.status === 500) {
-      showToast('Server-Fehler beim Verarbeiten der Antwort. Bitte versuchen Sie es später erneut.', 'error');
-      console.error('Server error details:', error.response?.data);
-    } else if (error.response?.data?.error) {
-      showToast(error.response.data.error, 'error');
-    } else {
-      showToast('Fehler beim Senden der Antwort. Bitte überprüfen Sie Ihre Internetverbindung.', 'error');
-    }
-  } finally {
-    isSubmitting.value = false;
-  }
-}
-
-// Add delete reply method
-const deleteReply = async (reply) => {
-  try {
-    await bulletinProxyService.deleteReply(props.message.id, reply._id)
-    showToast('Antwort wurde erfolgreich gelöscht', 'success')
-    emit('reply-deleted', reply._id)
-    showDeleteConfirm.value = false
-    selectedReply.value = null
-  } catch (error) {
-    console.error('Error deleting reply:', error)
-    if (error.response?.status === 401) {
-      showToast('Bitte melden Sie sich an, um Antworten zu löschen', 'error')
-    } else if (error.response?.status === 403) {
-      showToast('Sie haben keine Berechtigung, diese Antwort zu löschen', 'error')
-    } else if (error.response?.status === 500) {
-      showToast('Server-Fehler beim Löschen der Antwort. Bitte versuchen Sie es später erneut.', 'error')
-      console.error('Server error details:', error.response?.data)
-    } else if (error.message === 'Please log in to delete replies') {
-      showToast('Bitte melden Sie sich an, um Antworten zu löschen', 'error')
-    } else {
-      showToast('Fehler beim Löschen der Antwort. Bitte überprüfen Sie Ihre Internetverbindung.', 'error')
-    }
   }
 }
 </script> 
