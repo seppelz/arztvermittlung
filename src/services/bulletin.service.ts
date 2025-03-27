@@ -297,25 +297,21 @@ async function addReply(bulletinId: string, reply: Partial<BulletinReply>): Prom
       }
     }
 
-    // Still no userId, reject the operation
-    if (!userIdToUse) {
-      console.error('BulletinService: Unable to determine user ID for reply');
-      throw new Error('Benutzer-ID konnte nicht ermittelt werden. Bitte aktualisieren Sie die Seite und versuchen Sie es erneut.');
-    }
-    
     // Get user info from auth store
     const userName = authStore.userName || 'Angemeldeter Benutzer';
     const userEmail = authStore.userEmail || '';
     
-    // Prepare reply data with proper type - IMPORTANT: DON'T include status field
-    // From the backend schema, we see the replies array doesn't have a status field
+    // Prepare reply data - include only fields the backend expects
+    // Based on backend controller code: content, privacyPolicyAccepted are required
+    // Auth token will identify the user; we don't need to send userId explicitly
     const replyData: Record<string, any> = {
       content: reply.content,
-      privacyPolicyAccepted: true,
-      userId: userIdToUse,
-      name: userName,
-      email: userEmail
+      privacyPolicyAccepted: true
     };
+    
+    // Only include these fields for backwards compatibility
+    if (userName) replyData.name = userName;
+    if (userEmail) replyData.email = userEmail;
     
     // Add authorization headers
     const headers: Record<string, string> = { 
@@ -324,9 +320,8 @@ async function addReply(bulletinId: string, reply: Partial<BulletinReply>): Prom
     };
     
     console.log('BulletinService: Using authenticated user data:', { 
-      name: replyData.name,
-      email: replyData.email,
-      userId: replyData.userId
+      name: replyData.name || 'Not provided - will use auth token',
+      email: replyData.email || 'Not provided - will use auth token'
     });
     
     // Log what we're sending
@@ -358,12 +353,6 @@ async function addReply(bulletinId: string, reply: Partial<BulletinReply>): Prom
       if (status === 400) {
         if (responseData?.error?.includes('validation')) {
           console.error('BulletinService: Validation error:', responseData.error);
-          
-          // Special handling for various validation errors
-          if (responseData.error.includes('status')) {
-            throw new Error('Statusfehler: Ein interner Fehler ist aufgetreten. Der Status-Wert wird vom Server nicht akzeptiert.');
-          }
-          
           throw new Error('Validierungsfehler: ' + responseData.error);
         }
         throw new Error('Ungültige Anfrage. Bitte überprüfen Sie Ihre Eingaben.');
