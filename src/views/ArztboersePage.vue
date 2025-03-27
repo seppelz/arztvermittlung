@@ -386,30 +386,40 @@ const contactForm = reactive({
 const filteredMessages = computed(() => {
   let result = [...messages.value];
   
+  console.log('Filtering messages:', messages.value.length, 'total entries');
+  console.log('Message types:', messages.value.map(m => m.messageType));
+  console.log('Message statuses:', messages.value.map(m => m.status));
+  
   // Show only Angebot and Gesuch messages
   result = result.filter(msg => msg.messageType === 'Angebot' || msg.messageType === 'Gesuch');
+  console.log('After messageType filter:', result.length, 'entries');
   
-  // Show only approved entries
-  result = result.filter(msg => msg.status === 'active' || msg.status === undefined); // Abwärtskompatibilität für bestehende Einträge
+  // Show both active and pending entries for testing
+  // result = result.filter(msg => msg.status === 'active' || msg.status === undefined);
+  console.log('Status values in data:', [...new Set(result.map(m => m.status))]);
   
   // Filtern nach Nachrichtentyp
   if (currentFilter.value !== 'all') {
     result = result.filter(msg => msg.messageType === currentFilter.value);
+    console.log('After currentFilter:', result.length, 'entries');
   }
   
   // Sortieren
   result.sort((a, b) => {
     if (sortOrder.value === 'newest') {
-      return b.timestamp - a.timestamp;
+      return new Date(b.timestamp) - new Date(a.timestamp);
     } else {
-      return a.timestamp - b.timestamp;
+      return new Date(a.timestamp) - new Date(b.timestamp);
     }
   });
   
   // Paginierung
   const startIndex = (currentPage.value - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  return result.slice(startIndex, endIndex);
+  const paginatedResult = result.slice(startIndex, endIndex);
+  console.log('Final paginated result:', paginatedResult.length, 'entries');
+  
+  return paginatedResult;
 });
 
 const totalPages = computed(() => {
