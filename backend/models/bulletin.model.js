@@ -39,8 +39,9 @@ const bulletinSchema = new mongoose.Schema({
   },
   userType: {
     type: String,
-    required: [true, 'Bitte geben Sie den Benutzertyp ein'],
-    enum: ['Arzt', 'Klinik']
+    required: false,
+    enum: ['Arzt', 'Klinik', 'anonymous'],
+    default: 'Arzt'
   },
   messageType: {
     type: String,

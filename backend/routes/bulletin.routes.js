@@ -82,8 +82,9 @@ router.get('/', bulletinController.getAllBulletins);
 router.get('/search', bulletinController.searchBulletins);
 router.get('/:id', bulletinController.getBulletin);
 
-// Guest routes (require session)
-router.post('/', sessionMiddleware.validateSession, bulletinController.createBulletin);
+// Routes that require authentication
+// Changed from sessionMiddleware to authMiddleware to require login
+router.post('/', authMiddleware.protect, bulletinController.createBulletin);
 
 // Protected routes (require auth)
 router.use(authMiddleware.protect);

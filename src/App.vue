@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
+import AppHeader from '@/components/layout/AppHeader.vue'
 import AppFooter from '@/components/layout/AppFooter.vue'
 import ToastNotification from '@/components/ToastNotification.vue'
 import CookieBanner from '@/components/CookieBanner.vue'
@@ -82,6 +83,8 @@ const showApiWarning = computed(() => {
         Erneut versuchen
       </button>
     </div>
+    
+    <AppHeader />
     
     <main class="flex-grow main-content">
       <RouterView />

@@ -179,6 +179,12 @@ const initializeApp = async (): Promise<void> => {
     try {
       // 4. Attach router to the app
       app.use(router);
+      
+      // Add proper error handling for router navigation errors
+      router.onError((error) => {
+        console.error('Router navigation error:', error);
+      });
+      
       console.log('Router initialized');
     } catch (error) {
       console.error('Error installing router:', error);

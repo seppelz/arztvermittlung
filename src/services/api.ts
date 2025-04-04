@@ -12,7 +12,8 @@ interface ApiConfig {
 
 // Create base API configuration
 const apiConfig: ApiConfig = {
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
+  // Use local development proxy that forwards to production
+  baseURL: '/api',
   timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
@@ -20,32 +21,38 @@ const apiConfig: ApiConfig = {
   }
 };
 
-// Create axios instance with configuration
-const apiClient: AxiosInstance = axios.create(apiConfig);
+// Log the configured API URL
+console.log('Configured API URL:', apiConfig.baseURL);
+
+// Create axios instance with configuration and withCredentials
+const apiClient: AxiosInstance = axios.create({
+  ...apiConfig,
+  withCredentials: true // Critical: ensure cookies are sent with every request
+});
 
 // Request interceptor to attach auth token if available
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig): InternalAxiosRequestConfig => {
-    const authStore = useAuthStore();
-    const token = authStore.token;
+    // Get token directly from localStorage to avoid any store-related issues
+    const token = localStorage.getItem('token');
     
-    // Only attach token if we have one
+    // Always attach token if it exists, regardless of auth store state
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
-    }
-    
-    // Log requests in development
-    if (import.meta.env.DEV) {
-      console.log(`API Request: ${config.method?.toUpperCase()} ${config.url}`, { 
-        params: config.params, 
-        data: config.data 
-      });
+      
+      // Log first 10 chars of token for debugging (safe to log)
+      console.log(`[API] Request: ${config.method?.toUpperCase()} ${config.url} with auth token: ${token.substring(0, 10)}...`);
+      
+      // Add withCredentials flag to ensure cookies are sent
+      config.withCredentials = true;
+    } else {
+      console.log(`[API] Request: ${config.method?.toUpperCase()} ${config.url} WITHOUT auth token`);
     }
     
     return config;
   },
   (error: any) => {
-    console.error('API Request Error:', error);
+    console.error('[API] Request Error:', error);
     return Promise.reject(error);
   }
 );
@@ -54,7 +61,7 @@ apiClient.interceptors.request.use(
 apiClient.interceptors.response.use(
   (response: AxiosResponse): AxiosResponse => {
     // Log successful responses in development
-    if (import.meta.env.DEV) {
+    if (import.meta.env.DEV && response.config.url) {
       console.log(`API Response: ${response.status} ${response.config.url}`, { 
         data: response.data 
       });
@@ -62,7 +69,57 @@ apiClient.interceptors.response.use(
     
     return response;
   },
-  (error: any) => {
+  async (error: any) => {
+    // Handle 401 Unauthorized errors
+    if (error.response && error.response.status === 401) {
+      console.warn('API: Received 401 Unauthorized response', {
+        url: error.config?.url,
+        method: error.config?.method
+      });
+      
+      // Get the auth store to check authentication status
+      try {
+        const authStore = useAuthStore();
+        
+        // Dispatch an auth error event that components can listen for
+        const authErrorEvent = new CustomEvent('auth:error', { 
+          detail: { 
+            status: 401,
+            message: 'Authentication failed',
+            timestamp: new Date().toISOString()
+          } 
+        });
+        window.dispatchEvent(authErrorEvent);
+        
+        // If we think we're authenticated but get a 401, something is wrong with the token
+        if (authStore.isAuthenticated) {
+          console.warn('API: 401 error while authenticated - possible token issue');
+          
+          // Try to refresh auth state before logging out
+          await authStore.initAuth();
+          
+          // If re-initialization doesn't help, clear auth
+          if (!authStore.validateToken()) {
+            console.warn('API: Token validation failed after 401 - logging out');
+            authStore.clearAuth();
+          }
+        }
+      } catch (authError) {
+        console.error('API: Failed to handle 401 error:', authError);
+      }
+    }
+    
+    // Log all API errors in development
+    if (import.meta.env.DEV) {
+      console.error('API Response Error:', {
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        url: error.config?.url,
+        method: error.config?.method,
+        data: error.response?.data
+      });
+    }
+    
     // Handle common error scenarios
     if (error.response) {
       // Server responded with an error
@@ -194,4 +251,4 @@ const api = {
   }
 };
 
-export default api; 
+export default api;

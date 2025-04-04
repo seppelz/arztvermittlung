@@ -30,18 +30,11 @@
             Startseite
           </router-link>
           <router-link
-            :to="{ name: 'ForDoctors' }"
+            :to="{ name: 'Arztboerse' }"
             class="nav-link"
             active-class="nav-link-active"
           >
-            Für Ärzte
-          </router-link>
-          <router-link
-            :to="{ name: 'ForHospitals' }"
-            class="nav-link"
-            active-class="nav-link-active"
-          >
-            Für Kliniken
+            Stellenbörse
           </router-link>
           <router-link
             :to="{ name: 'BulletinBoard' }"
@@ -49,13 +42,6 @@
             active-class="nav-link-active"
           >
             Pinnwand
-          </router-link>
-          <router-link
-            :to="{ name: 'Arztboerse' }"
-            class="nav-link"
-            active-class="nav-link-active"
-          >
-            Stellenbörse
           </router-link>
           <router-link
             :to="{ name: 'About' }"
@@ -169,20 +155,12 @@
             Startseite
           </router-link>
           <router-link
-            :to="{ name: 'ForDoctors' }"
+            :to="{ name: 'Arztboerse' }"
             @click="mobileMenuOpen = false"
             class="mobile-nav-link"
             active-class="mobile-nav-link-active"
           >
-            Für Ärzte
-          </router-link>
-          <router-link
-            :to="{ name: 'ForHospitals' }"
-            @click="mobileMenuOpen = false"
-            class="mobile-nav-link"
-            active-class="mobile-nav-link-active"
-          >
-            Für Kliniken
+            Stellenbörse
           </router-link>
           <router-link
             :to="{ name: 'BulletinBoard' }"
@@ -191,14 +169,6 @@
             active-class="mobile-nav-link-active"
           >
             Pinnwand
-          </router-link>
-          <router-link
-            :to="{ name: 'Arztboerse' }"
-            @click="mobileMenuOpen = false"
-            class="mobile-nav-link"
-            active-class="mobile-nav-link-active"
-          >
-            Arztbörse
           </router-link>
           <router-link
             :to="{ name: 'About' }"
@@ -335,4 +305,4 @@ onUnmounted(() => {
 .logout-btn {
   @apply text-red-100 hover:bg-red-700/40;
 }
-</style> 
+</style>

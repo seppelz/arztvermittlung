@@ -137,16 +137,6 @@ const routes: RouteRecordRaw[] = [
     meta: { requiresAuth: true }
   },
   {
-    path: '/for-doctors',
-    name: 'ForDoctors',
-    component: () => import('@/views/ForDoctorsPage.vue')
-  },
-  {
-    path: '/for-hospitals',
-    name: 'ForHospitals',
-    component: () => import('@/views/ForHospitalsPage.vue')
-  },
-  {
     path: '/about',
     name: 'About',
     component: () => import('@/views/AboutPage.vue')
@@ -229,6 +219,12 @@ const routes: RouteRecordRaw[] = [
         path: 'settings',
         name: 'AdminSettings',
         component: () => import('@/views/admin/AdminSettings.vue'),
+        meta: { requiresAuth: true }
+      },
+      {
+        path: 'matches',
+        name: 'AdminMatches',
+        component: () => import('@/views/admin/MatchesView.vue'),
         meta: { requiresAuth: true }
       }
     ]
@@ -455,6 +451,9 @@ router.addRoute({
   path: '/error',
   name: 'Error',
   component: defineComponent({
+    props: {
+      error: Object
+    },
     setup() {
       // Get error details from route query parameters
       const route = router.currentRoute.value;

@@ -40,8 +40,9 @@ const validateOrCreateSession = (req, res, next) => {
  * Middleware that requires a valid session (stricter than validateOrCreateSession)
  */
 const validateSession = (req, res, next) => {
-  // Skip validation for authenticated users
+  // Always skip validation for authenticated users
   if (req.user) {
+    console.log('Session middleware: Authenticated user detected, bypassing session validation');
     return next();
   }
 

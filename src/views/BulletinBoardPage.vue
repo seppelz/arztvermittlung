@@ -1,3 +1,503 @@
+<script setup lang="ts">
+import { ref, reactive, computed, onMounted } from 'vue'
+import bulletinProxyService from '@/services/bulletinProxyService'
+import ReplySection from '@/components/bulletin/ReplySection.vue'
+import { Bulletin, UIBulletinReply } from '@/types'
+import { useAuthStore } from '@/stores/auth'
+import { useRouter } from 'vue-router'
+import { useToast } from '@/composables/useToast'
+
+// Define interfaces for type safety
+interface BulletinMessage {
+  id: string;
+  _id: string; // Match Bulletin's required _id
+  title?: string; // Make optional to match Bulletin
+  content: string;
+  name: string;
+  email: string;
+  timestamp: Date;
+  messageType: string;
+  status: string;
+  replies?: UIBulletinReply[];
+  userType: 'anonymous' | 'registered' | string;
+  createdAt: Date; // Match Bulletin's required createdAt
+  updatedAt: Date; // Match Bulletin's required updatedAt
+  [key: string]: any; // Allow other properties
+}
+
+// Local form interfaces
+interface NewMessage {
+  name: string;
+  email: string;
+  title: string;
+  content: string;
+  userType: string;
+  messageType: string;
+  [key: string]: string; // Add index signature for dynamic property access
+}
+
+interface ContactForm {
+  name: string;
+  email: string;
+  message: string;
+}
+
+// Zustandsvariablen
+const messages = ref<BulletinMessage[]>([]);
+const sortOrder = ref<'newest' | 'oldest'>('newest');
+const currentPage = ref<number>(1);
+const itemsPerPage = 6;
+const isSubmitting = ref<boolean>(false);
+const messageSent = ref<boolean>(false);
+const showContactModal = ref<boolean>(false);
+const showLoginModal = ref<boolean>(false);
+const selectedMessage = ref<BulletinMessage>({} as BulletinMessage);
+const isLoading = ref<boolean>(true);
+const loadError = ref<string | null>(null);
+const error = ref<string | null>(null);
+const fieldErrors = ref<Record<string, string>>({});
+const authStore = useAuthStore();
+const router = useRouter();
+const { showToast } = useToast();
+
+// Helper function to convert server replies to UI replies
+function convertServerReplies(bulletin: Bulletin): UIBulletinReply[] {
+  if (!bulletin.replies || bulletin.replies.length === 0) {
+    return [];
+  }
+  
+  return bulletin.replies.map(reply => ({
+    _id: reply._id,
+    bulletinId: bulletin._id, // Add bulletinId from parent
+    content: reply.content,
+    name: reply.name,
+    email: reply.email,
+    timestamp: reply.timestamp,
+    edited: reply.edited,
+    userId: reply.userId,
+    sessionId: reply.sessionId,
+    privacyPolicyAccepted: true // Always set to true for UI consistency
+  }));
+}
+
+// Ensure auth store is initialized before fetching bulletins
+onMounted(async () => {
+  console.log('[BulletinBoardPage] Component mounted');
+  
+  // Check if auth store is initialized
+  if (!authStore.initialized) {
+    console.log('[BulletinBoardPage] Auth store not initialized, initializing now');
+    await authStore.initAuth();
+  }
+  
+  // Log authentication status
+  console.log('[BulletinBoardPage] Auth status on mount:', 
+    authStore.isAuthenticated ? 'Authenticated' : 'Not authenticated');
+  console.log('[BulletinBoardPage] User data:', authStore.user);
+  
+  // Fetch bulletins
+  await fetchBulletins();
+});
+
+/**
+ * Fetch bulletins from the server
+ */
+async function fetchBulletins(): Promise<void> {
+  isLoading.value = true;
+  loadError.value = null;
+  
+  try {
+    console.log('[BulletinBoardPage] Fetching bulletins');
+    console.log('[BulletinBoardPage] Auth status:', 
+      authStore.isAuthenticated ? 'Authenticated' : 'Not authenticated');
+    console.log('[BulletinBoardPage] Auth token exists:', !!authStore.token);
+    
+    // Make sure auth is initialized before proceeding
+    if (!authStore.initialized) {
+      console.log('[BulletinBoardPage] Auth store not initialized, initializing now');
+      await authStore.initAuth();
+    }
+    
+    let bulletinsData = [];
+    const response = await bulletinProxyService.getAllBulletins({
+      sort: sortOrder.value === 'newest' ? '-createdAt' : 'createdAt',
+      status: 'active', // First try with active status
+      messageType: 'Information'
+    });
+    
+    bulletinsData = response?.data || [];
+    console.log(`[BulletinBoardPage] Fetched ${bulletinsData.length} active bulletins:`, bulletinsData);
+    
+    // If no active bulletins found, try with pending status
+    if (bulletinsData.length === 0) {
+      console.log('[BulletinBoardPage] No active bulletins found, trying pending status');
+      const pendingResponse = await bulletinProxyService.getAllBulletins({
+        sort: sortOrder.value === 'newest' ? '-createdAt' : 'createdAt',
+        status: 'pending',
+        messageType: 'Information'
+      });
+      
+      bulletinsData = pendingResponse?.data || [];
+      console.log(`[BulletinBoardPage] Fetched ${bulletinsData.length} pending bulletins:`, bulletinsData);
+    }
+    
+    // As fallback, try without status filter if still no bulletins found
+    if (bulletinsData.length === 0) {
+      console.log('[BulletinBoardPage] No bulletins found with status filters, trying without status filter');
+      const allResponse = await bulletinProxyService.getAllBulletins({
+        sort: sortOrder.value === 'newest' ? '-createdAt' : 'createdAt',
+        messageType: 'Information'
+      });
+      
+      bulletinsData = allResponse?.data || [];
+      console.log(`[BulletinBoardPage] Fetched ${bulletinsData.length} bulletins without status filter:`, bulletinsData);
+    }
+    
+    if (bulletinsData.length === 0) {
+      console.log('[BulletinBoardPage] No bulletins found');
+      messages.value = [];
+      return;
+    }
+    
+    // Process bulletins into UI format with proper type conversions
+    messages.value = bulletinsData.map((item: Bulletin) => {
+      // Ensure all required fields exist and handle any missing data
+      const bulletin = {
+        ...item,
+        createdAt: item.createdAt || new Date(),
+        updatedAt: item.updatedAt || new Date(),
+        status: item.status || 'published',
+        messageType: item.messageType || 'Information'
+      };
+      
+      // Process server timestamp to client-side Date
+      const timestamp = bulletin.createdAt instanceof Date 
+        ? bulletin.createdAt 
+        : new Date(bulletin.createdAt);
+        
+      // Convert server replies to UI-friendly format
+      const uiReplies = bulletin.replies ? convertServerReplies(bulletin) : [];
+      
+      // Create a UI-friendly message object
+      const message: BulletinMessage = {
+        id: bulletin._id,
+        _id: bulletin._id,
+        title: bulletin.title || '',
+        content: bulletin.content,
+        name: bulletin.name,
+        email: bulletin.email,
+        status: bulletin.status,
+        messageType: bulletin.messageType,
+        timestamp: timestamp,
+        createdAt: bulletin.createdAt,
+        updatedAt: bulletin.updatedAt,
+        userType: bulletin.userId ? 'registered' : 'anonymous',
+        replies: uiReplies
+      };
+      
+      return message;
+    });
+    
+    console.log('[BulletinBoardPage] Bulletins processed successfully:', messages.value.length);
+  } catch (error: any) {
+    console.error('[BulletinBoardPage] Error fetching bulletins:', error);
+    
+    // Check for authentication errors
+    if (error.response?.status === 401) {
+      loadError.value = 'Ihre Sitzung ist abgelaufen. Bitte melden Sie sich erneut an.';
+      showToast('Authentifizierungsfehler: Sie sind nicht mehr eingeloggt', 'error');
+      
+      // Clear auth state and redirect to login if necessary
+      if (authStore.isAuthenticated) {
+        authStore.clearAuth();
+        router.push('/login');
+      }
+    } else {
+      loadError.value = 'Fehler beim Laden der Daten';
+      showToast('Es ist ein Fehler beim Laden der Einträge aufgetreten', 'error');
+    }
+  } finally {
+    isSubmitting.value = false;
+    isLoading.value = false;
+  }
+}
+
+/**
+ * Submit a new bulletin message
+ */
+async function submitMessage(): Promise<void> {
+  try {
+    isSubmitting.value = true;
+    error.value = null;
+    
+    // Check authentication status
+    const isLoggedIn = authStore.isAuthenticated;
+    
+    console.log('[BulletinBoard] Authentication check before submission:', {
+      isAuthenticated: isLoggedIn,
+      hasUser: !!authStore.user,
+      userId: authStore.user?._id,
+      token: localStorage.getItem('token') ? 'Present (truncated): ' + localStorage.getItem('token')?.substring(0, 20) + '...' : 'Not found'
+    });
+
+    if (!isLoggedIn) {
+      error.value = 'Sie müssen angemeldet sein, um Einträge zu erstellen';
+      showLoginModal.value = true;
+      isSubmitting.value = false;
+      return;
+    }
+    
+    // Validate form
+    const requiredFields = ['title', 'content'];
+    let hasErrors = false;
+    
+    requiredFields.forEach(field => {
+      if (!newMessage[field]) {
+        fieldErrors.value[field] = 'Dieses Feld ist erforderlich';
+        hasErrors = true;
+      }
+    });
+    
+    if (hasErrors) {
+      error.value = 'Bitte füllen Sie alle erforderlichen Felder aus';
+      isSubmitting.value = false;
+      return;
+    }
+    
+    console.log('[BulletinBoard] Creating bulletin with form data:', {
+      title: newMessage.title,
+      type: newMessage.messageType || 'Information'
+    });
+    
+    // Attempt to create bulletin
+    const { success, message } = await bulletinProxyService.createBulletin({
+      title: newMessage.title,
+      content: newMessage.content,
+      messageType: newMessage.messageType || 'Information'
+    });
+    
+    console.log('[BulletinBoard] Bulletin creation response:', { success, message });
+    
+    if (success) {
+      // Reset form data
+      newMessage.title = '';
+      newMessage.content = '';
+      newMessage.messageType = 'Information';
+      
+      // Update bulletin list
+      await fetchBulletins();
+      
+      // Show success message
+      messageSent.value = true;
+      setTimeout(() => {
+        messageSent.value = false;
+      }, 3000);
+    } else {
+      error.value = message || 'Fehler beim Erstellen des Eintrags. Bitte versuchen Sie es später erneut.';
+      
+      // If authentication error, show login modal
+      if (message && message.includes('anmelden')) {
+        showLoginModal.value = true;
+      }
+    }
+  } catch (err: any) {
+    console.error('[BulletinBoard] Error:', err);
+    error.value = 'Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.';
+  } finally {
+    isSubmitting.value = false;
+  }
+}
+
+// Formulare
+const newMessage = reactive<NewMessage>({
+  name: '',
+  email: '',
+  title: '',
+  content: '',
+  userType: '',
+  messageType: 'Information',
+})
+
+const contactForm = reactive<ContactForm>({
+  name: '',
+  email: '',
+  message: ''
+});
+
+// Computed Properties
+const totalPages = computed(() => Math.ceil(messages.value.length / itemsPerPage));
+
+const filteredMessages = computed(() => {
+  // Apply sorting based on the selected order
+  const sortedMessages = [...messages.value].sort((a, b) => {
+    if (sortOrder.value === 'newest') {
+      return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
+    } else {
+      return new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime();
+    }
+  });
+  
+  // Apply pagination
+  const startIndex = (currentPage.value - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  return sortedMessages.slice(startIndex, endIndex);
+});
+
+// Helper function to check if the current user can edit a message
+function canEditMessage(message: BulletinMessage): boolean {
+  if (!authStore.isAuthenticated) return false;
+  
+  // Admin can edit all messages
+  if (authStore.isAdmin) return true;
+  
+  // User can edit their own messages
+  return message.userId === authStore.userId;
+}
+
+// Methoden
+function sortMessages(): void {
+  // Sortierung wird in der computed property angewendet
+  currentPage.value = 1; // Zurück zur ersten Seite
+}
+
+function formatDate(date: string | Date): string {
+  return new Date(date).toLocaleDateString('de-DE', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  });
+}
+
+function prevPage(): void {
+  if (currentPage.value > 1) {
+    currentPage.value--;
+  }
+}
+
+function nextPage(): void {
+  if (currentPage.value < totalPages.value) {
+    currentPage.value++;
+  }
+}
+
+function goToPage(page: number): void {
+  currentPage.value = page;
+}
+
+function contactPoster(message: BulletinMessage): void {
+  selectedMessage.value = message;
+  showContactModal.value = true;
+}
+
+function closeContactModal(): void {
+  showContactModal.value = false;
+  // Formular zurücksetzen
+  contactForm.name = '';
+  contactForm.email = '';
+  contactForm.message = '';
+}
+
+function sendContact(): void {
+  // Hier würden wir normalerweise eine API-Anfrage senden
+  console.log('Kontaktanfrage gesendet:', {
+    to: selectedMessage.value.email,
+    from: contactForm
+  });
+  
+  // Schließe das Modal und zeige eine Erfolgsmeldung
+  alert('Ihre Nachricht wurde gesendet!');
+  closeContactModal();
+}
+
+const handleReplyAdded = (reply: UIBulletinReply): void => {
+  // Find the bulletin this reply belongs to
+  const bulletinIndex = messages.value.findIndex(message => message.id === reply.bulletinId);
+  if (bulletinIndex !== -1) {
+    console.log(`Adding reply to bulletin at index ${bulletinIndex}`);
+    
+    // If replies array doesn't exist, initialize it
+    if (!messages.value[bulletinIndex].replies) {
+      messages.value[bulletinIndex].replies = [];
+    }
+    
+    // Add the new reply to the bulletin
+    messages.value[bulletinIndex].replies?.push({
+      ...reply,
+      privacyPolicyAccepted: true // Ensure this is always true for UI consistency
+    });
+  }
+}
+
+const handleReplyUpdated = (updatedReply: UIBulletinReply): void => {
+  // Find the bulletin this reply belongs to
+  const bulletinIndex = messages.value.findIndex(message => message.id === updatedReply.bulletinId);
+  if (bulletinIndex !== -1) {
+    console.log(`Updating reply in bulletin at index ${bulletinIndex}`);
+    
+    // Find the reply to update
+    const replies = messages.value[bulletinIndex].replies || [];
+    const replyIndex = replies.findIndex(reply => reply._id === updatedReply._id);
+    
+    if (replyIndex !== -1) {
+      // Update the reply
+      messages.value[bulletinIndex].replies![replyIndex] = {
+        ...updatedReply,
+        privacyPolicyAccepted: true // Ensure this is always true for UI consistency
+      };
+    }
+  }
+}
+
+const handleReplyDeleted = (replyId: string): void => {
+  // Find the bulletin containing this reply
+  const bulletinIndex = messages.value.findIndex(
+    message => message.replies?.some(reply => reply._id === replyId)
+  );
+  
+  if (bulletinIndex !== -1) {
+    console.log(`Removing reply ${replyId} from bulletin at index ${bulletinIndex}`);
+    
+    // Remove the reply
+    const replies = messages.value[bulletinIndex].replies || [];
+    messages.value[bulletinIndex].replies = replies.filter(reply => reply._id !== replyId);
+  }
+}
+
+async function deleteMessage(message: BulletinMessage): Promise<void> {
+  if (!canEditMessage(message)) {
+    alert('Sie sind nicht berechtigt, diese Nachricht zu löschen.');
+    return;
+  }
+
+  if (!confirm('Möchten Sie diese Nachricht wirklich löschen?')) {
+    return;
+  }
+
+  try {
+    // Call the API to delete the message
+    await bulletinProxyService.deleteBulletin(message.id);
+    
+    // Remove the message from the local list
+    messages.value = messages.value.filter(m => m.id !== message.id);
+    
+    alert('Nachricht erfolgreich gelöscht!');
+  } catch (err) {
+    console.error('Error deleting bulletin:', err);
+    alert('Fehler beim Löschen der Nachricht. Bitte versuchen Sie es später erneut.');
+  }
+}
+
+function editMessage(message: BulletinMessage): void {
+  if (!canEditMessage(message)) {
+    alert('Sie sind nicht berechtigt, diese Nachricht zu bearbeiten.');
+    return;
+  }
+  
+  // For now, just show an alert. A proper implementation would use a modal or redirect to an edit page
+  alert('Diese Funktion ist noch in Entwicklung. Sie können Ihre Nachricht später bearbeiten.');
+}
+</script>
+
 <template>
   <div>
     <section class="bg-dark text-white py-12">
@@ -33,9 +533,37 @@
           </div>
         </div>
         
+        <!-- Loading indicator -->
+        <div v-if="isLoading" class="max-w-7xl mx-auto text-center py-12">
+          <div class="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+          <p class="mt-4 text-gray-600">Lade Informationen...</p>
+        </div>
+        
+        <!-- Error message -->
+        <div v-else-if="loadError" class="max-w-7xl mx-auto py-8">
+          <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded shadow">
+            <div class="flex">
+              <div class="flex-shrink-0">
+                <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                </svg>
+              </div>
+              <div class="ml-3">
+                <p class="text-red-700">{{ loadError }}</p>
+                <button 
+                  @click="fetchBulletins" 
+                  class="mt-2 px-3 py-1 text-xs font-medium rounded bg-red-100 text-red-800 hover:bg-red-200 transition-colors"
+                >
+                  Erneut versuchen
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
         <!-- Nachrichten-Grid -->
-        <div class="max-w-7xl mx-auto mb-16">
-          <div v-if="filteredMessages.length === 0" class="text-center py-8">
+        <div v-else class="max-w-7xl mx-auto mb-16">
+          <div v-if="messages.length === 0" class="text-center py-8">
             <p class="text-gray-500 text-lg">Keine Informationen gefunden. Erstellen Sie die erste!</p>
           </div>
           
@@ -65,10 +593,27 @@
                       <button 
                         @click="contactPoster(message)" 
                         class="text-white bg-primary hover:bg-primary-dark font-medium px-4 py-1 rounded-lg shadow-sm transform hover:scale-105 transition-all"
-                        title="Kontakt aufnehmen"
+                        title="Kontakt"
                       >
                         Kontakt
                       </button>
+                      <!-- Edit and delete buttons for authenticated users -->
+                      <template v-if="authStore.isAuthenticated && canEditMessage(message)">
+                        <button 
+                          @click="editMessage(message)" 
+                          class="text-white bg-orange-500 hover:bg-orange-700 font-medium px-4 py-1 rounded-lg shadow-sm transform hover:scale-105 transition-all"
+                          title="Bearbeiten"
+                        >
+                          Bearbeiten
+                        </button>
+                        <button 
+                          @click="deleteMessage(message)" 
+                          class="text-white bg-red-500 hover:bg-red-700 font-medium px-4 py-1 rounded-lg shadow-sm transform hover:scale-105 transition-all"
+                          title="Löschen"
+                        >
+                          Löschen
+                        </button>
+                      </template>
                     </div>
                   </div>
                 </div>
@@ -116,48 +661,40 @@
           </div>
         </div>
         
-        <!-- Neue Nachricht erstellen - Breiteres, kompakteres Formular -->
+        <!-- Neue Nachricht erstellen - Bedingt nach Authentifizierungsstatus -->
         <div class="max-w-7xl mx-auto bg-white rounded-lg shadow-strong p-6 mb-8 border border-gray-200">
           <h2 class="text-2xl md:text-3xl font-bold mb-6 text-center text-heading border-b-2 border-primary pb-3">Neue Nachricht anpinnen</h2>
           
-          <form @submit.prevent="submitMessage" class="space-y-5">
-            <!-- Zwei-Spalten-Layout für kompakteren Look -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-              <div>
-                <label for="name" class="block text-text-dark font-semibold mb-1">Name</label>
-                <input 
-                  type="text" 
-                  id="name" 
-                  v-model="newMessage.name" 
-                  class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm"
-                  placeholder="Ihr Name oder Einrichtung"
-                />
-              </div>
+          <!-- Authentifizierungsaufforderung für nicht angemeldete Benutzer -->
+          <div v-if="!authStore.isAuthenticated" class="py-6">
+            <div class="text-center mb-6">
+              <h3 class="text-xl font-semibold text-gray-800 mb-3">Melden Sie sich an, um einen Beitrag zu erstellen</h3>
+              <p class="text-gray-600 mb-5">Um eine Nachricht zu veröffentlichen, Beiträge zu bearbeiten oder zu löschen, müssen Sie angemeldet sein.</p>
               
-              <div>
-                <label for="email" class="block text-text-dark font-semibold mb-1">E-Mail*</label>
-                <input 
-                  type="email" 
-                  id="email" 
-                  v-model="newMessage.email" 
-                  required 
-                  class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm"
-                  placeholder="ihre-email@beispiel.de"
-                />
-              </div>
-              
-              <div>
-                <label for="phone" class="block text-text-dark font-semibold mb-1">Telefonnummer</label>
-                <input 
-                  type="tel" 
-                  id="phone" 
-                  v-model="newMessage.phone" 
-                  class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm"
-                  placeholder="Ihre Telefonnummer"
-                />
+              <div class="flex justify-center space-x-4">
+                <router-link to="/login" class="inline-block px-6 py-3 bg-primary text-primary font-bold rounded-lg broder-2 border-primary hover:bg-primary-dark transition-colors shadow-md">
+                  <span class="text-lg">Anmelden</span>
+                </router-link>
+                <router-link to="/register" class="inline-block px-6 py-3 bg-white text-primary font-bold rounded-lg border-2 border-primary hover:bg-blue-50 transition-colors shadow-sm">
+                  <span class="text-lg">Registrieren</span>
+                </router-link>
               </div>
             </div>
             
+            <div class="border-t border-gray-200 pt-5 mt-5">
+              <div class="flex items-center justify-center">
+                <div class="bg-primary-100 rounded-full p-3 mr-3">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <p class="text-gray-600 text-sm">Die Registrierung ermöglicht es Ihnen, Ihre Beiträge später zu bearbeiten oder zu löschen.</p>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Vereinfachtes Formular für angemeldete Benutzer -->
+          <form v-else @submit.prevent="submitMessage" class="space-y-5">
             <div>
               <label for="title" class="block text-text-dark font-semibold mb-1">Titel*</label>
               <input 
@@ -171,31 +708,6 @@
             </div>
             
             <div>
-              <label for="specialty" class="block text-text-dark font-semibold mb-1">Fachrichtung</label>
-              <input 
-                type="text" 
-                id="specialty" 
-                v-model="newMessage.specialty" 
-                class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm"
-                placeholder="Ihre Fachrichtung (optional)"
-              />
-            </div>
-            
-            <div>
-              <label for="userType" class="block text-text-dark font-semibold mb-1">Sie sind*</label>
-              <select 
-                id="userType" 
-                v-model="newMessage.userType" 
-                required 
-                class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm appearance-none"
-              >
-                <option value="">Bitte wählen</option>
-                <option value="Arzt">Arzt</option>
-                <option value="Klinik">Klinik/Einrichtung</option>
-              </select>
-            </div>
-            
-            <div>
               <label for="content" class="block text-text-dark font-semibold mb-1">Nachricht*</label>
               <textarea 
                 id="content" 
@@ -205,13 +717,6 @@
                 class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm"
                 placeholder="Ihre Information hier..."
               ></textarea>
-            </div>
-            
-            <div class="flex items-start">
-              <input type="checkbox" id="privacyPolicy" v-model="newMessage.privacyPolicyAccepted" required class="mt-1 mr-2 w-5 h-5 text-primary border-2 border-gray-300 rounded focus:ring-primary" />
-              <label for="privacyPolicy" class="text-sm text-gray-700">
-                Ich habe die <router-link to="/privacy" class="text-primary hover:underline font-medium">Datenschutzerklärung</router-link> gelesen und akzeptiere diese.*
-              </label>
             </div>
             
             <div class="text-center">
@@ -275,334 +780,3 @@
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-import { ref, reactive, computed, onMounted } from 'vue'
-import bulletinProxyService from '@/services/bulletinProxyService'
-import ReplySection from '@/components/bulletin/ReplySection.vue'
-import { Bulletin } from '@/types'
-
-// Define interfaces for type safety
-interface BulletinMessage extends Omit<Bulletin, 'replies'> {
-  id: string;
-  timestamp: string | Date;
-  userType: string;
-  replies?: UIBulletinReply[];
-  [key: string]: any; // Allow other properties
-}
-
-// UI-specific bulletin reply that includes bulletinId
-interface UIBulletinReply {
-  _id: string;
-  bulletinId: string;
-  content: string;
-  name: string;
-  timestamp: Date;
-  email: string;
-  privacyPolicyAccepted: boolean;
-  userId?: string;
-  sessionId?: string;
-}
-
-interface NewMessage {
-  name: string;
-  email: string;
-  phone: string;
-  title: string;
-  specialty: string;
-  content: string;
-  userType: string;
-  privacyPolicyAccepted: boolean;
-  messageType: string;
-}
-
-interface ContactForm {
-  name: string;
-  email: string;
-  message: string;
-}
-
-// Zustandsvariablen
-const messages = ref<BulletinMessage[]>([]);
-const sortOrder = ref<'newest' | 'oldest'>('newest');
-const currentPage = ref<number>(1);
-const itemsPerPage = 6;
-const isSubmitting = ref<boolean>(false);
-const messageSent = ref<boolean>(false);
-const showContactModal = ref<boolean>(false);
-const selectedMessage = ref<BulletinMessage>({} as BulletinMessage);
-const isLoading = ref<boolean>(true);
-const loadError = ref<string | null>(null);
-
-// Helper function to convert server replies to UI replies
-function convertServerReplies(bulletin: Bulletin): UIBulletinReply[] {
-  if (!bulletin.replies || bulletin.replies.length === 0) {
-    return [];
-  }
-  
-  return bulletin.replies.map(reply => ({
-    _id: reply._id,
-    bulletinId: bulletin._id, // Add bulletinId from parent
-    content: reply.content,
-    name: reply.name,
-    email: reply.email,
-    timestamp: reply.timestamp instanceof Date ? reply.timestamp : new Date(reply.timestamp),
-    privacyPolicyAccepted: reply.privacyPolicyAccepted,
-    userId: reply.userId,
-    sessionId: reply.sessionId
-  }));
-}
-
-// Fetch actual bulletin board entries using the proxy service that now only uses real data
-const fetchBulletins = async (): Promise<void> => {
-  isLoading.value = true;
-  loadError.value = null;
-  
-  try {
-    console.log('Fetching bulletins via proxy service');
-    
-    const response = await bulletinProxyService.getAllBulletins({
-      messageType: 'Information',
-      sort: '-timestamp'
-    });
-    
-    if (response && response.data) {
-      // Process real API data
-      messages.value = response.data.map((item: Bulletin) => {
-        // Convert replies for UI usage
-        const uiReplies = convertServerReplies(item);
-        
-        return {
-          ...item,
-          id: item._id, // Add id field based on _id
-          userType: item.userId ? 'registered' : 'anonymous', // Derive userType
-          timestamp: item.createdAt || new Date(), // Use createdAt as timestamp
-          replies: uiReplies
-        };
-      });
-      
-      console.log('Loaded bulletins from database:', messages.value.length);
-    } else {
-      // API returned no data
-      messages.value = [];
-      loadError.value = 'Keine Einträge gefunden.';
-    }
-  } catch (err: unknown) {
-    console.error('Error fetching bulletins:', err);
-    const error = err as Error;
-    loadError.value = 'Fehler beim Laden der Daten: ' + (error.message || 'Unbekannter Fehler');
-    messages.value = [];
-  } finally {
-    isLoading.value = false;
-  }
-};
-
-// Formulare
-const newMessage = reactive<NewMessage>({
-  name: '',
-  email: '',
-  phone: '',
-  title: '',
-  specialty: '',
-  content: '',
-  userType: '',
-  privacyPolicyAccepted: false,
-  messageType: 'Information',
-})
-
-const contactForm = reactive<ContactForm>({
-  name: '',
-  email: '',
-  message: ''
-});
-
-// Berechnete Eigenschaften
-const filteredMessages = computed<BulletinMessage[]>(() => {
-  let result = [...messages.value];
-  
-  // Only show Information messages
-  result = result.filter(msg => msg.messageType === 'Information');
-  
-  // Sortieren
-  result.sort((a, b) => {
-    if (sortOrder.value === 'newest') {
-      return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
-    } else {
-      return new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime();
-    }
-  });
-  
-  // Paginierung
-  const startIndex = (currentPage.value - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  return result.slice(startIndex, endIndex);
-});
-
-const totalPages = computed<number>(() => {
-  let filteredTotal = messages.value.filter(msg => msg.messageType === 'Information');
-  return Math.ceil(filteredTotal.length / itemsPerPage);
-});
-
-// Methoden
-async function submitMessage(): Promise<void> {
-  isSubmitting.value = true;
-  
-  // Always set messageType to Information
-  newMessage.messageType = 'Information';
-  
-  try {
-    console.log('Submitting bulletin via proxy service');
-    
-    // Prepare the bulletin data with properties matching the Bulletin interface
-    const bulletinData: Partial<Bulletin> = {
-      name: newMessage.name,
-      email: newMessage.email,
-      title: newMessage.title,
-      specialty: newMessage.specialty,
-      content: newMessage.content,
-      messageType: newMessage.messageType,
-      privacyPolicyAccepted: newMessage.privacyPolicyAccepted,
-      // Additional fields that might be needed
-      status: 'pending', // Assuming new bulletins are pending by default
-    };
-    
-    // Send the request through our proxy service for better error handling
-    const response = await bulletinProxyService.createBulletin(bulletinData);
-    
-    if (response && response.data) {
-      // If successful, add the new message to our local list
-      const newEntry = response.data;
-      
-      // Convert and add the new entry to our messages list
-      const formattedEntry: BulletinMessage = {
-        ...newEntry,
-        id: newEntry._id,
-        userType: newEntry.userId ? 'registered' : 'anonymous',
-        timestamp: newEntry.createdAt || new Date(),
-        replies: convertServerReplies(newEntry)
-      };
-      
-      messages.value.unshift(formattedEntry);
-      
-      // Formular zurücksetzen
-      Object.keys(newMessage).forEach(key => {
-        if (key === 'privacyPolicyAccepted') {
-          newMessage.privacyPolicyAccepted = false;
-        } else if (key === 'messageType') {
-          newMessage.messageType = 'Information';
-        } else {
-          (newMessage as any)[key] = '';
-        }
-      });
-      
-      messageSent.value = true;
-      
-      // Show warning if using demo data
-      if ((response as any).isDemoData) {
-        alert('Ihre Nachricht wurde gespeichert, aber der Server konnte nicht erreicht werden. Die Nachricht wird lokal angezeigt, aber nicht dauerhaft gespeichert. Bitte versuchen Sie es später erneut.');
-      }
-      
-      // Erfolgsmeldung nach 3 Sekunden ausblenden
-      setTimeout(() => {
-        messageSent.value = false;
-      }, 3000);
-    }
-  } catch (err: unknown) {
-    console.error('Error submitting bulletin:', err);
-    const error = err as Error;
-    alert('Fehler beim Speichern: ' + (error.message || 'Unbekannter Fehler'));
-  } finally {
-    isSubmitting.value = false;
-  }
-}
-
-function sortMessages(): void {
-  // Sortierung wird in der computed property angewendet
-  currentPage.value = 1; // Zurück zur ersten Seite
-}
-
-function formatDate(date: string | Date): string {
-  return new Date(date).toLocaleDateString('de-DE', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric'
-  });
-}
-
-function prevPage(): void {
-  if (currentPage.value > 1) {
-    currentPage.value--;
-  }
-}
-
-function nextPage(): void {
-  if (currentPage.value < totalPages.value) {
-    currentPage.value++;
-  }
-}
-
-function goToPage(page: number): void {
-  currentPage.value = page;
-}
-
-function contactPoster(message: BulletinMessage): void {
-  selectedMessage.value = message;
-  showContactModal.value = true;
-}
-
-function closeContactModal(): void {
-  showContactModal.value = false;
-  // Formular zurücksetzen
-  contactForm.name = '';
-  contactForm.email = '';
-  contactForm.message = '';
-}
-
-function sendContact(): void {
-  // Hier würden wir normalerweise eine API-Anfrage senden
-  console.log('Kontaktanfrage gesendet:', {
-    to: selectedMessage.value.email,
-    from: contactForm
-  });
-  
-  // Schließe das Modal und zeige eine Erfolgsmeldung
-  alert('Ihre Nachricht wurde gesendet!');
-  closeContactModal();
-}
-
-const handleReplyAdded = (reply: UIBulletinReply): void => {
-  // Find the message and add the reply to its replies array
-  const message = messages.value.find(m => m.id === reply.bulletinId)
-  if (message) {
-    if (!message.replies) {
-      message.replies = []
-    }
-    message.replies.push(reply)
-  }
-}
-
-const handleReplyDeleted = (replyId: string): void => {
-  // Find the message and remove the reply from its replies array
-  messages.value.forEach(message => {
-    if (message.replies) {
-      message.replies = message.replies.filter(reply => reply._id !== replyId)
-    }
-  })
-}
-
-const handleReplyUpdated = (updatedReply: UIBulletinReply): void => {
-  // Find the message and update the reply in its replies array
-  messages.value.forEach(message => {
-    if (message.replies) {
-      message.replies = message.replies.map(reply => 
-        reply._id === updatedReply._id ? updatedReply : reply
-      )
-    }
-  })
-}
-
-// Load bulletins when component mounts
-onMounted(() => {
-  fetchBulletins();
-});
-</script> 

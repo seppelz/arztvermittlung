@@ -1,240 +1,176 @@
 <template>
-  <div>
-    <section class="bg-dark text-white py-12">
-      <div class="container mx-auto px-4">
-        <h1 class="text-4xl md:text-5xl font-extrabold mb-4 leading-tight">Stellenbörse</h1>
-        <p class="text-xl max-w-3xl">
-          Hier finden Ärzte und Einrichtungen kurzfristige Einsätze (1 Woche bis 3 Monate). 
-          Ärzte profitieren von übertariflichen Vergütungen, Kliniken lösen Personalengpässe schnell und unkompliziert.
-        </p>
-      </div>
-    </section>
-
-    <section class="py-12 bg-light">
-      <div class="container mx-auto px-4">
-        <!-- Nachrichtenliste -->
-        <div class="max-w-7xl mx-auto bg-white rounded-lg shadow-strong p-6 border border-gray-200 mb-10">
-          <h2 class="text-2xl md:text-3xl font-bold mb-6 text-heading border-b-2 border-primary pb-3">Stellenangebote und -gesuche</h2>
-          
-          <!-- Filter-Optionen -->
-          <div class="flex flex-wrap gap-3 items-center mb-6">
-            <h3 class="text-lg font-bold text-heading mr-4">Filter:</h3>
+  <!-- Bulletins Section -->
+  <section class="py-10 bg-gray-50">
+    <div class="container mx-auto px-4">
+      <div class="max-w-6xl mx-auto">
+        <h1 class="text-3xl font-bold text-heading mb-8">Arztbörse</h1>
+        
+        <!-- Filter and Sort Controls -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 space-y-4 md:space-y-0">
+          <div class="flex items-center space-x-4">
             <button 
-              @click="filterMessages('all')" 
-              class="px-4 py-2 rounded-lg transition-colors shadow-sm"
-              :class="currentFilter === 'all' ? 'bg-primary text-white font-bold' : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-300'"
+              @click="filterType = 'all'" 
+              :class="[
+                'px-4 py-2 rounded-lg font-medium transition-colors',
+                filterType === 'all' 
+                  ? 'bg-primary text-white' 
+                  : 'bg-white text-text-dark hover:bg-gray-100'
+              ]"
             >
               Alle
             </button>
             <button 
-              @click="filterMessages('Angebot')" 
-              class="px-4 py-2 rounded-lg transition-colors shadow-sm"
-              :class="currentFilter === 'Angebot' ? 'bg-success text-white font-bold' : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-300'"
+              @click="filterType = 'Angebot'" 
+              :class="[
+                'px-4 py-2 rounded-lg font-medium transition-colors',
+                filterType === 'Angebot' 
+                  ? 'bg-primary text-white' 
+                  : 'bg-white text-text-dark hover:bg-gray-100'
+              ]"
             >
-              Angebote
+              Stellenangebote
             </button>
             <button 
-              @click="filterMessages('Gesuch')" 
-              class="px-4 py-2 rounded-lg transition-colors shadow-sm"
-              :class="currentFilter === 'Gesuch' ? 'bg-primary text-white font-bold' : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-300'"
+              @click="filterType = 'Gesuch'" 
+              :class="[
+                'px-4 py-2 rounded-lg font-medium transition-colors',
+                filterType === 'Gesuch' 
+                  ? 'bg-primary text-white' 
+                  : 'bg-white text-text-dark hover:bg-gray-100'
+              ]"
             >
-              Gesuche
+              Stellengesuche
             </button>
+          </div>
             
-            <div class="ml-auto flex items-center">
-              <span class="mr-2 text-gray-700">Sortieren:</span>
-              <select v-model="sortOrder" @change="sortMessages" class="px-3 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary bg-white shadow-sm">
-                <option value="newest">Neueste zuerst</option>
-                <option value="oldest">Älteste zuerst</option>
-              </select>
-            </div>
-          </div>
-          
-          <!-- Loading and Content States -->
-          <div v-if="isLoading" class="p-8 text-center">
-            <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-4"></div>
-            <p class="text-lg text-gray-600">Stellenangebote werden geladen...</p>
-          </div>
-          
-          <div v-else-if="loadError" class="p-6 bg-red-50 border border-red-200 rounded-lg text-center mb-4">
-            <p class="text-red-600 mb-2 font-medium">{{ loadError }}</p>
-            <button 
-              @click="retryFetch" 
-              class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark text-sm"
+          <div class="flex items-center space-x-2">
+            <span class="text-text-dark">Sortieren:</span>
+            <select 
+              v-model="sortOrder" 
+              class="bg-white border border-gray-300 rounded-lg px-3 py-1 text-text-dark focus:outline-none focus:ring-2 focus:ring-primary"
             >
-              Erneut versuchen
-            </button>
-          </div>
-          
-          <div v-else-if="filteredMessages.length === 0" class="p-8 text-center border border-gray-200 rounded-lg mb-4">
-            <p class="text-lg text-gray-600 mb-2">Keine Stellenangebote/-gesuche gefunden.</p>
-            <p class="text-gray-500">Erstellen Sie ein neues Angebot oder Gesuch mit dem Formular unten.</p>
-          </div>
-          
-          <!-- Messages Grid -->
-          <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div 
-              v-for="message in filteredMessages" 
-              :key="message.id" 
-              class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-strong transition-shadow duration-300 flex flex-col border border-gray-200"
-            >
-              <div 
-                class="h-2 w-full" 
-                :class="{
-                  'bg-success': message.messageType === 'Angebot',
-                  'bg-primary': message.messageType === 'Gesuch'
-                }"
-              ></div>
-              <div class="p-6 flex-grow">
-                <div class="flex justify-between items-start mb-3">
-                  <span 
-                    class="inline-block px-3 py-1 text-xs font-bold rounded-full" 
-                    :class="{
-                      'bg-success bg-opacity-20 text-success border border-success': message.messageType === 'Angebot',
-                      'bg-primary bg-opacity-20 text-primary border border-primary': message.messageType === 'Gesuch'
-                    }"
-                  >
-                    {{ message.messageType }}
-                  </span>
-                  <span class="text-sm text-gray-500">{{ formatDate(message.timestamp) }}</span>
-                </div>
-                <h3 class="text-xl font-bold mb-2 text-heading">
-                  <span v-if="message.userType === 'Arzt'">Arzt sucht ab {{ formatDate(message.startDate) }} <span v-if="message.specialty" v-html="'Fachrichtung ' + message.specialty"></span></span>
-                  <span v-else-if="message.userType === 'Klinik'">Klinik sucht ab {{ formatDate(message.startDate) }} <span v-if="message.specialty" v-html="'Arzt der Fachrichtung ' + message.specialty"></span><span v-else>Arzt</span></span>
-                  <span v-else>{{ message.title }}</span>
-                </h3>
-                <p class="text-gray-700 mb-4">{{ message.content }}</p>
-                <div class="mt-auto pt-4 border-t border-gray-200">
-                  <div class="flex justify-between">
-                    <div>
-                      <p class="text-sm text-gray-600">
-                        <span v-if="message.userType === 'Arzt'">Ein Arzt <span v-if="message.specialty" v-html="'der Fachrichtung <strong>' + message.specialty + '</strong>'"></span> sucht ab <strong>{{ formatDate(message.startDate) }}</strong> eine Stelle.</span>
-                        <span v-if="message.userType === 'Klinik'">Eine Klinik aus <strong>{{ message.federalState || 'unbekannt' }}</strong> sucht ab <strong>{{ formatDate(message.startDate) }}</strong> einen Arzt <span v-if="message.specialty" v-html="'der Fachrichtung <strong>' + message.specialty + '</strong>'"></span>.</span>
-                      </p>
-                    </div>
-                    <button 
-                      @click="contactPoster(message)" 
-                      class="text-white bg-primary hover:bg-primary-dark font-medium px-4 py-1 rounded-lg shadow-sm transform hover:scale-105 transition-all"
-                      title="Kontakt aufnehmen"
-                    >
-                      Kontakt
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <!-- Paginierung (bei vielen Nachrichten) -->
-          <div v-if="messages.length > itemsPerPage" class="mt-8 flex justify-center">
-            <nav class="inline-flex rounded-md shadow">
-              <button 
-                @click="prevPage" 
-                :disabled="currentPage === 1" 
-                class="px-4 py-2 rounded-l-md border-2 border-gray-300"
-                :class="currentPage === 1 ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-white text-gray-700 hover:bg-gray-50'"
-              >
-                Zurück
-              </button>
-              <button 
-                v-for="page in totalPages" 
-                :key="page" 
-                @click="goToPage(page)" 
-                class="px-4 py-2 border-t-2 border-b-2 border-gray-300"
-                :class="currentPage === page ? 'bg-primary text-white border-primary' : 'bg-white text-gray-700 hover:bg-gray-50'"
-              >
-                {{ page }}
-              </button>
-              <button 
-                @click="nextPage" 
-                :disabled="currentPage === totalPages" 
-                class="px-4 py-2 rounded-r-md border-2 border-gray-300"
-                :class="currentPage === totalPages ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-white text-gray-700 hover:bg-gray-50'"
-              >
-                Weiter
-              </button>
-            </nav>
+              <option value="newest">Neueste zuerst</option>
+              <option value="oldest">Älteste zuerst</option>
+            </select>
           </div>
         </div>
-        
-        <!-- Neue Nachricht erstellen - Breiteres, kompakteres Formular -->
-        <div class="max-w-7xl mx-auto bg-white rounded-lg shadow-strong p-6 mb-8 border border-gray-200">
-          <h2 class="text-2xl md:text-3xl font-bold mb-6 text-center text-heading border-b-2 border-primary pb-3">Neues Angebot/Gesuch erstellen</h2>
           
-          <form @submit.prevent="submitMessage" class="space-y-5">
-            <!-- Zwei-Spalten-Layout für kompakteren Look -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <!-- Bulletins List -->
+        <div v-if="isLoading" class="flex justify-center py-10">
+          <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+        </div>
+          
+        <div v-else-if="filteredBulletins.length === 0" class="bg-white p-8 rounded-lg shadow-md text-center">
+          <p class="text-lg text-text-dark">Keine Einträge gefunden.</p>
+        </div>
+          
+        <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div 
+            v-for="bulletin in filteredBulletins" 
+            :key="bulletin._id" 
+            class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow flex flex-col h-full"
+          >
+            <div class="flex justify-between items-start">
               <div>
-                <label for="name" class="block text-text-dark font-semibold mb-1">Name</label>
-                <input 
-                  type="text" 
-                  id="name" 
-                  v-model="newMessage.name" 
-                  class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm"
-                  placeholder="Ihr Name oder Einrichtung (optional)"
-                />
-              </div>
-              
-              <div>
-                <label for="email" class="block text-text-dark font-semibold mb-1">E-Mail*</label>
-                <input 
-                  type="email" 
-                  id="email" 
-                  v-model="newMessage.email" 
-                  required 
-                  class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm"
-                  placeholder="ihre-email@beispiel.de"
-                />
-              </div>
-              
-              <div>
-                <label for="userType" class="block text-text-dark font-semibold mb-1">Sie sind*</label>
-                <select 
-                  id="userType" 
-                  v-model="newMessage.userType" 
-                  required 
-                  class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm appearance-none"
-                  @change="determineMessageType"
+                <span 
+                  :class="[
+                    'inline-block px-3 py-1 rounded-full text-sm font-medium mb-2',
+                    bulletin.messageType === 'Angebot' 
+                      ? 'bg-green-100 text-green-800' 
+                      : 'bg-blue-100 text-blue-800'
+                  ]"
                 >
-                  <option value="">Bitte wählen</option>
-                  <option value="Arzt">Arzt</option>
-                  <option value="Klinik">Klinik/Einrichtung</option>
-                </select>
-                <p v-if="newMessage.userType" class="text-sm mt-1 text-gray-600">
-                  <span v-if="newMessage.userType === 'Arzt'">Sie erstellen ein <strong class="text-primary">Gesuch</strong>.</span>
-                  <span v-if="newMessage.userType === 'Klinik'">Sie erstellen ein <strong class="text-success">Angebot</strong>.</span>
-                </p>
+                  {{ bulletin.messageType === 'Angebot' ? 'Stellenangebot' : 'Stellengesuch' }}
+                </span>
+                <h3 class="text-xl font-bold text-heading">{{ bulletin.title }}</h3>
               </div>
+              <span class="text-sm text-gray-500">{{ formatDate(bulletin.createdAt) }}</span>
+            </div>
               
-              <div>
-                <label for="startDate" class="block text-text-dark font-semibold mb-1">Verfügbar/Benötigt ab*</label>
-                <input 
-                  type="date" 
-                  id="startDate" 
-                  v-model="newMessage.startDate" 
-                  required 
-                  class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm"
-                />
+            <p class="mt-3 text-text-dark whitespace-pre-line flex-grow">{{ bulletin.content }}</p>
+              
+            <div class="mt-4 grid grid-cols-1 gap-2">
+              <div v-if="bulletin.specialty" class="flex items-center">
+                <span class="text-primary-700 font-medium mr-2">Fachbereich:</span>
+                <span>{{ bulletin.specialty }}</span>
               </div>
+              <div v-if="bulletin.location" class="flex items-center">
+                <span class="text-primary-700 font-medium mr-2">Ort:</span>
+                <span>{{ bulletin.location }}</span>
+              </div>
+              <div v-if="bulletin.period" class="flex items-center">
+                <span class="text-primary-700 font-medium mr-2">Zeitraum:</span>
+                <span>{{ bulletin.period }}</span>
+              </div>
+              <div v-if="bulletin.federalState" class="flex items-center">
+                <span class="text-primary-700 font-medium mr-2">Bundesland:</span>
+                <span>{{ bulletin.federalState }}</span>
+              </div>
+            </div>
+              
+            <div class="mt-6 flex justify-between items-center">
+              <div class="flex items-center">
+                <span class="font-medium text-text-dark">
+                  {{ bulletin.messageType === 'Angebot' ? 'Medizinische Einrichtung' : bulletin.name }}
+                </span>
+              </div>
+              <button 
+                @click="openContactModal(bulletin)" 
+                class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
+              >
+                Kontakt aufnehmen
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
+  <!-- Neue Nachricht erstellen -->
+  <section v-if="isAuthenticated" class="py-10 bg-white">
+    <div class="container mx-auto px-4">
+      <div class="max-w-3xl mx-auto">
+        <div class="flex justify-between items-center">
+          <h2 class="text-2xl font-bold text-heading">Stellenbörse</h2>
+          <button 
+            @click="isFormOpen = !isFormOpen" 
+            class="bg-primary hover:bg-primary-dark text-white font-bold py-2 px-4 rounded-lg"
+          >
+            {{ isFormOpen ? 'Formular schließen' : 'Neue Stellenanzeige erstellen' }}
+          </button>
+        </div>
+
+        <div v-if="isFormOpen" class="bg-white p-6 rounded-lg shadow-md mt-4 mb-6">
+          <h3 class="text-xl font-bold text-primary-700 mb-4">
+            {{ isUserHospital ? 'Neues Stellenangebot erstellen' : 'Neue Verfügbarkeit melden' }}
+          </h3>
+            
+          <form @submit.prevent="createMessage" class="space-y-4">
+            <!-- Hidden field for message type, automatically set based on user type -->
+            <input type="hidden" v-model="newMessageForm.messageType">
+            
+            <!-- Fields for hospitals only -->
+            <template v-if="isUserHospital">
               <div>
-                <label for="specialty" class="block text-text-dark font-semibold mb-1">Fachrichtung</label>
+                <label for="title" class="block text-text-dark font-semibold mb-1">Titel*</label>
                 <input 
                   type="text" 
-                  id="specialty" 
-                  v-model="newMessage.specialty" 
+                  id="title" 
+                  v-model="newMessageForm.title" 
+                  required 
                   class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm"
-                  placeholder="Ihre Fachrichtung (optional)"
+                  placeholder="Titel Ihrer Stellenanzeige"
                 />
               </div>
-              
-              <div v-if="newMessage.userType === 'Klinik'">
+                
+              <div>
                 <label for="federalState" class="block text-text-dark font-semibold mb-1">Bundesland*</label>
-                <select 
-                  id="federalState" 
-                  v-model="newMessage.federalState" 
-                  :required="newMessage.userType === 'Klinik'" 
-                  class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm appearance-none"
+                <select
+                  id="federalState"
+                  v-model="newMessageForm.federalState"
+                  required
+                  class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm"
                 >
                   <option value="">Bitte wählen</option>
                   <option value="Baden-Württemberg">Baden-Württemberg</option>
@@ -255,428 +191,471 @@
                   <option value="Thüringen">Thüringen</option>
                 </select>
               </div>
-            </div>
+                
+              <div>
+                <label for="content" class="block text-text-dark font-semibold mb-1">Zusätzliche Informationen</label>
+                <textarea 
+                  id="content" 
+                  v-model="newMessageForm.content" 
+                  rows="4" 
+                  class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm"
+                  placeholder="Weitere Details zur Stelle (optional)"
+                ></textarea>
+              </div>
+                
+              <div>
+                <label for="specialty" class="block text-text-dark font-semibold mb-1">Fachbereich*</label>
+                <input 
+                  type="text" 
+                  id="specialty" 
+                  v-model="newMessageForm.specialty"
+                  required  
+                  class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm"
+                  placeholder="z.B. Innere Medizin, Chirurgie, etc."
+                />
+              </div>
+            </template>
             
-            <div>
-              <label for="content" class="block text-text-dark font-semibold mb-1">Nachricht*</label>
-              <textarea 
-                id="content" 
-                v-model="newMessage.content" 
-                required 
-                rows="4" 
+            <!-- Common field for both user types -->
+            <div v-if="!isUserHospital">
+              <label for="startDate" class="block text-text-dark font-semibold mb-1">Verfügbar ab*</label>
+              <input 
+                type="date" 
+                id="startDate" 
+                v-model="newMessageForm.startDate"
+                required
                 class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm"
-                placeholder="Ihr Angebot/Gesuch hier..."
-              ></textarea>
+              />
+              <p class="text-sm text-gray-500 mt-1">Wählen Sie das Datum, ab dem Sie verfügbar sind. Wir vermitteln nur Vertretungen bis maximal 3 Monate.</p>
+            </div>
+
+            <div v-if="isUserHospital">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label for="startDate" class="block text-text-dark font-semibold mb-1">Startdatum*</label>
+                  <input 
+                    type="date" 
+                    id="startDate" 
+                    v-model="newMessageForm.startDate"
+                    required
+                    class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm"
+                  />
+                </div>
+                
+                <div>
+                  <label for="period" class="block text-text-dark font-semibold mb-1">Zeitraum (Beschreibung)</label>
+                  <input 
+                    type="text" 
+                    id="period" 
+                    v-model="newMessageForm.period"
+                    class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm"
+                    placeholder="z.B. 2 Wochen, 1 Monat, max. 3 Monate"
+                  />
+                  <p class="text-sm text-gray-500 mt-1">Wir vermitteln nur Vertretungen bis maximal 3 Monate.</p>
+                </div>
+              </div>
             </div>
             
-            <div class="flex items-start">
-              <input type="checkbox" id="privacyPolicy" v-model="newMessage.privacyPolicyAccepted" required class="mt-1 mr-2 w-5 h-5 text-primary border-2 border-gray-300 rounded focus:ring-primary" />
-              <label for="privacyPolicy" class="text-sm text-gray-700">
-                Ich habe die <router-link to="/privacy" class="text-primary hover:underline font-medium">Datenschutzerklärung</router-link> gelesen und akzeptiere diese.*
-              </label>
+            <div v-if="newMessageForm.error" class="p-3 bg-red-100 text-red-700 rounded-lg">
+              {{ newMessageForm.error }}
             </div>
-            
+                
+            <div v-if="newMessageForm.success" class="p-3 bg-green-100 text-green-700 rounded-lg">
+              {{ isUserHospital ? 'Ihr Stellenangebot wurde erfolgreich veröffentlicht.' : 'Ihre Verfügbarkeit wurde erfolgreich veröffentlicht.' }}
+            </div>
+                
             <div class="text-center">
               <button 
                 type="submit" 
                 class="bg-primary hover:bg-primary-dark text-white font-bold py-2 px-8 rounded-lg shadow-strong transition-colors duration-300 text-lg transform hover:scale-105"
-                :disabled="isSubmitting"
+                :disabled="newMessageForm.isSubmitting"
               >
-                {{ isSubmitting ? 'Wird gesendet...' : newMessage.userType === 'Arzt' ? 'Gesuch veröffentlichen' : newMessage.userType === 'Klinik' ? 'Angebot veröffentlichen' : 'Veröffentlichen' }}
+                {{ newMessageForm.isSubmitting ? 'Wird gesendet...' : (isUserHospital ? 'Stellenangebot veröffentlichen' : 'Verfügbarkeit veröffentlichen') }}
               </button>
             </div>
           </form>
-          
-          <div v-if="messageSent" class="mt-6 p-4 bg-success bg-opacity-10 text-success rounded-lg border-2 border-success">
-            <p class="font-semibold">Vielen Dank für Ihre Nachricht!</p>
-            <p>Ihre Nachricht wurde zur Freigabe weitergeleitet.</p>
-          </div>
         </div>
       </div>
-    </section>
+    </div>
+  </section>
     
-    <!-- Kontakt-Modal -->
-    <div v-if="showContactModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div class="bg-white rounded-lg shadow-xl p-8 max-w-lg w-full mx-4">
-        <h3 class="text-2xl font-bold mb-4 text-heading border-b-2 border-primary pb-3">Kontakt aufnehmen</h3>
-        <p class="mb-6">Sie möchten Kontakt mit <strong>{{ selectedMessage.name }}</strong> aufnehmen bezüglich der Nachricht: <strong>{{ selectedMessage.title }}</strong></p>
+  <!-- Login-Hinweis für nicht angemeldete Benutzer -->
+  <section v-else class="py-10 bg-white">
+    <div class="container mx-auto px-4">
+      <div class="max-w-3xl mx-auto text-center">
+        <h2 class="text-3xl font-bold text-heading mb-4">Möchten Sie eine Anzeige erstellen?</h2>
+        <p class="text-lg mb-6">Bitte melden Sie sich an, um Ihre eigene Anzeige zu veröffentlichen.</p>
+        <router-link to="/login" class="bg-primary hover:bg-primary-dark text-white font-bold py-2 px-8 rounded-lg shadow-strong transition-colors duration-300 text-lg transform hover:scale-105">
+          Zum Login
+        </router-link>
+      </div>
+    </div>
+  </section>
+
+  <!-- Kontakt-Modal -->
+  <div v-if="showContactModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg shadow-xl p-8 max-w-lg w-full mx-4">
+      <h3 class="text-2xl font-bold mb-4 text-heading border-b-2 border-primary pb-3">Kontakt aufnehmen</h3>
+      <p class="mb-6">
+        Sie möchten Kontakt mit <strong>{{ selectedMessage?.name }}</strong> aufnehmen bezüglich: 
+        <strong>{{ selectedMessage?.title || 'Stellenanzeige' }}</strong>
+      </p>
         
-        <form @submit.prevent="sendContact" class="space-y-4">
-          <div>
-            <label for="contactName" class="block text-text-dark font-semibold mb-2">Ihr Name*</label>
-            <input type="text" id="contactName" v-model="contactForm.name" required class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm" />
-          </div>
+      <form @submit.prevent="sendContactForm" class="space-y-4">
+        <div>
+          <label for="contactName" class="block text-text-dark font-semibold mb-2">Ihr Name*</label>
+          <input 
+            type="text" 
+            id="contactName" 
+            v-model="contactForm.name" 
+            required 
+            class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm"
+          />
+        </div>
           
-          <div>
-            <label for="contactEmail" class="block text-text-dark font-semibold mb-2">Ihre E-Mail*</label>
-            <input type="email" id="contactEmail" v-model="contactForm.email" required class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm" />
-          </div>
+        <div>
+          <label for="contactEmail" class="block text-text-dark font-semibold mb-2">Ihre E-Mail*</label>
+          <input 
+            type="email" 
+            id="contactEmail" 
+            v-model="contactForm.email" 
+            required 
+            class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm"
+          />
+        </div>
           
-          <div>
-            <label for="contactMessage" class="block text-text-dark font-semibold mb-2">Ihre Nachricht*</label>
-            <textarea id="contactMessage" v-model="contactForm.message" required rows="4" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm"></textarea>
-          </div>
+        <div>
+          <label for="contactMessage" class="block text-text-dark font-semibold mb-2">Ihre Nachricht*</label>
+          <textarea 
+            id="contactMessage" 
+            v-model="contactForm.message" 
+            required 
+            rows="4" 
+            class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-text-dark bg-white shadow-sm"
+          ></textarea>
+        </div>
           
-          <div class="flex justify-end space-x-4 mt-6">
-            <button 
-              type="button" 
-              @click="closeContactModal" 
-              class="px-6 py-2 border-2 border-gray-300 rounded-lg hover:bg-gray-50 text-gray-700 font-medium"
-            >
-              Abbrechen
-            </button>
-            <button 
-              type="submit" 
-              class="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark font-bold shadow-md transform hover:scale-105 transition-all"
-            >
-              Nachricht senden
-            </button>
-          </div>
-        </form>
+        <div class="flex justify-end space-x-4 mt-6">
+          <button 
+            type="button" 
+            @click="closeContactModal" 
+            class="px-6 py-2 border-2 border-gray-300 rounded-lg hover:bg-gray-50 text-gray-700 font-medium"
+          >
+            Abbrechen
+          </button>
+          <button 
+            type="submit" 
+            class="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark font-bold shadow-md transform hover:scale-105 transition-all"
+            :disabled="contactForm.isSubmitting"
+          >
+            {{ contactForm.isSubmitting ? 'Wird gesendet...' : 'Nachricht senden' }}
+          </button>
+        </div>
+          
+        <div v-if="contactForm.error" class="mt-4 p-3 bg-red-100 text-red-700 rounded-lg">
+          {{ contactForm.error }}
+        </div>
+          
+        <div v-if="contactForm.success" class="mt-4 p-3 bg-green-100 text-green-700 rounded-lg">
+          Ihre Nachricht wurde erfolgreich gesendet. Der Inserent wird sich in Kürze bei Ihnen melden.
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Login-Modal (wenn nicht angemeldet) -->
+  <div v-if="showLoginModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-lg shadow-strong max-w-md w-full p-6">
+      <h3 class="text-xl font-bold text-primary-700 mb-4">Anmeldung erforderlich</h3>
+      <p class="mb-6">Um eine neue Anzeige zu erstellen, müssen Sie angemeldet sein.</p>
+      <div class="flex justify-end space-x-4">
+        <button @click="showLoginModal = false" class="px-6 py-2 border-2 border-gray-300 rounded-lg hover:bg-gray-50 text-gray-700 font-medium">
+          Abbrechen
+        </button>
+        <router-link to="/login" class="bg-primary hover:bg-primary-dark text-white font-bold py-2 px-4 rounded-lg">
+          Zur Anmeldung
+        </router-link>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted } from 'vue'
-import bulletinProxyService from '@/services/bulletinProxyService'
-import { Bulletin } from '@/types'
+import { ref, computed, onMounted, watch } from 'vue';
+import { useAuthStore } from '@/stores/auth';
+import bulletinProxyService from '@/services/bulletinProxyService';
 
-// Extend the Bulletin type to include federalState
-declare module '@/types' {
-  interface Bulletin {
-    federalState?: string;
-  }
-}
+const authStore = useAuthStore();
 
-// Define interfaces
-interface JobBulletin {
-  _id: string;
-  id?: string;
-  title?: string;
-  content: string;
-  name: string;
-  email: string;
-  status: string;
-  messageType: 'Angebot' | 'Gesuch';
-  timestamp: string | Date;
-  createdAt?: Date;
-  updatedAt?: Date;
-  startDate?: Date | string;
-  specialty?: string;
-  federalState?: string;
-  userType?: string;
-  privacyPolicyAccepted: boolean;
-  [key: string]: any; // Allow indexing with strings
-}
+// Computed property to check if user is authenticated
+const isAuthenticated = computed(() => {
+  console.log('[ArztboersePage] Authentication check:', {
+    isAuthenticated: authStore.isAuthenticated,
+    user: authStore.user,
+    role: authStore.user?.role,
+    userType: authStore.user?.userType
+  });
+  return authStore.isAuthenticated;
+});
 
-interface ContactForm {
-  name: string;
-  email: string;
-  message: string;
-}
+// Computed property to determine if the user is a hospital or a doctor
+const isUserHospital = computed(() => {
+  if (!authStore.isAuthenticated || !authStore.user) return null;
+  console.log('[ArztboersePage] User type check:', {
+    role: authStore.user.role,
+    userType: authStore.user.userType,
+    isHospital: authStore.user.role === 'hospital' || authStore.user.userType === 'Klinik',
+    isDoctor: authStore.user.role === 'doctor' || authStore.user.userType === 'Arzt'
+  });
+  return authStore.user.role === 'hospital' || authStore.user.userType === 'Klinik';
+});
 
-interface NewBulletin {
-  name: string;
-  email: string;
-  userType: string;
-  messageType: string;
-  content: string;
-  specialty: string;
-  federalState: string;
-  startDate: string;
-  status: string;
-  privacyPolicyAccepted: boolean;
-  [key: string]: any; // Allow indexing with strings
-}
+// State for bulletins
+const bulletins = ref<any[]>([]);
+const isLoading = ref(true);
+const filterType = ref('all');
+const sortOrder = ref('newest');
 
-// State variables
-const messages = ref<JobBulletin[]>([]);
-const currentFilter = ref<string>('all');
-const sortOrder = ref<'newest' | 'oldest'>('newest');
-const currentPage = ref<number>(1);
-const itemsPerPage = 6;
-const isSubmitting = ref<boolean>(false);
-const messageSent = ref<boolean>(false);
-const showContactModal = ref<boolean>(false);
-const selectedMessage = ref<JobBulletin>({} as JobBulletin);
-const isLoading = ref<boolean>(true);
-const loadError = ref<string | null>(null);
-
-// Forms
-const newMessage = reactive<NewBulletin>({
-  name: '',
-  email: '',
-  userType: '',
-  messageType: '', // Will be set automatically based on userType
+// State for new message form
+const isFormOpen = ref(true); // Set to true by default for logged-in users
+const newMessageForm = ref({
+  title: '',
   content: '',
+  messageType: 'Angebot',
   specialty: '',
+  location: '',
+  period: '',
+  startDate: new Date().toISOString().split('T')[0], // Initialize with today's date
   federalState: '',
-  startDate: new Date().toISOString().split('T')[0], // Today's date as default
-  status: 'pending', // New entries are set to 'pending' by default
-  privacyPolicyAccepted: false
+  contactEmail: '',
+  isSubmitting: false,
+  error: null,
+  success: false
 });
 
-const contactForm = reactive<ContactForm>({
+// State for contact modal
+const showContactModal = ref(false);
+const selectedMessage = ref<any>(null);
+const contactForm = ref({
   name: '',
   email: '',
-  message: ''
+  message: '',
+  isSubmitting: false,
+  error: null,
+  success: false
 });
 
-// Computed properties
-const filteredMessages = computed<JobBulletin[]>(() => {
-  let result = [...messages.value];
+// State for login modal
+const showLoginModal = ref(false);
+
+// Filtered bulletins based on selected filter
+const filteredBulletins = computed(() => {
+  // First filter out "Information" type messages - only show Angebot and Gesuch
+  const jobBulletins = bulletins.value.filter(bulletin => 
+    bulletin.messageType === 'Angebot' || bulletin.messageType === 'Gesuch'
+  );
   
-  console.log('Filtering messages:', messages.value.length, 'total entries');
-  console.log('Message types:', [...new Set(messages.value.map(m => m.messageType))]);
-  console.log('Message statuses:', [...new Set(messages.value.map(m => m.status))]);
-  
-  // Show only Angebot and Gesuch messages
-  result = result.filter(msg => msg.messageType === 'Angebot' || msg.messageType === 'Gesuch');
-  console.log('After messageType filter:', result.length, 'entries');
-  
-  // Show only active entries and handle legacy entries without status
-  result = result.filter(msg => msg.status === 'active' || msg.status === undefined);
-  console.log('After status filter:', result.length, 'entries with status active/undefined');
-  
-  // Filter by message type
-  if (currentFilter.value !== 'all') {
-    result = result.filter(msg => msg.messageType === currentFilter.value);
-    console.log('After currentFilter:', result.length, 'entries');
+  // Then apply the type filter if not "all"
+  if (filterType.value === 'all') {
+    return jobBulletins;
   }
-  
-  // Sort
-  result.sort((a, b) => {
-    if (sortOrder.value === 'newest') {
-      return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
-    } else {
-      return new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime();
-    }
-  });
-  
-  // Pagination
-  const startIndex = (currentPage.value - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const paginatedResult = result.slice(startIndex, endIndex);
-  console.log('Final paginated result:', paginatedResult.length, 'entries');
-  
-  return paginatedResult;
+  return jobBulletins.filter(bulletin => bulletin.messageType === filterType.value);
 });
 
-const totalPages = computed<number>(() => {
-  let filteredTotal = messages.value.filter(msg => msg.messageType === 'Angebot' || msg.messageType === 'Gesuch');
-  if (currentFilter.value !== 'all') {
-    filteredTotal = filteredTotal.filter(msg => msg.messageType === currentFilter.value);
-  }
-  return Math.ceil(filteredTotal.length / itemsPerPage);
-});
-
-// Methods
-function determineMessageType(): void {
-  if (newMessage.userType === 'Arzt') {
-    newMessage.messageType = 'Gesuch';
-  } else if (newMessage.userType === 'Klinik') {
-    newMessage.messageType = 'Angebot';
-  } else {
-    newMessage.messageType = '';
-  }
-}
-
-async function submitMessage(): Promise<void> {
-  isSubmitting.value = true;
-  
-  // Set messageType based on userType
-  determineMessageType();
-  
-  // Generate title based on userType and startDate
-  let generatedTitle = '';
-  if (newMessage.userType === 'Arzt') {
-    generatedTitle = `Arzt sucht ab ${formatDate(newMessage.startDate)}${newMessage.specialty ? ' Fachrichtung ' + newMessage.specialty : ''}`;
-  } else if (newMessage.userType === 'Klinik') {
-    generatedTitle = `Klinik sucht ab ${formatDate(newMessage.startDate)}${newMessage.specialty ? ' Arzt der Fachrichtung ' + newMessage.specialty : ' Arzt'}`;
-  }
-  
-  try {
-    console.log('Submitting job listing to database');
-    
-    // Prepare data for API (convert date string to Date object)
-    const bulletinData: Partial<Bulletin> = {
-      title: generatedTitle,
-      name: newMessage.name,
-      email: newMessage.email,
-      content: newMessage.content,
-      messageType: newMessage.messageType,
-      status: 'pending',
-      privacyPolicyAccepted: true,
-      specialty: newMessage.specialty || undefined
-    };
-    
-    // Add startDate as a Date object
-    if (newMessage.startDate) {
-      bulletinData.startDate = new Date(newMessage.startDate);
-    }
-    
-    // Add federalState if it exists
-    if (newMessage.federalState) {
-      (bulletinData as any).federalState = newMessage.federalState;
-    }
-    
-    const response = await bulletinProxyService.createBulletin(bulletinData);
-    
-    if (response && response.data) {
-      // If successful, add the new listing to our local list
-      const newEntry = response.data;
-      
-      // Convert to our JobBulletin format
-      const formattedEntry: JobBulletin = {
-        _id: newEntry._id,
-        id: newEntry._id,
-        title: newEntry.title,
-        content: newEntry.content,
-        name: newEntry.name,
-        email: newEntry.email,
-        status: newEntry.status,
-        messageType: newEntry.messageType as 'Angebot' | 'Gesuch',
-        timestamp: newEntry.createdAt || new Date(),
-        createdAt: newEntry.createdAt,
-        updatedAt: newEntry.updatedAt,
-        startDate: newEntry.startDate,
-        specialty: newEntry.specialty,
-        federalState: newEntry.federalState,
-        userType: newMessage.userType, // Copy from form
-        privacyPolicyAccepted: true
-      };
-      
-      messages.value.unshift(formattedEntry);
-      
-      // Reset form
-      Object.keys(newMessage).forEach(key => {
-        if (key === 'privacyPolicyAccepted') {
-          newMessage.privacyPolicyAccepted = false;
-        } else if (key === 'startDate') {
-          newMessage.startDate = new Date().toISOString().split('T')[0]; // Reset to today's date
-        } else {
-          newMessage[key] = '';
-        }
-      });
-      
-      messageSent.value = true;
-      
-      // Hide success message after 3 seconds
-      setTimeout(() => {
-        messageSent.value = false;
-      }, 3000);
-    }
-  } catch (err: any) {
-    console.error('Error submitting job listing:', err);
-    alert('Fehler beim Speichern: ' + (err.message || 'Unbekannter Fehler'));
-  } finally {
-    isSubmitting.value = false;
-  }
-}
-
-function filterMessages(filter: string): void {
-  currentFilter.value = filter;
-  currentPage.value = 1; // Back to first page
-}
-
-function sortMessages(): void {
-  // Sorting is applied in the computed property
-  currentPage.value = 1; // Back to first page
-}
-
-function formatDate(date: string | Date | undefined): string {
-  // Add safety check to handle missing dates
-  if (!date) {
-    return 'Unbekannt';
-  }
-  
-  return new Date(date).toLocaleDateString('de-DE', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric'
-  });
-}
-
-function prevPage(): void {
-  if (currentPage.value > 1) {
-    currentPage.value--;
-  }
-}
-
-function nextPage(): void {
-  if (currentPage.value < totalPages.value) {
-    currentPage.value++;
-  }
-}
-
-function goToPage(page: number): void {
-  currentPage.value = page;
-}
-
-function contactPoster(message: JobBulletin): void {
-  selectedMessage.value = message;
-  showContactModal.value = true;
-}
-
-function closeContactModal(): void {
-  showContactModal.value = false;
-  // Reset form
-  contactForm.name = '';
-  contactForm.email = '';
-  contactForm.message = '';
-}
-
-function sendContact(): void {
-  // Here we would normally send an API request
-  console.log('Contact request sent:', {
-    to: selectedMessage.value.email,
-    from: contactForm
-  });
-  
-  // Close the modal and show a success message
-  alert('Ihre Nachricht wurde gesendet!');
-  closeContactModal();
-}
-
-function retryFetch(): void {
-  window.location.reload();
-}
-
-// Fetch job listings on component mount
+// Fetch bulletins on component mount
 onMounted(async () => {
+  console.log('[ArztboersePage] Component mounted, auth state:', {
+    isAuthenticated: authStore.isAuthenticated,
+    user: authStore.user,
+    isUserHospital: isUserHospital.value
+  });
+  
+  await fetchBulletins();
+  
+  // Set message type based on user type
+  if (isUserHospital.value !== null) {
+    newMessageForm.value.messageType = isUserHospital.value ? 'Angebot' : 'Gesuch';
+    console.log('[ArztboersePage] Setting message type based on user type:', newMessageForm.value.messageType);
+  }
+});
+
+// Watch for changes in sort order and refetch bulletins
+watch(sortOrder, async () => {
+  await fetchBulletins();
+});
+
+// Format date for display
+const formatDate = (dateString: string) => {
+  const date = new Date(dateString);
+  return new Intl.DateTimeFormat('de-DE', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  }).format(date);
+};
+
+// Fetch bulletins from API
+const fetchBulletins = async () => {
+  isLoading.value = true;
   try {
-    console.log('Fetching job listings');
-    isLoading.value = true;
-    loadError.value = null;
-    
-    // Fetch from the bulletinProxyService
     const response = await bulletinProxyService.getAllBulletins({
-      messageType: currentFilter.value === 'all' ? '' : currentFilter.value,
-      sort: sortOrder.value === 'newest' ? '-timestamp' : 'timestamp'
+      sort: sortOrder.value === 'newest' ? '-createdAt' : 'createdAt',
+      status: 'active'
     });
-    
-    if (response && response.data) {
-      console.log(`Loaded ${response.data.length} job listings`);
-      
-      // Process data and convert _id to id if needed
-      messages.value = response.data.map((item: any) => ({
-        ...item,
-        id: item._id, // Add id field based on _id
-        timestamp: item.createdAt || item.timestamp || new Date(),
-        status: item.status || 'active', // Default to active if status is missing
-        messageType: item.messageType as 'Angebot' | 'Gesuch'
-      }));
-    } else {
-      console.warn('No job listings found or empty response');
-      messages.value = [];
-    }
-  } catch (err: any) {
-    console.error('Error fetching job listings:', err);
-    loadError.value = `Fehler beim Laden der Daten: ${err.message || 'Unbekannter Fehler'}`;
+    bulletins.value = response.data;
+  } catch (error) {
+    console.error('Error fetching bulletins:', error);
   } finally {
     isLoading.value = false;
   }
-});
-</script> 
+};
+
+// Reset form fields
+const resetNewMessageForm = () => {
+  // Set message type based on user type
+  if (isUserHospital.value !== null) {
+    newMessageForm.value.messageType = isUserHospital.value ? 'Angebot' : 'Gesuch';
+  } else {
+    newMessageForm.value.messageType = 'Angebot';
+  }
+  
+  newMessageForm.value.title = '';
+  newMessageForm.value.content = '';
+  newMessageForm.value.specialty = '';
+  newMessageForm.value.location = '';
+  newMessageForm.value.period = '';
+  newMessageForm.value.startDate = new Date().toISOString().split('T')[0]; // Reset to today's date
+  newMessageForm.value.federalState = '';
+  newMessageForm.value.contactEmail = '';
+  newMessageForm.value.error = null;
+  newMessageForm.value.success = false;
+  
+  // Don't close form after submission for logged-in users
+  // setTimeout(() => {
+  //   isFormOpen.value = false;
+  // }, 2000);
+};
+
+// Create a new message
+const createMessage = async () => {
+  if (!isAuthenticated.value) {
+    showLoginModal.value = true;
+    return;
+  }
+  
+  newMessageForm.value.isSubmitting = true;
+  newMessageForm.value.error = null;
+  
+  try {
+    // For doctors, auto-generate title and content based on their profile
+    let bulletinData: any = {
+      messageType: newMessageForm.value.messageType,
+      period: newMessageForm.value.period || `ab ${newMessageForm.value.startDate}`,
+      email: authStore.user?.email || '',
+      name: authStore.user?.firstName || 'Anonym',
+      privacyPolicyAccepted: true,
+      startDate: newMessageForm.value.startDate // Use the date picker value directly
+    };
+    
+    if (isUserHospital.value) {
+      // Format the content in the standardized format for hospitals
+      const formattedDate = new Date(newMessageForm.value.startDate).toLocaleDateString('de-DE');
+      const standardContent = `Eine Einrichtung in ${newMessageForm.value.federalState} sucht ab ${formattedDate} einen Vertretungsarzt für ${newMessageForm.value.period || 'einen kurzen Zeitraum'}.`;
+      
+      // Add any additional content if provided
+      const fullContent = newMessageForm.value.content 
+        ? `${standardContent}\n\n${newMessageForm.value.content}` 
+        : standardContent;
+      
+      // For hospitals, use the form fields with standardized content
+      bulletinData = {
+        ...bulletinData,
+        title: newMessageForm.value.title,
+        content: fullContent,
+        specialty: newMessageForm.value.specialty,
+        federalState: newMessageForm.value.federalState
+      };
+    } else {
+      // For doctors, generate title and content based on their profile
+      const specialty = authStore.user?.specialty || 'Arzt';
+      const formattedDate = new Date(newMessageForm.value.startDate).toLocaleDateString('de-DE');
+      bulletinData.title = `${specialty} verfügbar ab ${formattedDate}`;
+      bulletinData.content = `Ich bin als ${specialty} verfügbar ab ${formattedDate}.`;
+      bulletinData.specialty = authStore.user?.specialty || '';
+    }
+    
+    console.log('Submitting bulletin data:', bulletinData);
+    await bulletinProxyService.createBulletin(bulletinData);
+    
+    newMessageForm.value.success = true;
+    resetNewMessageForm();
+    await fetchBulletins();
+  } catch (error: any) {
+    console.error('Error creating bulletin:', error);
+    if (error.response?.data?.errors) {
+      const errorMessages = Object.values(error.response.data.errors).join(', ');
+      newMessageForm.value.error = errorMessages || error.response?.data?.message || 'Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.';
+    } else {
+      newMessageForm.value.error = error.response?.data?.message || 'Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.';
+    }
+  } finally {
+    newMessageForm.value.isSubmitting = false;
+  }
+};
+
+// Open contact modal
+const openContactModal = (message: any) => {
+  if (!isAuthenticated.value) {
+    showLoginModal.value = true;
+    return;
+  }
+  
+  selectedMessage.value = message;
+  showContactModal.value = true;
+  
+  // Pre-fill contact form with user data if available
+  if (authStore.user) {
+    contactForm.value.name = `${authStore.user.firstName || ''} ${authStore.user.lastName || ''}`.trim();
+    contactForm.value.email = authStore.user.email || '';
+  }
+};
+
+// Close contact modal
+const closeContactModal = () => {
+  showContactModal.value = false;
+  contactForm.value = {
+    name: '',
+    email: '',
+    message: '',
+    isSubmitting: false,
+    error: null,
+    success: false
+  };
+};
+
+// Send contact form
+const sendContactForm = async () => {
+  contactForm.value.isSubmitting = true;
+  contactForm.value.error = null;
+  
+  try {
+    await bulletinProxyService.contactBulletinAuthor(selectedMessage.value._id, {
+      name: contactForm.value.name,
+      email: contactForm.value.email,
+      message: contactForm.value.message
+    });
+    
+    contactForm.value.success = true;
+    
+    // Close modal after a delay
+    setTimeout(() => {
+      closeContactModal();
+    }, 3000);
+  } catch (error: any) {
+    console.error('Error sending contact form:', error);
+    contactForm.value.error = error.response?.data?.message || 'Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.';
+  } finally {
+    contactForm.value.isSubmitting = false;
+  }
+};
+</script>

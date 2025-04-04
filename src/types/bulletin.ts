@@ -17,11 +17,12 @@ export interface Bulletin {
   createdAt: Date;
   updatedAt: Date;
   startDate?: Date;
-  specialty?: string;
+  // Removed specialty as it's no longer used in forms
   state?: string;
   userId?: string;
   sessionId?: string;
-  privacyPolicyAccepted: boolean;
+  // privacyPolicyAccepted is handled automatically for authenticated users
+  privacyPolicyAccepted?: boolean;
 }
 
 /**
@@ -33,9 +34,11 @@ export interface BulletinReply {
   name: string;
   email: string;
   timestamp: Date;
+  edited?: Date; // Added to track when a reply was edited
   userId?: string;
   sessionId?: string;
-  privacyPolicyAccepted: boolean;
+  // privacyPolicyAccepted is handled automatically for authenticated users
+  privacyPolicyAccepted?: boolean;
 }
 
 /**
@@ -62,3 +65,10 @@ export interface BulletinPaginationResponse {
   limit: number;
   totalPages: number;
 } 
+
+/**
+ * UI-friendly version of bulletin reply with additional context
+ */
+export interface UIBulletinReply extends BulletinReply {
+  bulletinId: string;
+}

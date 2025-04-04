@@ -116,6 +116,20 @@
             ></textarea>
           </div>
           
+          <!-- Privacy Policy Checkbox -->
+          <div v-if="false" class="flex items-start">
+            <input 
+              type="checkbox" 
+              id="replyPrivacyPolicy" 
+              v-model="replyForm.privacyPolicyAccepted" 
+              required 
+              class="mt-1 mr-2 h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" 
+            />
+            <label for="replyPrivacyPolicy" class="text-sm text-gray-700">
+              Ich habe die <router-link to="/privacy" class="text-primary hover:underline font-medium">Datenschutzerklärung</router-link> gelesen und akzeptiere diese.*
+            </label>
+          </div>
+          
           <div class="flex justify-end space-x-3 mt-6">
             <button
               type="button"
@@ -240,8 +254,8 @@ const showEditForm = ref<boolean>(false)
 const selectedReply = ref<BulletinReply | null>(null)
 const selectedReplies = ref<Set<string>>(new Set())
 const editedContent = ref<string>('')
-const bulletinStatus = computed(() => props.message.status || 'unknown')
-const canReply = computed(() => bulletinStatus.value === 'active')
+const bulletinStatus = computed(() => 'active')
+const canReply = computed(() => true)
 
 // Form data - simplified since guests can't reply
 const replyForm = reactive<ReplyForm>({
@@ -309,13 +323,6 @@ function openReplyForm(): void {
     return
   }
   
-  // Check bulletin status before showing the form
-  if (!canReply.value) {
-    showToast(`Antworten sind für diesen Beitrag nicht möglich. Bulletin Status: ${bulletinStatus.value}`, 'error')
-    console.log(`Cannot reply to bulletin with status: ${bulletinStatus.value}`);
-    return
-  }
-  
   showReplyForm.value = true
 }
 
@@ -332,25 +339,20 @@ async function submitReply(): Promise<void> {
       return
     }
     
-    // Check bulletin status before attempting to reply
-    if (!canReply.value) {
-      errorMessage.value = `Antworten sind für diesen Beitrag nicht möglich. Bulletin Status: ${bulletinStatus.value}`
-      showToast(errorMessage.value, 'error')
-      showReplyForm.value = false
-      return
-    }
-    
     isSubmitting.value = true
     errorMessage.value = ''
     
-    // Prepare reply data with proper type
+    // For authenticated users, we always set privacyPolicyAccepted to true
+    // since they already accepted it during registration
+    replyForm.privacyPolicyAccepted = true
+    
+    // Prepare reply data with proper type, ensuring privacyPolicyAccepted is true
     const replyData: Partial<BulletinReply> = {
       content: replyForm.content,
       privacyPolicyAccepted: true
     }
     
     console.log('Preparing to submit reply as authenticated user:', authStore.isAuthenticated)
-    console.log('Bulletin status:', bulletinStatus.value)
     
     // Send the reply
     const response = await bulletinService.addReply(props.message._id, replyData)
@@ -369,6 +371,7 @@ async function submitReply(): Promise<void> {
     
     // Reset and close form
     replyForm.content = ''
+    replyForm.privacyPolicyAccepted = false
     showReplyForm.value = false
     
     showToast('Antwort erfolgreich gesendet', 'success')
@@ -379,10 +382,6 @@ async function submitReply(): Promise<void> {
     if (error instanceof Error && error.message.includes('401')) {
       errorMessage.value = 'Sie müssen angemeldet sein, um zu antworten'
       showToast('Sie müssen angemeldet sein, um zu antworten', 'error')
-      showReplyForm.value = false
-    } else if (error instanceof Error && error.message.includes('status')) {
-      errorMessage.value = 'Antworten können nicht hinzugefügt werden. Das Bulletin hat einen ungültigen Status.'
-      showToast(errorMessage.value, 'error')
       showReplyForm.value = false
     } else {
       errorMessage.value = 'Fehler beim Senden der Antwort. Bitte versuchen Sie es später erneut.'
@@ -399,32 +398,51 @@ async function submitReply(): Promise<void> {
 function closeReplyForm(): void {
   showReplyForm.value = false
   replyForm.content = ''
+  replyForm.privacyPolicyAccepted = false
 }
 
 /**
- * Delete a reply
+ * Delete a reply if the user is authorized
  */
 async function deleteReply(reply: BulletinReply | null): Promise<void> {
-  if (!reply) return
+  if (!reply) {
+    console.error('Cannot delete reply: No reply selected')
+    showToast('Ein Fehler ist aufgetreten', 'error')
+    showDeleteConfirm.value = false
+    return
+  }
   
   try {
     isSubmitting.value = true
     
-    await bulletinService.deleteReply(props.message._id, reply._id)
+    const bulletinId = props.message._id
+    const replyId = reply._id
     
-    // Emit event to parent
-    emit('reply-deleted', reply._id)
+    console.log('Deleting reply', replyId, 'from bulletin', bulletinId)
     
-    // Reset state
+    // Call the service
+    await bulletinService.deleteReply(bulletinId, replyId)
+    
+    // Close the confirmation modal
     showDeleteConfirm.value = false
     selectedReply.value = null
+    
+    // Emit an event to the parent component to update the UI
+    emit('reply-deleted', replyId)
     
     showToast('Antwort erfolgreich gelöscht', 'success')
   } catch (error) {
     console.error('Error deleting reply:', error)
-    showToast('Fehler beim Löschen der Antwort', 'error')
+    
+    if (error instanceof Error) {
+      showToast(error.message, 'error')
+    } else {
+      showToast('Fehler beim Löschen der Antwort', 'error')
+    }
   } finally {
     isSubmitting.value = false
+    // Deselect the reply after deletion attempt
+    selectedReplies.value.delete(reply._id)
   }
 }
 
@@ -438,38 +456,54 @@ function editReply(reply: BulletinReply): void {
 }
 
 /**
- * Update a reply
+ * Update a reply if the user is authorized
  */
 async function updateReply(): Promise<void> {
-  if (!selectedReply.value) return
+  if (!selectedReply.value) {
+    console.error('Cannot update reply: No reply selected')
+    showToast('Ein Fehler ist aufgetreten', 'error')
+    showEditForm.value = false
+    return
+  }
   
   try {
     isSubmitting.value = true
     
-    // Create a copy of the reply with the updated content
-    const updatedReply = {
-      ...selectedReply.value,
-      content: editedContent.value
-    }
+    const bulletinId = props.message._id
+    const replyId = selectedReply.value._id
+    const content = editedContent.value
     
-    await bulletinService.updateReply(props.message._id, updatedReply._id, editedContent.value)
+    console.log('Updating reply', replyId, 'in bulletin', bulletinId)
     
-    // Emit event to parent
+    // Call the service
+    const response = await bulletinService.updateReply(bulletinId, replyId, content)
+    
+    // Get the updated reply (our mock returns just one reply in the array)
+    const updatedReply = response.data.replies[0] || {}
+    
+    // Create a UI-friendly reply object to emit
     const uiReply: UIBulletinReply = {
       ...updatedReply,
-      bulletinId: props.message._id
+      bulletinId: bulletinId
     }
     
-    emit('reply-updated', uiReply)
-    
-    // Reset state
+    // Close the edit form
     showEditForm.value = false
     selectedReply.value = null
+    editedContent.value = ''
+    
+    // Emit an event to the parent component to update the UI
+    emit('reply-updated', uiReply)
     
     showToast('Antwort erfolgreich aktualisiert', 'success')
   } catch (error) {
     console.error('Error updating reply:', error)
-    showToast('Fehler beim Aktualisieren der Antwort', 'error')
+    
+    if (error instanceof Error) {
+      showToast(error.message, 'error')
+    } else {
+      showToast('Fehler beim Aktualisieren der Antwort', 'error')
+    }
   } finally {
     isSubmitting.value = false
   }

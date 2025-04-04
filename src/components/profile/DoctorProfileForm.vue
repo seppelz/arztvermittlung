@@ -95,29 +95,18 @@
       <div class="space-y-4">
         <h3 class="text-lg font-medium text-gray-700">Verfügbarkeit</h3>
         
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label for="availableFrom" class="block text-sm font-medium text-gray-700">Verfügbar ab</label>
-            <input
-              id="availableFrom"
-              v-model="formData.availability.availableFrom"
-              type="date"
-              required
-              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            >
-          </div>
-          
-          <div>
-            <label for="federalState" class="block text-sm font-medium text-gray-700">Bevorzugtes Bundesland</label>
-            <select
-              id="federalState"
-              v-model="formData.availability.federalState"
-              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            >
-              <option value="">Bitte wählen</option>
-              <option v-for="state in federalStates" :key="state" :value="state">{{ state }}</option>
-            </select>
-          </div>
+        <div>
+          <label for="availableFrom" class="block text-sm font-medium text-gray-700">Verfügbar ab</label>
+          <input
+            id="availableFrom"
+            v-model="formData.availability.availableFrom"
+            type="date"
+            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            :class="{ 'border-red-500': errors.availability.availableFrom }"
+          >
+          <p v-if="errors.availability.availableFrom" class="mt-1 text-sm text-red-600">
+            {{ errors.availability.availableFrom }}
+          </p>
         </div>
       </div>
 
@@ -172,7 +161,6 @@ interface ContactInfo {
 
 interface Availability {
   availableFrom: string;
-  federalState: string;
 }
 
 interface Qualification {
@@ -199,7 +187,6 @@ interface FormErrors {
   };
   availability: {
     availableFrom: string;
-    federalState: string;
   };
 }
 
@@ -223,13 +210,6 @@ const qualificationsList = ref<Qualification[]>([
   { id: 'habilitation', name: 'Habilitation' }
 ])
 
-const federalStates: string[] = [
-  'Baden-Württemberg', 'Bayern', 'Berlin', 'Brandenburg', 'Bremen',
-  'Hamburg', 'Hessen', 'Mecklenburg-Vorpommern', 'Niedersachsen',
-  'Nordrhein-Westfalen', 'Rheinland-Pfalz', 'Saarland', 'Sachsen',
-  'Sachsen-Anhalt', 'Schleswig-Holstein', 'Thüringen'
-]
-
 const formData = ref<FormData>({
   name: '',
   specialty: '',
@@ -240,8 +220,7 @@ const formData = ref<FormData>({
     phone: ''
   },
   availability: {
-    availableFrom: '',
-    federalState: ''
+    availableFrom: ''
   },
   additionalInfo: ''
 })
@@ -254,8 +233,7 @@ const errors = ref<FormErrors>({
     phone: ''
   },
   availability: {
-    availableFrom: '',
-    federalState: ''
+    availableFrom: ''
   }
 })
 
@@ -288,8 +266,7 @@ onMounted(async () => {
           phone: response.data.contact?.phone || ''
         },
         availability: {
-          availableFrom: response.data.availability?.availableFrom || '',
-          federalState: response.data.availability?.federalState || ''
+          availableFrom: response.data.availability?.availableFrom || ''
         },
         additionalInfo: response.data.additionalInfo || ''
       }
@@ -319,8 +296,7 @@ const validateForm = (): boolean => {
       phone: ''
     },
     availability: {
-      availableFrom: '',
-      federalState: ''
+      availableFrom: ''
     }
   }
 

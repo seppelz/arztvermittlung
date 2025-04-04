@@ -24,7 +24,7 @@
                 </svg>
               </router-link>  
 
-              <router-link :to="{ name: 'JobBoard' }" class="btn-hero-secondary px-6 py-3">
+              <router-link :to="{ name: 'Arztboerse' }" class="btn-hero-secondary px-6 py-3">
                 Stellenbörse ansehen
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" viewBox="0 0 20 20" fill="currentColor">
                   <path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
@@ -176,7 +176,7 @@
               </li>
             </ol>
             <div class="mt-8">
-              <router-link :to="{ name: 'ForDoctors' }" class="btn-primary w-full text-center py-3">
+              <router-link :to="{ name: 'Profile', query: { userType: 'doctor' }}" class="btn-primary w-full text-center py-3">
                 Als Arzt registrieren
               </router-link>
             </div>
@@ -210,7 +210,7 @@
               </li>
             </ol>
             <div class="mt-8">
-              <router-link :to="{ name: 'ForHospitals' }" class="btn-secondary w-full text-center py-3">
+              <router-link :to="{ name: 'Profile', query: { userType: 'hospital' }}" class="btn-secondary w-full text-center py-3">
                 Als Klinik registrieren
               </router-link>
             </div>
@@ -305,10 +305,10 @@
               Ärzte: Erhöhen Sie Ihr Einkommen durch flexible Kurzeinsätze (1 Woche bis 3 Monate) mit attraktivem Honorarzuschlag. Kliniken: Überbrücken Sie Personalengpässe schnell und unkompliziert mit qualifizierten Fachärzten.
             </p>
             <div class="flex flex-wrap justify-center gap-4">
-              <router-link :to="{ name: 'ForDoctors' }" class="btn-white text-lg px-8 py-3 bg-white text-secondary-700 hover:bg-neutral-100">
+              <router-link :to="{ name: 'Profile', query: { userType: 'doctor' }}" class="btn-white text-lg px-8 py-3 bg-white text-secondary-700 hover:bg-neutral-100">
                 Für Ärzte
               </router-link>
-              <router-link :to="{ name: 'ForHospitals' }" class="btn-outline text-lg px-8 py-3 bg-transparent border-2 border-white text-white hover:bg-white/10">
+              <router-link :to="{ name: 'Profile', query: { userType: 'hospital' }}" class="btn-outline text-lg px-8 py-3 bg-transparent border-2 border-white text-white hover:bg-white/10">
                 Für Kliniken
               </router-link>
             </div>
@@ -723,7 +723,7 @@ onMounted(() => {
 }
 
 .network-line {
-  animation: dash 15s linear infinite alternate;
+  animation: dash 15s linear infinite;
   stroke-dasharray: 5;
 }
 

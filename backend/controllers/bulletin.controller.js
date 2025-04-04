@@ -188,9 +188,15 @@ exports.createBulletin = async (req, res) => {
       });
     }
     
-    // Get user ID if authenticated, otherwise generate session ID
-    const userId = req.user?._id;
-    const sessionId = !userId ? generateSessionId() : null;
+    // User must be authenticated to create a bulletin
+    if (!req.user || !req.user._id) {
+      return res.status(401).json({
+        success: false,
+        message: 'Authentication required to create bulletins'
+      });
+    }
+    
+    const userId = req.user._id;
 
     const bulletin = new Bulletin({
       title,
@@ -204,17 +210,27 @@ exports.createBulletin = async (req, res) => {
       phone,
       privacyPolicyAccepted,
       userId,
-      sessionId
+      // No more sessionId, we only allow authenticated users
     });
 
     await bulletin.save();
 
-    // Send email notification for new bulletin
-    await sendEmail({
-      to: process.env.ADMIN_EMAIL,
-      subject: `New ${messageType} Bulletin Entry`,
-      text: `A new ${messageType} bulletin entry has been created by ${name} (${email}).`
-    });
+    // Try to send email notification for new bulletin, but don't block on failure
+    try {
+      if (process.env.ADMIN_EMAIL) {
+        await sendEmail({
+          to: process.env.ADMIN_EMAIL,
+          subject: `New ${messageType} Bulletin Entry`,
+          text: `A new ${messageType} bulletin entry has been created by ${name} (${email}).`
+        });
+        console.log('Email notification sent for new bulletin');
+      } else {
+        console.log('Skipping email notification - ADMIN_EMAIL not configured');
+      }
+    } catch (emailError) {
+      // Log the error but continue with the response
+      console.error('Failed to send email notification:', emailError);
+    }
 
     res.status(201).json({
       success: true,
