@@ -169,7 +169,6 @@
 
 <script setup lang="ts">
 import { ref, reactive } from 'vue';
-import { useRouter } from 'vue-router';
 import authService from '@/services/auth.service';
 
 interface FormData {
@@ -189,7 +188,16 @@ interface RegisterError {
   message?: string;
 }
 
-const router = useRouter();
+interface RegistrationData {
+  name: string;
+  email: string;
+  password: string;
+  privacyPolicyAccepted: boolean;
+  termsAccepted: boolean;
+  role: 'user' | 'admin' | 'doctor' | 'hospital';
+  userType: 'Arzt' | 'Klinik';
+  username: string;
+}
 
 const formData = reactive<FormData>({
   name: '',
@@ -208,20 +216,17 @@ const handleSubmit = async (): Promise<void> => {
   isSubmitting.value = true;
   
   try {
-    // Map userType properly according to backend expectations
-    const userData = {
+    const userData: RegistrationData = {
       ...formData,
-      role: 'user',
+      role: 'doctor',
       userType: 'Arzt',
       username: formData.email.split('@')[0] // Generate a username from email
     };
     
     await authService.register(userData);
     
-    // Show success message
     successMessage.value = 'Registrierung erfolgreich! Sie können sich jetzt anmelden und Ihr Profil vervollständigen.';
     
-    // Reset form
     Object.keys(formData).forEach(key => {
       (formData as any)[key] = '';
     });

@@ -17,7 +17,10 @@ export interface Bulletin {
   createdAt: Date;
   updatedAt: Date;
   startDate?: Date;
-  // Removed specialty as it's no longer used in forms
+  specialty?: string;
+  federalState?: string;
+  period?: string;
+  location?: string;
   state?: string;
   userId?: string;
   sessionId?: string;

@@ -120,6 +120,18 @@ interface RegisterError {
   message?: string;
 }
 
+// Define the registration data interface
+interface RegistrationData {
+  name: string;
+  email: string;
+  password: string;
+  privacyPolicyAccepted: boolean;
+  termsAccepted: boolean;
+  role: 'user' | 'admin' | 'doctor' | 'hospital';
+  userType: 'Arzt' | 'Klinik';
+  username: string;
+}
+
 const props = defineProps<{
   userType: 'Arzt' | 'Klinik';
 }>();
@@ -142,7 +154,7 @@ const handleSubmit = async (): Promise<void> => {
   
   try {
     // Map userType properly according to backend expectations
-    const userData = {
+    const userData: RegistrationData = {
       ...formData,
       role: props.userType === 'Arzt' ? 'doctor' : 'hospital', // Set the correct role based on userType
       userType: props.userType,

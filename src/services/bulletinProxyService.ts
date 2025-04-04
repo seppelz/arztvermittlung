@@ -14,7 +14,12 @@ import {
 } from './bulletin.service';
 
 // Map the ResponseWithData to ApiResponse for consistency
-function mapToApiResponse<T>(response: ResponseWithData<T>): ApiResponse<T> {
+function mapToApiResponse<T>(response: ResponseWithData<T> | any): ApiResponse<T> {
+  // If response is already an ApiResponse, return it
+  if (response && 'status' in response) {
+    return response as ApiResponse<T>;
+  }
+  
   // Check if the data is a paginated response with items and pagination
   if (response.data && typeof response.data === 'object' && 
       !Array.isArray(response.data) && 
@@ -22,10 +27,10 @@ function mapToApiResponse<T>(response: ResponseWithData<T>): ApiResponse<T> {
       'pagination' in response.data) {
     // For paginated responses, extract the items
     return {
-      data: (response.data as any).items,
+      data: response.data.items as T,
       success: response.success || true,
       status: 200,
-      message: response.message || ''
+      message: response.message || 'Operation successful'
     };
   }
   
@@ -34,7 +39,7 @@ function mapToApiResponse<T>(response: ResponseWithData<T>): ApiResponse<T> {
     data: response.data,
     success: response.success || true,
     status: 200,
-    message: response.message || ''
+    message: response.message || 'Operation successful'
   };
 }
 
@@ -93,12 +98,7 @@ async function getAllBulletinsProxy(params: BulletinParams = {}): Promise<ApiRes
 async function getBulletinByIdProxy(id: string): Promise<ApiResponse<Bulletin>> {
   try {
     const bulletin = await getBulletinById(id);
-    return {
-      data: bulletin,
-      success: true,
-      status: 200,
-      message: 'Bulletin retrieved successfully'
-    };
+    return mapToApiResponse({ data: bulletin, success: true });
   } catch (error) {
     console.error(`[BulletinProxyService] Error getting bulletin ${id}:`, error);
     throw error;
@@ -179,12 +179,7 @@ async function createBulletinProxy(bulletinData: Partial<Bulletin>): Promise<Api
     
     console.log('[BulletinProxyService] Bulletin created successfully:', response.data);
     
-    return {
-      success: true,
-      status: 201,
-      message: 'Bulletin created successfully',
-      data: response.data.data || response.data
-    };
+    return mapToApiResponse(response.data);
   } catch (error: any) {
     console.error('[BulletinProxyService] Error creating bulletin:', error);
     
@@ -233,12 +228,7 @@ async function createBulletinProxy(bulletinData: Partial<Bulletin>): Promise<Api
 async function updateBulletinProxy(id: string, bulletinData: Partial<Bulletin>): Promise<ApiResponse<Bulletin>> {
   try {
     const bulletin = await updateBulletin(id, bulletinData);
-    return {
-      data: bulletin,
-      success: true,
-      status: 200,
-      message: 'Bulletin updated successfully'
-    };
+    return mapToApiResponse({ data: bulletin, success: true });
   } catch (error) {
     console.error(`[BulletinProxyService] Error updating bulletin ${id}:`, error);
     throw error;
@@ -269,12 +259,7 @@ async function deleteBulletinProxy(id: string): Promise<ApiResponse<{ success: b
 async function addReplyProxy(bulletinId: string, replyData: Partial<BulletinReply>): Promise<ApiResponse<Bulletin>> {
   try {
     const bulletin = await addReply(bulletinId, replyData);
-    return {
-      data: bulletin,
-      success: true,
-      status: 200,
-      message: 'Reply added successfully'
-    };
+    return mapToApiResponse({ data: bulletin, success: true });
   } catch (error: any) {
     console.error(`[BulletinProxyService] Error adding reply to bulletin ${bulletinId}:`, error);
     
@@ -312,12 +297,7 @@ async function addReplyProxy(bulletinId: string, replyData: Partial<BulletinRepl
 async function deleteReplyProxy(bulletinId: string, replyId: string): Promise<ApiResponse<Bulletin>> {
   try {
     const bulletin = await deleteReply(bulletinId, replyId);
-    return {
-      data: bulletin,
-      success: true,
-      status: 200,
-      message: 'Reply deleted successfully'
-    };
+    return mapToApiResponse({ data: bulletin, success: true });
   } catch (error: any) {
     console.error(`[BulletinProxyService] Error deleting reply ${replyId} from bulletin ${bulletinId}:`, error);
     
@@ -351,12 +331,7 @@ async function deleteReplyProxy(bulletinId: string, replyId: string): Promise<Ap
 async function updateReplyProxy(bulletinId: string, replyId: string, content: string): Promise<ApiResponse<Bulletin>> {
   try {
     const bulletin = await updateReply(bulletinId, replyId, content);
-    return {
-      data: bulletin,
-      success: true,
-      status: 200,
-      message: 'Reply updated successfully'
-    };
+    return mapToApiResponse({ data: bulletin, success: true });
   } catch (error: any) {
     console.error(`[BulletinProxyService] Error updating reply ${replyId} in bulletin ${bulletinId}:`, error);
     
@@ -394,7 +369,25 @@ async function getUserBulletinsProxy(params: BulletinParams = {}): Promise<ApiRe
     console.log('[BulletinProxyService] Getting user bulletins with params:', params);
     const response = await getUserBulletins(params);
     console.log('[BulletinProxyService] User bulletins response:', response);
-    return mapToApiResponse(response);
+    
+    // Check if the response was successful
+    if (!response.success) {
+      console.warn('[BulletinProxyService] Failed to get user bulletins:', response.message);
+      return {
+        data: [],
+        success: false,
+        status: 404,
+        message: response.message || 'Failed to load user bulletins'
+      };
+    }
+    
+    // Return the bulletins with success status
+    return {
+      data: response.data || [],
+      success: true,
+      status: 200,
+      message: response.message || `Found ${response.data?.length || 0} bulletins`
+    };
   } catch (error) {
     console.error('[BulletinProxyService] Error getting user bulletins:', error);
     
@@ -450,12 +443,7 @@ async function contactBulletinAuthorProxy(bulletinId: string, contactData: { nam
     
     console.log('[BulletinProxyService] Contact request sent successfully:', response.data);
     
-    return {
-      success: true,
-      status: 200,
-      message: 'Contact request sent successfully',
-      data: response.data
-    };
+    return mapToApiResponse(response.data);
   } catch (error: any) {
     console.error(`[BulletinProxyService] Error contacting bulletin author for bulletin ${bulletinId}:`, error);
     

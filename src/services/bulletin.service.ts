@@ -1,6 +1,6 @@
 import api from './api';
 import { useAuthStore } from '@/stores/auth';
-import { Bulletin, BulletinReply, BulletinParams, ApiResponse, PaginatedResponse, Pagination } from '@/types';
+import { Bulletin, BulletinReply, BulletinParams, PaginatedResponse, Pagination } from '@/types';
 
 /**
  * Response data structure
@@ -445,22 +445,57 @@ async function getUserBulletins(params: BulletinParams = {}): Promise<ResponseWi
       };
     }
     
-    // Use the same approach as in ArztboersePage.vue
-    // Get all bulletins with status 'active'
-    const response = await getAllBulletins({
-      status: 'active',
-      ...params
+    // Get the user's email
+    const userEmail = authStore.userEmail;
+    if (!userEmail) {
+      console.warn('BulletinService: User email not available');
+      return {
+        success: false,
+        data: [],
+        message: 'User email not available'
+      };
+    }
+    
+    console.log(`BulletinService: Fetching bulletins for user email ${userEmail}`);
+    
+    // Use the /bulletin endpoint instead of /arztboerse
+    const response = await api.get('/bulletin', { 
+      params: {
+        ...params,
+        status: 'active'
+      },
+      timeout: 15000,
+      headers: {
+        'Accept': 'application/json',
+        'Cache-Control': 'no-cache'
+      }
     });
     
-    // Extract the bulletins from the response
+    console.log('BulletinService: Got response from /bulletin:', response);
+    
+    // Extract bulletins from the response based on its structure
     let allBulletins: Bulletin[] = [];
-    if (response && response.data && response.data.items) {
-      allBulletins = response.data.items;
+    
+    if (response) {
+      if (Array.isArray(response)) {
+        // Direct array response
+        allBulletins = response;
+      } else if (response.data && Array.isArray(response.data)) {
+        // { data: [...] } format
+        allBulletins = response.data;
+      } else if (response.data && response.data.items && Array.isArray(response.data.items)) {
+        // { data: { items: [...] } } format
+        allBulletins = response.data.items;
+      } else if (response.items && Array.isArray(response.items)) {
+        // { items: [...] } format
+        allBulletins = response.items;
+      } else {
+        console.warn('BulletinService: Unexpected response format:', response);
+      }
     }
     
     // Filter bulletins by the current user's email
-    const userEmail = authStore.userEmail;
-    console.log(`BulletinService: Filtering bulletins for user email ${userEmail}`);
+    console.log(`BulletinService: Filtering ${allBulletins.length} bulletins for user email ${userEmail}`);
     
     const userBulletins = allBulletins.filter((bulletin: Bulletin) => {
       return bulletin.email === userEmail;
@@ -475,7 +510,23 @@ async function getUserBulletins(params: BulletinParams = {}): Promise<ResponseWi
     };
   } catch (error) {
     console.error('BulletinService: Error getting user bulletins:', error);
-    throw error;
+    
+    // Enhanced error logging
+    if (error && typeof error === 'object') {
+      console.error('BulletinService: Detailed error info:', {
+        name: (error as any).name,
+        message: (error as any).message,
+        response: (error as any).response,
+        stack: (error as any).stack
+      });
+    }
+    
+    // Return empty array with error message instead of throwing
+    return {
+      success: false,
+      data: [],
+      message: (error as any)?.message || 'Failed to load user bulletins'
+    };
   }
 }
 
