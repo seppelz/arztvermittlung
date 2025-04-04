@@ -30,19 +30,19 @@
         <DoctorProfileForm @profile-updated="handleDoctorProfileUpdate" />
       </div>
       
-      <!-- Doctor Availability Manager -->
-      <div v-if="isDoctor" class="mb-6">
-        <AvailabilityManager @profile-updated="handleDoctorProfileUpdate" />
-      </div>
-      
       <!-- Hospital Profile Form -->
       <div v-if="isHospital" class="mb-6">
         <HospitalProfileForm @profile-updated="handleHospitalProfileUpdate" />
       </div>
       
-      <!-- Hospital Availability Manager -->
-      <div v-if="isHospital" class="mb-6">
-        <AvailabilityManager @profile-updated="handleHospitalProfileUpdate" />
+      <!-- Job Postings Manager - Show for both doctors and hospitals -->
+      <div class="mb-6">
+        <JobPostingsManager />
+      </div>
+      
+      <!-- Bulletin Board Manager - Show for both doctors and hospitals -->
+      <div class="mb-6">
+        <BulletinBoardManager />
       </div>
 
       <!-- Account Management -->
@@ -105,9 +105,11 @@ import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
 import { useToast } from '@/composables/useToast';
 import api from '@/services/api';
+
 import DoctorProfileForm from '@/components/profile/DoctorProfileForm.vue';
 import HospitalProfileForm from '@/components/profile/HospitalProfileForm.vue';
-import AvailabilityManager from '@/components/profile/AvailabilityManager.vue';
+import JobPostingsManager from '@/components/profile/JobPostingsManager.vue';
+import BulletinBoardManager from '@/components/profile/BulletinBoardManager.vue';
 
 // Define interfaces
 interface User {

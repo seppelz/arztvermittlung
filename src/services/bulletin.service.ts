@@ -1,6 +1,6 @@
 import api from './api';
 import { useAuthStore } from '@/stores/auth';
-import { Bulletin, BulletinReply, BulletinParams, PaginatedResponse, Pagination } from '@/types';
+import type { Bulletin, BulletinParams, BulletinReply, UIBulletinReply, PaginatedResponse, Pagination } from '@/types';
 
 /**
  * Response data structure
@@ -478,16 +478,14 @@ async function getUserBulletins(params: BulletinParams = {}): Promise<ResponseWi
     
     if (response) {
       if (Array.isArray(response)) {
-        // Direct array response
         allBulletins = response;
       } else if (response.data && Array.isArray(response.data)) {
-        // { data: [...] } format
         allBulletins = response.data;
+      } else if (response.data && response.data.bulletins && Array.isArray(response.data.bulletins)) {
+        allBulletins = response.data.bulletins;
       } else if (response.data && response.data.items && Array.isArray(response.data.items)) {
-        // { data: { items: [...] } } format
         allBulletins = response.data.items;
       } else if (response.items && Array.isArray(response.items)) {
-        // { items: [...] } format
         allBulletins = response.items;
       } else {
         console.warn('BulletinService: Unexpected response format:', response);
@@ -526,6 +524,87 @@ async function getUserBulletins(params: BulletinParams = {}): Promise<ResponseWi
       success: false,
       data: [],
       message: (error as any)?.message || 'Failed to load user bulletins'
+    };
+  }
+}
+
+/**
+ * Get all replies made by a specific user
+ * @param params - Filter parameters including user email
+ * @returns Promise with user replies and their parent bulletins
+ */
+async function getUserReplies(params: BulletinParams): Promise<{ success: boolean; data: UIBulletinReply[]; message: string }> {
+  try {
+    const userEmail = params.email;
+    
+    if (!userEmail) {
+      console.warn('BulletinService: User email not available for getting replies');
+      return {
+        success: false,
+        data: [],
+        message: 'User email not available'
+      };
+    }
+    
+    console.log(`BulletinService: Fetching replies for user email ${userEmail}`);
+    
+    // First get all bulletins with replies
+    const response = await api.get('/bulletin', { 
+      params: {
+        ...params,
+        status: 'active',
+        hasReplies: true
+      },
+      timeout: 15000,
+      headers: {
+        'Accept': 'application/json',
+        'Cache-Control': 'no-cache'
+      }
+    });
+    
+    console.log('BulletinService: Got response for bulletins with replies:', response);
+    
+    // Extract bulletins from the response based on its structure
+    let allBulletins: Bulletin[] = [];
+    
+    if (response) {
+      if (Array.isArray(response)) {
+        allBulletins = response;
+      } else if (response.data && Array.isArray(response.data)) {
+        allBulletins = response.data;
+      } else if (response.data && response.data.bulletins && Array.isArray(response.data.bulletins)) {
+        allBulletins = response.data.bulletins;
+      }
+    }
+    
+    // Extract all replies made by the user
+    const userReplies: UIBulletinReply[] = [];
+    
+    allBulletins.forEach(bulletin => {
+      if (bulletin.replies && Array.isArray(bulletin.replies)) {
+        bulletin.replies.forEach(reply => {
+          if (reply.email === userEmail) {
+            userReplies.push({
+              ...reply,
+              bulletinId: bulletin._id
+            });
+          }
+        });
+      }
+    });
+    
+    return {
+      success: true,
+      data: userReplies,
+      message: `Found ${userReplies.length} replies by user`
+    };
+    
+  } catch (error: any) {
+    console.error('BulletinService: Error fetching user replies:', error);
+    return {
+      success: false,
+      data: [],
+      message: error.message || 'Error fetching user replies'
     };
   }
 }
@@ -579,6 +658,7 @@ export {
   deleteReply,
   updateReply,
   getUserBulletins,
+  getUserReplies,
   canEditBulletin,
   canEditReply,
   getSessionId
