@@ -12,32 +12,27 @@ MedMatch
 Hülshoffstr. 22
 46342 Velen
 
-## 3. Website-Analyse mit Plausible Analytics
+## 3. Website-Analyse mit Umami Analytics
 
-Wir nutzen Plausible Analytics, um die Nutzung unserer Website zu analysieren. Plausible ist ein datenschutzfreundlicher Anbieter, der:
+Wir nutzen Umami Analytics, um die Nutzung unserer Website zu analysieren. Umami ist ein datenschutzfreundlicher Anbieter, der:
 
 - Keine Cookies verwendet
-- Keine persönlichen Daten sammelt
-- Vollständig DSGVO-konform ist
-- Keine IP-Adressen speichert
-- Keine Fingerprinting-Techniken einsetzt
+- Keine personenbezogenen Daten sammelt
+- DSGVO-konform ist
+- Daten anonymisiert erfasst
 
-### Was wird bei Plausible Analytics erfasst?
+### Was wird bei Umami Analytics erfasst?
 
-Plausible erfasst nur:
-- Seitenaufrufe
-- Verweildauer
-- Verweise (von welchen Websites kommen Besucher)
-- Geografische Daten (Land, Stadt)
-- Geräteinformationen (Browser, Betriebssystem)
-- Bildschirmauflösung
+Umami erfasst nur:
 
-### Keine Erfassung von:
-- Persönlichen Daten
-- IP-Adressen
-- Browser-Fingerprints
-- Cookies
-- Anderen persönlichen Informationen
+- Anonymisierte IP-Adressen
+- Browsertyp und -version
+- Gerätetyp
+- Seitenzugriffe und Klicks 
+- Verweisende Websites
+- Ungefähre geografische Standorte (auf Landesebene)
+
+Diese Daten werden ausschließlich für statistische Zwecke verwendet und niemals mit persönlichen Daten verknüpft.
 
 ## 4. Datenerhebung und -verarbeitung
 

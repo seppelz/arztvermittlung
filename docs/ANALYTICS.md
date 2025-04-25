@@ -1,161 +1,64 @@
-# Analytics Implementation Guide
+# Analytics Implementation
 
-This document provides guidelines for implementing and using Plausible Analytics in the MedMatch application.
+This document provides guidelines for implementing and using Umami Analytics in the MedMatch application.
 
-## Why Plausible Analytics?
+## Why Umami Analytics?
 
-We've chosen Plausible Analytics over Google Analytics for several important reasons:
+We've chosen Umami Analytics for several important reasons:
 
-1. **Privacy-Focused**: Plausible doesn't use cookies, doesn't collect personal data, and is fully GDPR, CCPA, and PECR compliant.
-2. **No Cookie Banners Needed**: Since Plausible doesn't use cookies, we don't need to show annoying cookie consent banners.
-3. **Lightweight**: Plausible's script is under 1KB (compared to ~45KB for Google Analytics), resulting in faster page loads.
-4. **Simple Dashboard**: Clean, easy-to-understand metrics without overwhelming complexity.
-5. **Data Ownership**: Full data ownership with EU-based data storage and optional self-hosting.
+1. **Privacy-Focused**: Umami doesn't use cookies, doesn't collect personal data, and is fully GDPR, CCPA, and PECR compliant.
+2. **No Cookie Banners Needed**: Since Umami doesn't use cookies, we don't need to show annoying cookie consent banners.
+3. **Lightweight**: Umami's script is under 2KB, resulting in faster page loads.
+4. **Open Source**: Umami is completely open-source and can be self-hosted.
+5. **Free Options**: Umami offers a free cloud tier or can be self-hosted at no cost.
 
-## Getting Started
+## Implementation
 
-### Installation and Configuration
+### Basic Tracking Setup
 
-The Plausible script is already added to our `index.html` file:
+The Umami script is added to our `index.html` file:
 
 ```html
-<script defer data-domain="med-match.de" src="https://plausible.io/js/script.js"></script>
+<script async defer src="https://your-umami-instance.com/script.js" data-website-id="your-website-id"></script>
 ```
 
-When developing locally, analytics events will be logged to the console but not sent to Plausible. In production, events will be sent to our Plausible dashboard.
+When developing locally, you may want to disable analytics by commenting out this script.
 
-### Setting Up a Plausible Account
+### Setting Up a Umami Account
 
-1. Sign up at [plausible.io](https://plausible.io)
-2. Add your domain (med-match.de)
-3. Get your tracking script (already added)
-4. Set appropriate team member access
+1. Sign up at [cloud.umami.is](https://cloud.umami.is/signup) for the cloud version
+   - OR follow the [self-hosting guide](https://umami.is/docs/install)
+2. Create a new website in your dashboard
+3. Update the script tag in `index.html` with your website's specific details
 
-## Using Analytics in MedMatch
+### Custom Event Tracking
 
-### Automatic Page Tracking
+For custom event tracking, use the following method:
 
-Page views are automatically tracked whenever the user navigates to a new route. This is handled by the router integration in `main.js`.
+```typescript
+// Track a page view manually
+umami.trackView('/your-page-path');
 
-### Analytics Service
-
-For direct access, import from the analytics service:
-
-```javascript
-import { trackEvent, trackPageView, trackFormSubmission } from '@/services/analyticsService'
-
-// Track a custom event
-trackEvent('Button Clicked', { buttonName: 'Submit' })
-
-// Manually track a page view
-trackPageView('/custom-page')
-
-// Track a form submission
-trackFormSubmission('Registration Form')
+// Track an event
+umami.trackEvent('Button Clicked', 'signup-form');
 ```
 
-### Vue Composable
+## Privacy Considerations
 
-The recommended way to use analytics in Vue components is through the `useAnalytics` composable:
+In your privacy policy, make sure to:
 
-```javascript
-import { useAnalytics } from '@/composables/useAnalytics'
+1. Mention that you use Umami Analytics
+2. Explain that it's cookie-free and privacy-focused
+3. Link to Umami's privacy documentation: https://umami.is/docs/privacy
 
-// In your setup function
-const { trackInteraction, trackForm, trackFeatureUsage, trackError } = useAnalytics()
+## Troubleshooting
 
-// Track user interactions
-trackInteraction('Button Clicked', { buttonName: 'Submit' })
+If analytics isn't working:
 
-// Track form submissions
-trackForm('Registration Form', { hasEmail: true })
+1. Check your browser's network tab to confirm the script is loading
+2. Verify your website ID is correct
+3. Check that the domain matches in the Umami dashboard
 
-// Track feature usage
-trackFeatureUsage('Export Data', { format: 'CSV' })
+## Dashboard Access
 
-// Track errors
-trackError('API Error', 'Failed to fetch data', { statusCode: 500 })
-```
-
-## Best Practices
-
-### DO
-
-- ✅ Use semantic event names (e.g., 'Form Submission' not 'clicked submit button')
-- ✅ Group related events with consistent naming (e.g., 'Form: Contact', 'Form: Registration')
-- ✅ Use the provided composables and services rather than direct calls to window.plausible
-- ✅ Track business-meaningful events rather than every small interaction
-- ✅ Consider user privacy in all tracking decisions
-- ✅ Document new event types in this documentation
-
-### DON'T
-
-- ❌ Track personally identifiable information (PII) such as names, emails, or IDs
-- ❌ Create event explosions (too many unique event names)
-- ❌ Track every minor interaction (mouse movements, hovers, etc.)
-- ❌ Implement redundant tracking (already covered by automatic tracking)
-
-## Example Implementation
-
-Here's an example of analytics integration in a form component:
-
-```vue
-<script setup>
-import { ref } from 'vue'
-import { useAnalytics } from '@/composables/useAnalytics'
-
-const { trackForm, trackInteraction } = useAnalytics()
-
-// Track when user submits form
-const submitForm = () => {
-  // Track the submission
-  trackForm('Contact Form', {
-    // DON'T include personal data
-    hasName: !!formData.name,
-    hasEmail: !!formData.email,
-    messageLength: formData.message.length
-  })
-  
-  // Form submission logic...
-}
-
-// Track when user interacts with specific element
-const trackSpecialInteraction = () => {
-  trackInteraction('Special Feature Used', {
-    location: 'Contact Form',
-    action: 'clicked'
-  })
-}
-</script>
-```
-
-## Dashboard and Reporting
-
-Access your Plausible dashboard at: `https://plausible.io/med-match.de`
-
-The dashboard provides:
-- Visitor data
-- Page views
-- Referral sources
-- Top pages
-- Country data
-- Device information
-- Custom event tracking
-
-## Privacy Policy Considerations
-
-Update your privacy policy to inform users about analytics tracking:
-
-1. Mention that you use Plausible Analytics
-2. Explain that it's cookie-free and privacy-respecting
-3. Link to Plausible's data policy: https://plausible.io/data-policy
-4. Include information about what information is collected (no personal data)
-
-## Support and Troubleshooting
-
-If analytics events aren't being tracked:
-
-1. Check browser console for errors
-2. Verify script is loading correctly
-3. Check that the domain matches in the Plausible dashboard
-4. Test with event debugging enabled: `https://plausible.io/js/script.manual.js` 
+Access your Umami dashboard at: `https://cloud.umami.is` (or your self-hosted URL) 
