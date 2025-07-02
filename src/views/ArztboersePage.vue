@@ -47,7 +47,7 @@
             <span class="text-text-dark">Sortieren:</span>
             <select 
               v-model="sortOrder" 
-              class="bg-white border border-gray-300 rounded-lg px-3 py-1 text-text-dark focus:outline-none focus:ring-2 focus:ring-primary"
+              class="bg-white border border-gray-300 rounded-lg px-3 py-1 text-text-dark focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
             >
               <option value="newest">Neueste zuerst</option>
               <option value="oldest">Älteste zuerst</option>
@@ -109,17 +109,33 @@
             </div>
               
             <div class="mt-6 flex justify-between items-center">
-              <div class="flex items-center">
-                <span class="font-medium text-text-dark">
-                  {{ bulletin.messageType === 'Angebot' ? 'Medizinische Einrichtung' : bulletin.name }}
-                </span>
-              </div>
+              <!-- Conditionally show Interest Button -->
               <button 
-                @click="openContactModal(bulletin)" 
-                class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
+                v-if="isAuthenticated && user && ((user.userType === 'Arzt' && bulletin.messageType === 'Angebot') || (user.userType === 'Klinik' && bulletin.messageType === 'Gesuch'))"
+                @click="showInterest(bulletin)"
+                :class="[
+                  'px-4 py-2 rounded-lg font-medium text-sm transition-colors',
+                  interestedJobIds.has(bulletin._id) ? 'bg-gray-300 text-gray-600 cursor-not-allowed' : 
+                  '!bg-primary hover:bg-primary-dark text-white', 
+                  interestLoadingStates[bulletin._id] ? 'opacity-50 cursor-wait' : ''
+                ]"
+                :disabled="interestedJobIds.has(bulletin._id) || interestLoadingStates[bulletin._id]"
+                style="background-color: #0CA5E9 !important;"
+              >
+                <span v-if="interestLoadingStates[bulletin._id]" class="inline-block w-4 h-4 border-2 border border-t-transparent rounded-full animate-spin mr-1"></span>
+                {{ interestedJobIds.has(bulletin._id) ? 'Interesse angemeldet' : 'Interesse anmelden' }}
+              </button>
+
+              <!-- Contact Author Button (Example - adjust as needed) -->
+              <!-- You might want similar logic here if contact depends on roles -->
+              <!-- <button 
+                v-if="isAuthenticated && user && ((user.userType === 'Arzt' && bulletin.messageType === 'Angebot') || (user.userType === 'Klinik' && bulletin.messageType === 'Gesuch'))"
+                @click="openContactModal(bulletin)"
+                class="px-4 py-2 rounded-lg font-medium text-sm bg-primary hover:bg-primary-dark text-white transition-colors"
               >
                 Kontakt aufnehmen
-              </button>
+              </button> -->
+             
             </div>
           </div>
         </div>
@@ -382,42 +398,24 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue';
-import { useAuthStore } from '@/stores/auth';
+import { useAuthStore } from '@/stores/auth'; 
 import bulletinProxyService from '@/services/bulletinProxyService';
-
+import interestService from '@/services/interestService';
+import { formatDate } from '@/utils/formatDate'; 
+import type { Bulletin } from '@/types/bulletin'; 
+import type { Interest, InterestResponse } from '@/types/interest'; 
+ 
 const authStore = useAuthStore();
+const isAuthenticated = computed(() => authStore.isAuthenticated);
+const user = computed(() => authStore.user);
+const isUserHospital = computed(() => user.value?.userType === 'Klinik');
 
-// Computed property to check if user is authenticated
-const isAuthenticated = computed(() => {
-  console.log('[ArztboersePage] Authentication check:', {
-    isAuthenticated: authStore.isAuthenticated,
-    user: authStore.user,
-    role: authStore.user?.role,
-    userType: authStore.user?.userType
-  });
-  return authStore.isAuthenticated;
-});
-
-// Computed property to determine if the user is a hospital or a doctor
-const isUserHospital = computed(() => {
-  if (!authStore.isAuthenticated || !authStore.user) return null;
-  console.log('[ArztboersePage] User type check:', {
-    role: authStore.user.role,
-    userType: authStore.user.userType,
-    isHospital: authStore.user.role === 'hospital' || authStore.user.userType === 'Klinik',
-    isDoctor: authStore.user.role === 'doctor' || authStore.user.userType === 'Arzt'
-  });
-  return authStore.user.role === 'hospital' || authStore.user.userType === 'Klinik';
-});
-
-// State for bulletins
-const bulletins = ref<any[]>([]);
+const bulletins = ref<Bulletin[]>([]);
 const isLoading = ref(true);
 const filterType = ref('all');
 const sortOrder = ref('newest');
 
-// State for new message form
-const isFormOpen = ref(true); // Set to true by default for logged-in users
+const isFormOpen = ref(true); 
 const newMessageForm = ref({
   title: '',
   content: '',
@@ -425,76 +423,69 @@ const newMessageForm = ref({
   specialty: '',
   location: '',
   period: '',
-  startDate: new Date().toISOString().split('T')[0], // Initialize with today's date
+  startDate: new Date().toISOString().split('T')[0], 
   federalState: '',
   contactEmail: '',
   isSubmitting: false,
-  error: null,
+  error: null as string | null,
   success: false
 });
 
-// State for contact modal
 const showContactModal = ref(false);
-const selectedMessage = ref<any>(null);
+const selectedMessage = ref<Bulletin | null>(null); 
 const contactForm = ref({
   name: '',
   email: '',
   message: '',
   isSubmitting: false,
-  error: null,
+  error: null as string | null,
   success: false
 });
 
-// State for login modal
 const showLoginModal = ref(false);
 
-// Filtered bulletins based on selected filter
+const interestedJobIds = ref<Set<string>>(new Set()); 
+const interestLoadingStates = ref<Record<string, boolean>>({}); 
+const interestError = ref<string | null>(null); 
+
 const filteredBulletins = computed(() => {
-  // First filter out "Information" type messages - only show Angebot and Gesuch
   const jobBulletins = bulletins.value.filter(bulletin => 
     bulletin.messageType === 'Angebot' || bulletin.messageType === 'Gesuch'
   );
   
-  // Then apply the type filter if not "all"
   if (filterType.value === 'all') {
     return jobBulletins;
   }
   return jobBulletins.filter(bulletin => bulletin.messageType === filterType.value);
 });
 
-// Fetch bulletins on component mount
 onMounted(async () => {
-  console.log('[ArztboersePage] Component mounted, auth state:', {
-    isAuthenticated: authStore.isAuthenticated,
-    user: authStore.user,
-    isUserHospital: isUserHospital.value
+  await fetchBulletins();
+  await fetchUserInterests(); // Fetch interests when component mounts
+  // Optionally, watch for authentication changes to refetch interests if needed
+  watch(isAuthenticated, (newValue) => {
+    if (newValue) {
+      fetchUserInterests();
+    } else {
+      interestedJobIds.value.clear();
+    }
   });
   
-  await fetchBulletins();
-  
-  // Set message type based on user type
-  if (isUserHospital.value !== null) {
-    newMessageForm.value.messageType = isUserHospital.value ? 'Angebot' : 'Gesuch';
-    console.log('[ArztboersePage] Setting message type based on user type:', newMessageForm.value.messageType);
+  if (user.value) {
+    newMessageForm.value.messageType = user.value.userType === 'Klinik' ? 'Angebot' : 'Gesuch';
   }
+  // Watch for changes in user type if the user logs in/out after mount
+  watch(user, (newUser) => {
+      if (newUser) {
+        newMessageForm.value.messageType = newUser.userType === 'Klinik' ? 'Angebot' : 'Gesuch';
+      }
+  });
 });
 
-// Watch for changes in sort order and refetch bulletins
 watch(sortOrder, async () => {
   await fetchBulletins();
 });
 
-// Format date for display
-const formatDate = (dateString: string) => {
-  const date = new Date(dateString);
-  return new Intl.DateTimeFormat('de-DE', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  }).format(date);
-};
-
-// Fetch bulletins from API
 const fetchBulletins = async () => {
   isLoading.value = true;
   try {
@@ -510,11 +501,9 @@ const fetchBulletins = async () => {
   }
 };
 
-// Reset form fields
 const resetNewMessageForm = () => {
-  // Set message type based on user type
-  if (isUserHospital.value !== null) {
-    newMessageForm.value.messageType = isUserHospital.value ? 'Angebot' : 'Gesuch';
+  if (user.value) {
+    newMessageForm.value.messageType = user.value.userType === 'Klinik' ? 'Angebot' : 'Gesuch';
   } else {
     newMessageForm.value.messageType = 'Angebot';
   }
@@ -524,21 +513,19 @@ const resetNewMessageForm = () => {
   newMessageForm.value.specialty = '';
   newMessageForm.value.location = '';
   newMessageForm.value.period = '';
-  newMessageForm.value.startDate = new Date().toISOString().split('T')[0]; // Reset to today's date
+  newMessageForm.value.startDate = new Date().toISOString().split('T')[0]; 
   newMessageForm.value.federalState = '';
   newMessageForm.value.contactEmail = '';
   newMessageForm.value.error = null;
   newMessageForm.value.success = false;
   
-  // Don't close form after submission for logged-in users
   // setTimeout(() => {
   //   isFormOpen.value = false;
   // }, 2000);
 };
 
-// Create a new message
 const createMessage = async () => {
-  if (!isAuthenticated.value) {
+  if (!isAuthenticated.value || !user.value) {
     showLoginModal.value = true;
     return;
   }
@@ -547,27 +534,23 @@ const createMessage = async () => {
   newMessageForm.value.error = null;
   
   try {
-    // For doctors, auto-generate title and content based on their profile
     let bulletinData: any = {
       messageType: newMessageForm.value.messageType,
       period: newMessageForm.value.period || `ab ${newMessageForm.value.startDate}`,
-      email: authStore.user?.email || '',
-      name: authStore.user?.firstName || 'Anonym',
+      email: user.value?.email || '',
+      name: user.value?.firstName || 'Anonym',
       privacyPolicyAccepted: true,
-      startDate: newMessageForm.value.startDate // Use the date picker value directly
+      startDate: newMessageForm.value.startDate 
     };
     
     if (isUserHospital.value) {
-      // Format the content in the standardized format for hospitals
       const formattedDate = new Date(newMessageForm.value.startDate).toLocaleDateString('de-DE');
       const standardContent = `Eine Einrichtung in ${newMessageForm.value.federalState} sucht ab ${formattedDate} einen Vertretungsarzt für ${newMessageForm.value.period || 'einen kurzen Zeitraum'}.`;
       
-      // Add any additional content if provided
       const fullContent = newMessageForm.value.content 
         ? `${standardContent}\n\n${newMessageForm.value.content}` 
         : standardContent;
       
-      // For hospitals, use the form fields with standardized content
       bulletinData = {
         ...bulletinData,
         title: newMessageForm.value.title,
@@ -576,12 +559,11 @@ const createMessage = async () => {
         federalState: newMessageForm.value.federalState
       };
     } else {
-      // For doctors, generate title and content based on their profile
-      const specialty = authStore.user?.specialty || 'Arzt';
+      const specialty = user.value?.specialty || 'Arzt';
       const formattedDate = new Date(newMessageForm.value.startDate).toLocaleDateString('de-DE');
       bulletinData.title = `${specialty} verfügbar ab ${formattedDate}`;
       bulletinData.content = `Ich bin als ${specialty} verfügbar ab ${formattedDate}.`;
-      bulletinData.specialty = authStore.user?.specialty || '';
+      bulletinData.specialty = user.value?.specialty || '';
     }
     
     console.log('Submitting bulletin data:', bulletinData);
@@ -603,24 +585,6 @@ const createMessage = async () => {
   }
 };
 
-// Open contact modal
-const openContactModal = (message: any) => {
-  if (!isAuthenticated.value) {
-    showLoginModal.value = true;
-    return;
-  }
-  
-  selectedMessage.value = message;
-  showContactModal.value = true;
-  
-  // Pre-fill contact form with user data if available
-  if (authStore.user) {
-    contactForm.value.name = `${authStore.user.firstName || ''} ${authStore.user.lastName || ''}`.trim();
-    contactForm.value.email = authStore.user.email || '';
-  }
-};
-
-// Close contact modal
 const closeContactModal = () => {
   showContactModal.value = false;
   contactForm.value = {
@@ -633,8 +597,13 @@ const closeContactModal = () => {
   };
 };
 
-// Send contact form
 const sendContactForm = async () => {
+  if (!selectedMessage.value) {
+    contactForm.value.error = 'Fehler: Keine Nachricht ausgewählt.';
+    contactForm.value.isSubmitting = false;
+    return;
+  }
+  
   contactForm.value.isSubmitting = true;
   contactForm.value.error = null;
   
@@ -647,7 +616,6 @@ const sendContactForm = async () => {
     
     contactForm.value.success = true;
     
-    // Close modal after a delay
     setTimeout(() => {
       closeContactModal();
     }, 3000);
@@ -656,6 +624,84 @@ const sendContactForm = async () => {
     contactForm.value.error = error.response?.data?.message || 'Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.';
   } finally {
     contactForm.value.isSubmitting = false;
+  }
+};
+
+const showInterest = async (bulletin: Bulletin) => {
+  // Double-check authentication and user role consistency with the button's v-if
+  if (!isAuthenticated.value || !user.value) {
+    console.error('User not authenticated or user data missing.');
+    // Optionally trigger login modal: showLoginModal.value = true;
+    return; 
+  }
+
+  // Determine target type based on bulletin message type
+  const targetType = bulletin.messageType === 'Angebot' ? 'job' : 'user';
+  const targetId = bulletin._id;
+
+  // Check if the action is allowed for the current user type
+  const isDoctorInterestedInOffer = user.value?.userType === 'Arzt' && targetType === 'job';
+  const isClinicInterestedInApplicant = user.value?.userType === 'Klinik' && targetType === 'user';
+
+  if (!isDoctorInterestedInOffer && !isClinicInterestedInApplicant) {
+     console.error('User type not authorized for this type of interest.');
+     interestError.value = 'Sie sind nicht berechtigt, Interesse für diesen Eintrag anzumelden.'; // User-facing error
+     // Clear the error after some time
+     setTimeout(() => interestError.value = null, 5000);
+     return;
+  }
+
+  interestLoadingStates.value[targetId] = true;
+  interestError.value = null; // Clear previous errors
+
+  try {
+    console.log(`Sending interest for ${targetType} with ID ${targetId}`); // Debug log
+    // Implement real interestService.createInterest call
+    const response = await interestService.createInterest({ 
+      targetType: targetType, 
+      targetId: targetId 
+    });
+    const interestResponse: InterestResponse = response.data; // Assuming response.data is InterestResponse
+    console.log('Interest response:', interestResponse); // Debug log
+    
+    if (interestResponse.success) {
+      interestedJobIds.value.add(targetId); // Mark as interested
+      console.log('Added interest to set:', targetId); // Debug log
+    } else {
+      interestError.value = interestResponse.message || 'Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.';
+    }
+  } catch (err: any) { 
+    console.error('Error showing interest:', err);
+    interestError.value = err.response?.data?.message || 'Fehler beim Anmelden des Interesses.';
+     // Clear the error after some time
+     setTimeout(() => interestError.value = null, 5000);
+  } finally {
+    // Use Vue.set or similar if reactivity issues arise, but direct assignment should work with ref
+    interestLoadingStates.value[targetId] = false; 
+  }
+};
+
+const fetchUserInterests = async () => {
+  if (!isAuthenticated.value || !user.value) return;
+
+  try {
+    console.log("Fetching user interests..."); // Debug log
+    // TODO: Implement interestService.getUserInterests() in interestService.ts
+    // const response = await interestService.getUserInterests(); 
+    // const userInterests: Interest[] = response.data; // Assuming response.data is Interest[]
+    const userInterests: Interest[] = []; // Placeholder
+
+    console.log("Fetched interests (placeholder):", userInterests); // Debug log
+    
+    interestedJobIds.value.clear(); // Clear existing before adding new ones
+    userInterests.forEach((interest: Interest) => { // Added type Interest
+      console.log("Adding interest to set:", interest.targetId); // Debug log
+      interestedJobIds.value.add(interest.targetId);
+    });
+    console.log("Final interestedJobIds set:", interestedJobIds.value); // Debug log
+  } catch (error) {
+    console.error('Error fetching user interests:', error);
+    // Potentially show a user-facing error message here
   }
 };
 </script>
